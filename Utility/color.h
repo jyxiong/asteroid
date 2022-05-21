@@ -6,10 +6,18 @@
 
 void write_color(const color& pixel_color, int samples_per_pixel, std::ostream& out)
 {
-    auto color = pixel_color / samples_per_pixel;
+    auto r = pixel_color.x();
+    auto g = pixel_color.y();
+    auto b = pixel_color.z();
 
-    out << static_cast<int>(256 * clamp(color.x(), 0.0, 0.999)) << ' '
-        << static_cast<int>(256 * clamp(color.y(), 0.0, 0.999)) << ' '
-        << static_cast<int>(256 * clamp(color.z(), 0.0, 0.999)) << '\n';
+    auto scale = 1.0 / samples_per_pixel;
+
+    r = sqrt(r * scale);
+    g = sqrt(g * scale);
+    b = sqrt(b * scale);
+
+    out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
+        << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
+        << static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
 }
 
