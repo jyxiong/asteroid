@@ -56,7 +56,6 @@ public:
         return (fabs(m_element[0]) < s) && (fabs(m_element[1]) < s) && (fabs(m_element[2]) < s);
     }
 
-
 public:
     double m_element[3];
 };
