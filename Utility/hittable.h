@@ -1,13 +1,17 @@
 #pragma once
 
-#include "Utility/vec3.h"
-#include "Utility/ray.h"
+#include <memory>
+#include "vec3.h"
+#include "ray.h"
+
+class material;
 
 struct hit_record {
     point3 p;
     double t{};
     vec3 normal;
     bool front_face{};
+    std::shared_ptr<material> mat_ptr;
 
     inline void set_face_normal(const ray& r, const vec3& outward_normal)
     {

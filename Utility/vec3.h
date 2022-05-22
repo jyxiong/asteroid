@@ -50,6 +50,13 @@ public:
         return m_element[0] * m_element[0] + m_element[1] * m_element[1] + m_element[2] * m_element[2];
     }
 
+    // near zero
+    bool near_zero() {
+        const auto s = 1e-8;
+        return (fabs(m_element[0]) < s) && (fabs(m_element[1]) < s) && (fabs(m_element[2]) < s);
+    }
+
+
 public:
     double m_element[3];
 };
@@ -131,4 +138,10 @@ inline vec3 cross(const vec3& u, const vec3& v)
 inline vec3 unit_vector(vec3 v)
 {
     return v / v.length();
+}
+
+// reflect vector
+vec3 reflect(const vec3& v, const vec3& n)
+{
+    return v - 2 * dot(n, v) * n;
 }

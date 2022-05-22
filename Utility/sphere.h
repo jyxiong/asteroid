@@ -1,18 +1,22 @@
 #pragma once
 
-#include "Utility/hittable.h"
-#include "Utility/ray.h"
-#include "Utility/vec3.h"
+#include <memory>
+#include <utility>
+#include "hittable.h"
+#include "ray.h"
+#include "vec3.h"
 
 class sphere : public hittable {
 public:
     sphere() = default;
     sphere(const point3& center, double radius) : m_center(center), m_radius(radius) {}
+    sphere(const point3& center, double radius, std::shared_ptr<material> mat_ptr) : m_center(center), m_radius(radius), m_mat_ptr(std::move(mat_ptr)) {}
 
     bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 private:
     point3 m_center;
     double m_radius;
+    std::shared_ptr<material> m_mat_ptr;
 };
 
 // https://raytracing.github.io/books/RayTracingInOneWeekend.html#addingasphere/ray-sphereintersection
@@ -46,6 +50,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     // https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces
     vec3 outward_normal = (rec.p - m_center) / m_radius;
     rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = m_mat_ptr;
 
     return true;
 }

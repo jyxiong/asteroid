@@ -3,5 +3,5 @@ add_library(Utility INTERFACE
         color.h
         ray.h
         hittable.h
-        sphere.h rtweekend.h hittable_list.h camera.h)
+        sphere.h rtweekend.h hittable_list.h camera.h material.h)
 target_include_directories(Utility INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

@@ -8,37 +8,34 @@
 #include "Utility/rtweekend.h"
 #include "Utility/sphere.h"
 #include "Utility/camera.h"
+#include "Utility/material.h"
 
 // blend (1.0, 1.0, 1.0) and (0.5, 0.7, 1.0) with height or ray.y()
 color ray_color(const ray& r, const hittable_list& world, int depth)
 {
-    if (depth <= 0)
+    if (depth <= 0) // case 1: if not hit within depth recursive
         return color{0.0, 0.0, 0.0};
 
     hit_record rec;
 
+    // case 0: hit the world geometry
     // set t_min to 0.001 rather than 0.0 due to the floating point approximation.
-    if (world.hit(r, 0.001, infinity, rec))
+    if (world.hit(r, 0.001, infinity, rec)) // step 1: record the hit information of input ray and world geometry
     {
-        // https://raytracing.github.io/images/fig-1.09-rand-vec.jpg
-        // here generate a random point in a unit sphere targeting the sphere at point p
-        // reflect light is p->s
+        ray scattered;
+        color attenuation;
 
-        // auto target = rec.p + rec.normal + random_in_unit_sphere();
-        auto target = rec.p + rec.normal + random_unit_vector();
-        // auto target = rec.p + random_in_hemisphere(rec.normal);
-
-        // recursive to simulate the multiple reflection
-        // what does 0.5 mean? may mean the light absorption of each reflection
-        return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth - 1);
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) // step 2: get the scattered ray by record info
+            return attenuation * ray_color(scattered, world, depth - 1); // step 3: blend the recursive color of the scattered ray
+        return color{0.0, 0.0, 0.0}; // case 2: if not scatter
     }
 
+    // case 3: hit the sky
     // cause viewport height is 2.0 in range (-1.0, 1.0)
     vec3 unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
-
 
 int main()
 {
@@ -51,8 +48,16 @@ int main()
 
     // world
     hittable_list world;
-    world.add(std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5));
-    world.add(std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100));
+
+    auto material_ground = std::make_shared<lambertian>(color(0.8, 0.8, 0.0));
+    auto material_center = std::make_shared<lambertian>(color(0.7, 0.3, 0.3));
+    auto material_left = std::make_shared<metal>(color(0.8, 0.8, 0.8), 0.3);
+    auto material_right = std::make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);
+
+    world.add(std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100, material_ground));
+    world.add(std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, material_center));
+    world.add(std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add(std::make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, material_right));
 
     // camera
     camera cam;
