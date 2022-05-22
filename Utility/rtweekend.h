@@ -65,3 +65,8 @@ inline double clamp(double x, double min, double max)
     if (x < min) return min;
     return x;
 }
+
+inline double degrees_to_radians(double degree)
+{
+    return degree * pi / 180.0;
+}
