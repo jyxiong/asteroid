@@ -9,7 +9,7 @@ public:
 class solid_color : public texture {
 public:
     solid_color() = default;
-    solid_color(const color &c) : m_color(c) {}
+    explicit solid_color(const color &c) : m_color(c) {}
 
     solid_color(double r, double g, double b) : solid_color(color{r, g, b}) {}
 

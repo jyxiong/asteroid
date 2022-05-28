@@ -15,7 +15,8 @@ public:
 
 class lambertian : public material {
 public:
-    explicit lambertian(const color& albedo) : m_albedo(albedo) {}
+    explicit lambertian(const color& albedo) : m_albedo(std::make_shared<solid_color>(albedo)) {}
+    explicit lambertian(std::shared_ptr<texture> albedo) : m_albedo(std::move(albedo)) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
         // lambertian material with random scatter direction
@@ -34,12 +35,12 @@ public:
             scatter_direction = rec.normal;
 
         scattered = ray(rec.p, scatter_direction, r_in.time());
-        attenuation = m_albedo;
+        attenuation = m_albedo->value(rec.u, rec.v, rec.p);
 
         return true;
     }
 private:
-    color m_albedo;
+    std::shared_ptr<texture> m_albedo;
 };
 
 class metal : public material {
