@@ -1,8 +1,7 @@
-#include <utility>
-
 #include "vec3.h"
 #include "perlin.h"
 #include "rtweekend.h"
+#include "rtw_stb_image.h"
 
 class texture {
 public:
@@ -50,10 +49,53 @@ public:
     explicit noise_texture(double scale) : m_scale(scale) {}
 
     color value(double u, double v, const point3 &p) const override {
-        return color(1, 1, 1) * m_noise.turb(m_scale * p);
+//        return color(1, 1, 1) * 0.5 * (1 + m_noise.noise(m_scale * p));
+//        return color(1, 1, 1) * m_noise.turb(m_scale * p);
+        return color(1, 1, 1) * 0.5 * (1 + sin(m_scale * p.z() + 10 * m_noise.turb(p)));
     }
 
 public:
     perlin m_noise;
     double m_scale{};
+};
+
+class image_texture : public texture {
+public:
+    image_texture() : m_data(nullptr) {}
+    explicit image_texture(const char *filename) {
+
+        m_data = stbi_load(filename, &m_width, &m_height, &m_channel, 0);
+        if (m_data == nullptr) {
+            std::cerr << "ERROR: Could not load texture image file '" << filename << "'.\n";
+            m_width = m_height = 0;
+        }
+    }
+    ~image_texture() {
+        if (m_data != nullptr) {
+            stbi_image_free(m_data);
+        }
+    }
+
+    color value(double u, double v, const point3 &p) const override {
+        if (m_data == nullptr)
+            return color{0.0, 1.0, 1.0};
+
+        u = clamp(u, 0.0, 1.0);
+        v = 1 - clamp(v, 0.0, 1.0);
+
+        auto i = static_cast<int>(u * m_width);
+        auto j = static_cast<int>(v * m_height);
+
+        if (i >= m_width)
+            i = m_width - 1;
+        if (j >= m_height)
+            j = m_height - 1;
+
+        const auto color_scale = 1.0 / 255.0;
+        auto pixel = m_data + j * m_channel * m_width + i * m_channel;
+        return color{color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2]};
+    }
+private:
+    unsigned char *m_data;
+    int m_width{}, m_height{}, m_channel{};
 };

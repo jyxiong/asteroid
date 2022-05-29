@@ -63,7 +63,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     // https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces
     vec3 outward_normal = (rec.p - m_center) / m_radius;
     rec.set_face_normal(r, outward_normal);
-    get_sphere_uv(rec.p, rec.u, rec.v);
+    get_sphere_uv(outward_normal, rec.u, rec.v);
     rec.mat_ptr = m_mat_ptr;
 
     return true;

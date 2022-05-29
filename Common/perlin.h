@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include "vec3.h"
 #include "rtweekend.h"
 
@@ -94,13 +95,15 @@ private:
         auto vv = v * v * (3 - 2 * v);
         auto ww = w * w * (3 - 2 * w);
         auto accum = 0.0;
+
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++)
                 for (int k = 0; k < 2; k++) {
                     vec3 weight_v(u - i, v - j, w - k);
                     accum += (i * uu + (1 - i) * (1 - uu)) *
                         (j * vv + (1 - j) * (1 - vv)) *
-                        (k * ww + (1 - k) * (1 - ww)) * dot(c[i][j][k], weight_v);
+                        (k * ww + (1 - k) * (1 - ww)) *
+                        dot(c[i][j][k], weight_v);
                 }
 
         return accum;
