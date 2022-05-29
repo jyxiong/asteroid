@@ -1,4 +1,7 @@
+#include <utility>
+
 #include "vec3.h"
+#include "perlin.h"
 #include "rtweekend.h"
 
 class texture {
@@ -24,12 +27,12 @@ private:
 class checker_texture : public texture {
 public:
     checker_texture() = default;
-    checker_texture(const std::shared_ptr<texture> &even, const std::shared_ptr<texture> &odd)
-        : m_even(even), m_odd(odd) {}
+    checker_texture(std::shared_ptr<texture> even, std::shared_ptr<texture> odd)
+        : m_even(std::move(even)), m_odd(std::move(odd)) {}
     checker_texture(const color &c1, const color &c2)
         : m_even(std::make_shared<solid_color>(c1)), m_odd(std::make_shared<solid_color>(c2)) {}
 
-    virtual color value(double u, double v, const point3 &p) const override {
+    color value(double u, double v, const point3 &p) const override {
         auto sines = sin(10 * p.x()) * sin(10 * p.y()) * sin(10 * p.z());
         if (sines < 0)
             return m_odd->value(u, v, p);
@@ -39,4 +42,18 @@ public:
 private:
     std::shared_ptr<texture> m_even;
     std::shared_ptr<texture> m_odd;
+};
+
+class noise_texture : public texture {
+public:
+    noise_texture() = default;
+    explicit noise_texture(double scale) : m_scale(scale) {}
+
+    color value(double u, double v, const point3 &p) const override {
+        return color(1, 1, 1) * m_noise.turb(m_scale * p);
+    }
+
+public:
+    perlin m_noise;
+    double m_scale{};
 };

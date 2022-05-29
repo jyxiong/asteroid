@@ -15,9 +15,9 @@
 #include "Common/camera.h"
 
 // blend (1.0, 1.0, 1.0) and (0.5, 0.7, 1.0) with height or ray.y()
-color ray_color(const ray& r, const hittable_list& world, int depth) {
+color ray_color(const ray &r, const hittable_list &world, int depth) {
     if (depth <= 0) // case 1: if not hit within depth recursive
-        return { 0.0, 0.0, 0.0 };
+        return {0.0, 0.0, 0.0};
 
     hit_record rec;
 
@@ -30,8 +30,8 @@ color ray_color(const ray& r, const hittable_list& world, int depth) {
 
         if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) // step 2: get the scattered ray by record info
             return attenuation
-            * ray_color(scattered, world, depth - 1); // step 3: blend the recursive color of the scattered ray
-        return { 0.0, 0.0, 0.0 }; // case 2: if not scatter
+                * ray_color(scattered, world, depth - 1); // step 3: blend the recursive color of the scattered ray
+        return {0.0, 0.0, 0.0}; // case 2: if not scatter
     }
 
     // case 3: hit the sky
@@ -45,7 +45,7 @@ hittable_list random_scene() {
     hittable_list world;
 
     auto checker = std::make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
-    world.add(std::make_shared<sphere>(point3(0,-1000,0), 1000, std::make_shared<lambertian>(checker)));
+    world.add(std::make_shared<sphere>(point3(0, -1000, 0), 1000, std::make_shared<lambertian>(checker)));
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
@@ -62,15 +62,13 @@ hittable_list random_scene() {
                     auto center2 = center + vec3(0, random_double(0, .5), 0);
                     world.add(std::make_shared<moving_sphere>(
                         center, center2, 0.0, 1.0, 0.2, sphere_material));
-                }
-                else if (choose_mat < 0.95) {
+                } else if (choose_mat < 0.95) {
                     // metal
                     auto albedo = random_vec3(0.5, 1);
                     auto fuzz = random_double(0, 0.5);
                     sphere_material = std::make_shared<metal>(albedo, fuzz);
                     world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
-                }
-                else {
+                } else {
                     // glass
                     sphere_material = std::make_shared<dielectric>(1.5);
                     world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
@@ -96,9 +94,18 @@ hittable_list two_spheres() {
     hittable_list objects;
 
     auto checker = std::make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
-
-    objects.add(std::make_shared<sphere>(point3(0,-10, 0), 10, std::make_shared<lambertian>(checker)));
+    objects.add(std::make_shared<sphere>(point3(0, -10, 0), 10, std::make_shared<lambertian>(checker)));
     objects.add(std::make_shared<sphere>(point3(0, 10, 0), 10, std::make_shared<lambertian>(checker)));
+
+    return objects;
+}
+
+hittable_list two_perlin_spheres() {
+    hittable_list objects;
+
+    auto perlin = std::make_shared<noise_texture>(4);
+    objects.add(std::make_shared<sphere>(point3(0, -1000, 0), 1000, std::make_shared<lambertian>(perlin)));
+    objects.add(std::make_shared<sphere>(point3(0, 2, 0), 2, std::make_shared<lambertian>(perlin)));
 
     return objects;
 }
@@ -120,25 +127,33 @@ int main() {
     auto aperture = 0.0;
 
     switch (0) {
-        case 1:
+        case 1: {
             world = random_scene();
-            lookfrom = point3(13,2,3);
-            lookat = point3(0,0,0);
+            lookfrom = point3(13, 2, 3);
+            lookat = point3(0, 0, 0);
             vfov = 20.0;
             aperture = 0.1;
             break;
-
-        default:
-        case 2:
+        }
+        case 2: {
             world = two_spheres();
-            lookfrom = point3(13,2,3);
-            lookat = point3(0,0,0);
+            lookfrom = point3(13, 2, 3);
+            lookat = point3(0, 0, 0);
             vfov = 20.0;
             break;
+        }
+        default:
+        case 3: {
+            world = two_perlin_spheres();
+            lookfrom = point3(13, 2, 3);
+            lookat = point3(0, 0, 0);
+            vfov = 20.0;
+            break;
+        }
     }
 
     // Camera
-    vec3 vup(0,1,0);
+    vec3 vup(0, 1, 0);
     auto dist_to_focus = 10.0;
 
     camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
@@ -148,7 +163,7 @@ int main() {
     for (int j = image_height - 1; j >= 0; --j) {
         std::cerr << "\rScanline remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
-            color pixel_color{ 0.0, 0.0, 0.0 };
+            color pixel_color{0.0, 0.0, 0.0};
             for (int k = 0; k < samples_per_pixel; ++k) {
                 // ray
                 auto u = (i + random_double()) / (image_width - 1);
