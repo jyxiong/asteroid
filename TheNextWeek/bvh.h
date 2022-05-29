@@ -60,7 +60,6 @@ bvh_node::bvh_node(const std::vector<std::shared_ptr<hittable>> &src_objects,
                    double time0,
                    double time1) {
 
-    // 为了能够排序，采用拷贝赋值，里面是指针，没太大影响
     auto objects = src_objects;
 
     int axis = random_int(0, 2);
@@ -79,7 +78,6 @@ bvh_node::bvh_node(const std::vector<std::shared_ptr<hittable>> &src_objects,
             m_left = objects[start + 1];
         }
     } else {
-        // 这边有问题啊，排序只要最开始一次就好了
         std::sort(objects.begin() + start, objects.begin() + end, comparator);
 
         auto mid = start + object_span / 2;

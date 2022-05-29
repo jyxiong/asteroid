@@ -33,13 +33,6 @@ private:
     std::shared_ptr<material> m_mat_ptr;
 };
 
-// https://raytracing.github.io/books/RayTracingInOneWeekend.html#addingasphere/ray-sphereintersection
-// hit test with quadratic equation:
-// direction⋅direction * t^2 + 2direction⋅(origin−center) * t + (origin−center)⋅(origin−center) − r^2 = 0
-// discriminant = b * b - 4 * a * c > 0
-// root = (-b - sqrt(discriminant)) / (2 * a)
-// https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/simplifyingtheray-sphereintersectioncode
-// simplify the equation by dividing both the numerator and denominator of 2
 bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
     vec3 oc = r.origin() - m_center;
     auto a = r.direction().length_squared();
@@ -60,7 +53,6 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 
     rec.t = root;
     rec.p = r.at(root);
-    // https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces
     vec3 outward_normal = (rec.p - m_center) / m_radius;
     rec.set_face_normal(r, outward_normal);
     get_sphere_uv(outward_normal, rec.u, rec.v);

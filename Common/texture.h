@@ -61,7 +61,7 @@ public:
 
 class image_texture : public texture {
 public:
-    image_texture() : m_data(nullptr) {}
+    image_texture() = default;
     explicit image_texture(const char *filename) {
 
         m_data = stbi_load(filename, &m_width, &m_height, &m_channel, 0);
@@ -96,6 +96,6 @@ public:
         return color{color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2]};
     }
 private:
-    unsigned char *m_data;
+    unsigned char *m_data{};
     int m_width{}, m_height{}, m_channel{};
 };

@@ -7,6 +7,8 @@
 #include "hittable_list.h"
 #include "moving_sphere.h"
 #include "bvh.h"
+#include "aarect.h"
+#include "box.h"
 
 #include "Common/vec3.h"
 #include "Common/ray.h"
@@ -15,30 +17,27 @@
 #include "Common/camera.h"
 
 // blend (1.0, 1.0, 1.0) and (0.5, 0.7, 1.0) with height or ray.y()
-color ray_color(const ray &r, const hittable_list &world, int depth) {
-    if (depth <= 0) // case 1: if not hit within depth recursive
+color ray_color(const ray &r, const color &background, const hittable_list &world, int depth) {
+    // case 0: if not hit within depth recursive
+    if (depth <= 0)
         return {0.0, 0.0, 0.0};
 
     hit_record rec;
 
-    // case 0: hit the world geometry
-    // set t_min to 0.001 rather than 0.0 due to the floating point approximation.
-    if (world.hit(r, 0.001, infinity, rec)) // step 1: record the hit information of input ray and world geometry
-    {
-        ray scattered;
-        color attenuation;
+    // case 1: no hit
+    if (!world.hit(r, 0.001, infinity, rec))
+        return background;
 
-        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) // step 2: get the scattered ray by record info
-            return attenuation
-                * ray_color(scattered, world, depth - 1); // step 3: blend the recursive color of the scattered ray
-        return {0.0, 0.0, 0.0}; // case 2: if not scatter
-    }
+    ray scattered;
+    color attenuation;
+    color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
 
-    // case 3: hit the sky
-    // cause viewport height is 2.0 in range (-1.0, 1.0)
-    vec3 unit_direction = unit_vector(r.direction());
-    auto t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
+    // case 2: no scatter
+    if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+        return emitted;
+
+    // case 3: blend the recursive color of the scattered ray
+    return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
 }
 
 hittable_list random_scene() {
@@ -119,13 +118,47 @@ hittable_list earth() {
     return hittable_list(globe);
 }
 
+hittable_list simple_light() {
+    hittable_list objects;
+
+    auto per_text = std::make_shared<noise_texture>(4);
+    objects.add(std::make_shared<sphere>(point3(0, -1000, 0), 1000, std::make_shared<lambertian>(per_text)));
+    objects.add(std::make_shared<sphere>(point3(0, 2, 0), 2, std::make_shared<lambertian>(per_text)));
+
+    auto diff_light = std::make_shared<diffuse_light>(color(4, 4, 4));
+    objects.add(std::make_shared<sphere>(point3(0, 7, 0), 2, diff_light));
+    objects.add(std::make_shared<xy_rect>(3, 5, 1, 3, -2, diff_light));
+
+    return objects;
+}
+
+hittable_list cornell_box() {
+    hittable_list objects;
+
+    auto red = std::make_shared<lambertian>(color(.65, .05, .05));
+    auto white = std::make_shared<lambertian>(color(.73, .73, .73));
+    auto green = std::make_shared<lambertian>(color(.12, .45, .15));
+    auto light = std::make_shared<diffuse_light>(color(15, 15, 15));
+
+    objects.add(std::make_shared<yz_rect>(0, 555, 0, 555, 555, green));
+    objects.add(std::make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+    objects.add(std::make_shared<xz_rect>(213, 343, 227, 332, 554, light));
+    objects.add(std::make_shared<xz_rect>(0, 555, 0, 555, 0, white));
+    objects.add(std::make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+    objects.add(std::make_shared<xy_rect>(0, 555, 0, 555, 555, white));
+
+    objects.add(std::make_shared<box>(point3(130, 0, 65), point3(295, 165, 230), white));
+    objects.add(std::make_shared<box>(point3(265, 0, 295), point3(430, 330, 460), white));
+
+    return objects;
+}
+
 int main() {
     // image
-    const double aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400;
-    const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int samples_per_pixel = 100;
-    const int depth = 50;
+    double aspect_ratio = 16.0 / 9.0;
+    int image_width = 400;
+    int samples_per_pixel = 100;
+    int depth = 50;
 
     // World
     hittable_list world;
@@ -134,10 +167,12 @@ int main() {
     point3 lookat;
     auto vfov = 40.0;
     auto aperture = 0.0;
+    color background;
 
     switch (0) {
         case 1: {
             world = random_scene();
+            background = color(0.70, 0.80, 1.00);
             lookfrom = point3(13, 2, 3);
             lookat = point3(0, 0, 0);
             vfov = 20.0;
@@ -146,6 +181,7 @@ int main() {
         }
         case 2: {
             world = two_spheres();
+            background = color(0.70, 0.80, 1.00);
             lookfrom = point3(13, 2, 3);
             lookat = point3(0, 0, 0);
             vfov = 20.0;
@@ -153,17 +189,38 @@ int main() {
         }
         case 3: {
             world = two_perlin_spheres();
+            background = color(0.70, 0.80, 1.00);
             lookfrom = point3(13, 2, 3);
             lookat = point3(0, 0, 0);
             vfov = 20.0;
             break;
         }
-        default:
         case 4: {
             world = earth();
+            background = color(0.70, 0.80, 1.00);
             lookfrom = point3(13, 2, 3);
             lookat = point3(0, 0, 0);
             vfov = 20.0;
+            break;
+        }
+        case 5:{
+            world = simple_light();
+            background = color(0, 0, 0);
+            lookfrom = point3(26, 3, 6);
+            lookat = point3(0, 2, 0);
+            vfov = 20.0;
+            break;
+        }
+        default:
+        case 6: {
+            world = cornell_box();
+            aspect_ratio = 1.0;
+            image_width = 600;
+            samples_per_pixel = 200;
+            background = color(0, 0, 0);
+            lookfrom = point3(278, 278, -800);
+            lookat = point3(278, 278, 0);
+            vfov = 40.0;
             break;
         }
     }
@@ -171,6 +228,7 @@ int main() {
     // Camera
     vec3 vup(0, 1, 0);
     auto dist_to_focus = 10.0;
+    int image_height = static_cast<int>(image_width / aspect_ratio);
 
     camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
 
@@ -186,7 +244,7 @@ int main() {
                 auto v = (j + random_double()) / (image_height - 1);
 
                 ray ray = cam.get_ray(u, v);
-                pixel_color += ray_color(ray, world, depth);
+                pixel_color += ray_color(ray, background, world, depth);
 
             }
             write_color(pixel_color, samples_per_pixel, std::cout);
