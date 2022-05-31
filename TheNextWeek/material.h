@@ -117,3 +117,18 @@ public:
 private:
     std::shared_ptr<texture> m_emit;
 };
+
+class isotropic : public material {
+public:
+    explicit isotropic(color albedo) : m_albedo(std::make_shared<solid_color>(albedo)) {}
+    isotropic(std::shared_ptr<texture> albedo) : m_albedo(std::move(albedo)) {}
+
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
+        scattered = ray(rec.p, random_in_unit_sphere(), r_in.time());
+        attenuation = m_albedo->value(rec.u, rec.v, rec.p);
+        return true;
+    }
+
+public:
+    std::shared_ptr<texture> m_albedo;
+};

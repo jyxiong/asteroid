@@ -2,9 +2,9 @@ import os
 import numpy as np
 import imageio
 
-data = np.zeros((540000, 3), np.uint8)
+data = np.zeros((640000, 3), np.uint8)
 
-f = open('image.txt', encoding='utf-16')
+f = open('2.ppm', encoding='utf-16')
 i = 0
 for line in f:
     pixel = line[:-1].split(' ')
@@ -17,5 +17,5 @@ for line in f:
 
     i = i + 1
 
-data.reshape((600, 900, 3))
-imageio.imwrite('image.jpg', data)
+data.reshape((800, 800, 3))
+imageio.imwrite('TheNextWeek.jpg', data)

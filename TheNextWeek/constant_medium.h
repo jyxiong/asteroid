@@ -1,0 +1,79 @@
+#pragma once
+
+#include <memory>
+#include <iostream>
+#include "rtweekend.h"
+
+#include "hittable.h"
+#include "material.h"
+#include "texture.h"
+
+class constant_medium : public hittable {
+public:
+    constant_medium(std::shared_ptr<hittable> object_ptr, double density, std::shared_ptr<texture> albedo)
+        : m_boundary(object_ptr),
+          m_neg_inv_density(-1 / density),
+          m_phase_function(std::make_shared<isotropic>(albedo)) {}
+
+    constant_medium(std::shared_ptr<hittable> object_ptr, double density, color albedo)
+        : m_boundary(object_ptr),
+          m_neg_inv_density(-1 / density),
+          m_phase_function(std::make_shared<isotropic>(albedo)) {}
+
+    bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+    bool bounding_box(double time0, double time1, aabb &output_box) const override {
+        return m_boundary->bounding_box(time0, time1, output_box);
+    }
+
+public:
+    std::shared_ptr<hittable> m_boundary;
+    std::shared_ptr<material> m_phase_function;
+    double m_neg_inv_density;
+};
+
+bool constant_medium::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+    // Print occasional samples when debugging. To enable, set enableDebug true.
+    const bool enable_debug = false;
+    const bool debugging = enable_debug && random_double() < 0.00001;
+
+    hit_record rec1, rec2;
+
+    if (!m_boundary->hit(r, -infinity, infinity, rec1))
+        return false;
+
+    if (!m_boundary->hit(r, rec1.t + 0.0001, infinity, rec2))
+        return false;
+
+    if (debugging) std::cerr << "\nt_min=" << rec1.t << ", t_max=" << rec2.t << '\n';
+
+    if (rec1.t < t_min) rec1.t = t_min;
+    if (rec2.t > t_max) rec2.t = t_max;
+
+    if (rec1.t >= rec2.t)
+        return false;
+
+    if (rec1.t < 0)
+        rec1.t = 0;
+
+    const auto ray_length = r.direction().length();
+    const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
+    const auto hit_distance = m_neg_inv_density * log(random_double());
+
+    if (hit_distance > distance_inside_boundary)
+        return false;
+
+    rec.t = rec1.t + hit_distance / ray_length;
+    rec.p = r.at(rec.t);
+
+    if (debugging) {
+        std::cerr << "hit_distance = " << hit_distance << '\n'
+                  << "rec.t = " << rec.t << '\n'
+                  << "rec.p = " << rec.p << '\n';
+    }
+
+    rec.normal = vec3(1, 0, 0);  // arbitrary
+    rec.front_face = true;     // also arbitrary
+    rec.mat_ptr = m_phase_function;
+
+    return true;
+}

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <memory>
 
+#include "rtw_stb_image.h"
+
 #include "material.h"
 #include "sphere.h"
 #include "hittable.h"
@@ -105,9 +107,8 @@ int main() {
 
     camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
-    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
-    for (int j = image_height - 1; j >= 0; --j) {
+    std::vector<unsigned char> image(image_width * image_height * 3);
+    for (int j = 0; j < image_height; ++j) {
         std::cerr << "\rScanline remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
             color pixel_color{0.0, 0.0, 0.0};
@@ -118,11 +119,13 @@ int main() {
 
                 ray ray = cam.get_ray(u, v);
                 pixel_color += ray_color(ray, world, depth);
-
             }
-            write_color(pixel_color, samples_per_pixel, std::cout);
+            write_color(pixel_color, samples_per_pixel, j * image_width + i, image);
         }
     }
+
+    stbi_flip_vertically_on_write(true);
+    stbi_write_jpg("InOneWeekend1.jpg", image_width, image_height, 3, image.data(), 100);
 
     std::cerr << "\rDone.\n";
 
