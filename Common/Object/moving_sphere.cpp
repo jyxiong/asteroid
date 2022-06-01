@@ -1,36 +1,17 @@
-#pragma once
+#include "moving_sphere.h"
 
-#include <memory>
-#include <utility>
-#include "hittable.h"
-
-class moving_sphere : public hittable {
-public:
-    moving_sphere() = default;
-    moving_sphere(const vec3 &center0,
-                  const vec3 &center1,
-                  double time0,
-                  double time1,
-                  double radius,
-                  std::shared_ptr<material>  mat_ptr)
-        : m_center0(center0),
-          m_center1(center1),
-          m_time0(time0),
-          m_time1(time1),
-          m_radius(radius),
-          m_mat_ptr(std::move(mat_ptr)) {}
-
-    bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
-    bool bounding_box(double time0, double time1, aabb &output_box) const override;
-private:
-    vec3 center(double time) const;
-
-private:
-    vec3 m_center0, m_center1;
-    double m_time0{}, m_time1{};
-    double m_radius{};
-    std::shared_ptr<material> m_mat_ptr;
-};
+moving_sphere::moving_sphere(const vec3 &center0,
+                             const vec3 &center1,
+                             double time0,
+                             double time1,
+                             double radius,
+                             std::shared_ptr<material> mat_ptr)
+    : m_center0(center0),
+      m_center1(center1),
+      m_time0(time0),
+      m_time1(time1),
+      m_radius(radius),
+      m_mat_ptr(std::move(mat_ptr)) {}
 
 bool moving_sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
     auto time_center = center(r.time());
@@ -67,7 +48,7 @@ bool moving_sphere::bounding_box(double time0, double time1, aabb &output_box) c
     aabb box1(center(time1) - vec3(m_radius, m_radius, m_radius),
               center(time1) + vec3(m_radius, m_radius, m_radius));
 
-    output_box = surrounding_box(box0, box1);
+    output_box = aabb::surrounding_box(box0, box1);
     return true;
 }
 

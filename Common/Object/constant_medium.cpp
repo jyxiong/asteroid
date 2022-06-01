@@ -1,35 +1,16 @@
-#pragma once
+#include "constant_medium.h"
+#include "Common/randomGenerator.h"
+#include "Common/utils.h"
 
-#include <memory>
-#include <iostream>
-#include "rtweekend.h"
+constant_medium::constant_medium(std::shared_ptr<hittable> object_ptr, double density, std::shared_ptr<texture> albedo)
+    : m_boundary(std::move(object_ptr)),
+      m_neg_inv_density(-1 / density),
+      m_phase_function(std::make_shared<isotropic>(std::move(albedo))) {}
 
-#include "hittable.h"
-#include "material.h"
-#include "texture.h"
-
-class constant_medium : public hittable {
-public:
-    constant_medium(std::shared_ptr<hittable> object_ptr, double density, std::shared_ptr<texture> albedo)
-        : m_boundary(object_ptr),
-          m_neg_inv_density(-1 / density),
-          m_phase_function(std::make_shared<isotropic>(albedo)) {}
-
-    constant_medium(std::shared_ptr<hittable> object_ptr, double density, color albedo)
-        : m_boundary(object_ptr),
-          m_neg_inv_density(-1 / density),
-          m_phase_function(std::make_shared<isotropic>(albedo)) {}
-
-    bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
-    bool bounding_box(double time0, double time1, aabb &output_box) const override {
-        return m_boundary->bounding_box(time0, time1, output_box);
-    }
-
-public:
-    std::shared_ptr<hittable> m_boundary;
-    std::shared_ptr<material> m_phase_function;
-    double m_neg_inv_density;
-};
+constant_medium::constant_medium(std::shared_ptr<hittable> object_ptr, double density, color albedo)
+    : m_boundary(std::move(object_ptr)),
+      m_neg_inv_density(-1 / density),
+      m_phase_function(std::make_shared<isotropic>(albedo)) {}
 
 bool constant_medium::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
     // Print occasional samples when debugging. To enable, set enableDebug true.
@@ -38,10 +19,10 @@ bool constant_medium::hit(const ray &r, double t_min, double t_max, hit_record &
 
     hit_record rec1, rec2;
 
-    if (!m_boundary->hit(r, -infinity, infinity, rec1))
+    if (!m_boundary->hit(r, -util::infinity, util::infinity, rec1))
         return false;
 
-    if (!m_boundary->hit(r, rec1.t + 0.0001, infinity, rec2))
+    if (!m_boundary->hit(r, rec1.t + 0.0001, util::infinity, rec2))
         return false;
 
     if (debugging) std::cerr << "\nt_min=" << rec1.t << ", t_max=" << rec2.t << '\n';

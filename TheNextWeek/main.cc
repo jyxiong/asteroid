@@ -2,21 +2,35 @@
 #include <memory>
 #include <vector>
 
-#include "material.h"
-#include "sphere.h"
-#include "hittable.h"
-#include "hittable_list.h"
-#include "moving_sphere.h"
-#include "bvh.h"
-#include "aarect.h"
-#include "box.h"
-#include "constant_medium.h"
+#include "Common/External/stb_image_write.h"
+
+#include "Common/Object/aarect.h"
+#include "Common/Object/sphere.h"
+#include "Common/Object/hittable.h"
+#include "Common/Object/hittable_list.h"
+#include "Common/Object/moving_sphere.h"
+#include "Common/Object/bvh.h"
+#include "Common/Object/box.h"
+#include "Common/Object/constant_medium.h"
+#include "Common/Object/Transform/translate.h"
+#include "Common/Object/Transform/rotate_y.h"
+
+#include "Common/Material/material.h"
+#include "Common/Material/lambertian.h"
+#include "Common/Material/metal.h"
+#include "Common/Material/dielectric.h"
+#include "Common/Material/diffuse_light.h"
+
+#include "Common/Texture/checker_texture.h"
+#include "Common/Texture/noise_texture.h"
+#include "Common/Texture/image_texture.h"
 
 #include "Common/vec3.h"
 #include "Common/ray.h"
 #include "Common/color.h"
-#include "Common/rtweekend.h"
+#include "Common/randomGenerator.h"
 #include "Common/camera.h"
+#include "Common/utils.h"
 
 // blend (1.0, 1.0, 1.0) and (0.5, 0.7, 1.0) with height or ray.y()
 color ray_color(const ray &r, const color &background, const hittable_list &world, int depth) {
@@ -27,7 +41,7 @@ color ray_color(const ray &r, const color &background, const hittable_list &worl
     hit_record rec;
 
     // case 1: no hit
-    if (!world.hit(r, 0.001, infinity, rec))
+    if (!world.hit(r, 0.001, util::infinity, rec))
         return background;
 
     ray scattered;

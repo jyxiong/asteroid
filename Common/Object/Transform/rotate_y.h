@@ -1,63 +1,4 @@
-#pragma once
-
-#include <memory>
-#include <utility>
-#include "Common/ray.h"
-#include "Common/vec3.h"
-#include "Common/aabb.h"
-#include "Common/rtweekend.h"
-
-class material; // declare material without define
-
-struct hit_record {
-    point3 p;
-    double t{};
-    vec3 normal;
-    bool front_face;
-    std::shared_ptr<material> mat_ptr;
-    double u, v;
-
-    inline void set_face_normal(const ray &r, const vec3 &outward_normal) {
-        front_face = dot(r.direction(), outward_normal) < 0.0;
-        normal = front_face ? outward_normal : -outward_normal;
-    }
-};
-
-class hittable {
-public:
-    virtual bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const = 0;
-    virtual bool bounding_box(double time0, double time1, aabb &output_box) const = 0;
-};
-
-class translate : public hittable {
-public:
-    translate(std::shared_ptr<hittable> object_ptr, const vec3 &offset)
-        : m_object_ptr(std::move(object_ptr)), m_offset(offset) {}
-
-    bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
-    bool bounding_box(double time0, double time1, aabb &output_box) const override;
-public:
-    std::shared_ptr<hittable> m_object_ptr;
-    vec3 m_offset;
-};
-
-bool translate::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
-    ray moved_r(r.origin() - m_offset, r.direction(), r.time());
-    if (!m_object_ptr->hit(moved_r, t_min, t_max, rec))
-        return false;
-
-    rec.p += m_offset;
-    rec.set_face_normal(moved_r, rec.normal);
-    return true;
-}
-
-bool translate::bounding_box(double time0, double time1, aabb &output_box) const {
-    if (!m_object_ptr->bounding_box(time0, time1, output_box))
-        return false;
-
-    output_box = aabb(output_box.min() + m_offset, output_box.max() + m_offset);
-    return true;
-}
+#include "Common/Object/hittable.h"
 
 class rotate_y : public hittable {
 public:
@@ -78,13 +19,13 @@ public:
 };
 
 rotate_y::rotate_y(std::shared_ptr<hittable> object_ptr, double angle) : m_object_ptr(std::move(object_ptr)) {
-    auto radians = degrees_to_radians(angle);
+    auto radians = util::degrees_to_radians(angle);
     m_sin_theta = sin(radians);
     m_cos_theta = cos(radians);
     m_has_box = m_object_ptr->bounding_box(0, 1, m_box);
 
-    point3 min(infinity, infinity, infinity);
-    point3 max(-infinity, -infinity, -infinity);
+    point3 min(util::infinity, util::infinity, util::infinity);
+    point3 max(-util::infinity, -util::infinity, -util::infinity);
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {

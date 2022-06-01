@@ -1,23 +1,16 @@
-#pragma once
+#include "sphere.h"
 
-#include <memory>
-#include "hittable.h"
-#include "Common/ray.h"
-#include "Common/vec3.h"
+void get_sphere_uv(const point3 &p, double &u, double &v) {
+    auto theta = acos(-p.y());
+    auto phi = atan2(-p.z(), p.x()) + util::pi;
 
-class sphere : public hittable {
-public:
-    sphere() = default;
-    sphere(const point3 &center, double radius) : m_center(center), m_radius(radius) {}
-    sphere(const point3 &center, double radius, std::shared_ptr<material> mat_ptr)
-        : m_center(center), m_radius(radius), m_mat_ptr(std::move(mat_ptr)) {}
+    u = phi / (2 * util::pi);
+    v = theta / util::pi;
+}
 
-    bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
-private:
-    point3 m_center;
-    double m_radius{};
-    std::shared_ptr<material> m_mat_ptr;
-};
+sphere::sphere(const point3 &center, double radius) : m_center(center), m_radius(radius) {}
+sphere::sphere(const point3 &center, double radius, std::shared_ptr<material> mat_ptr)
+    : m_center(center), m_radius(radius), m_mat_ptr(std::move(mat_ptr)) {}
 
 bool sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
     vec3 oc = r.origin() - m_center;
@@ -41,7 +34,14 @@ bool sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) cons
     rec.p = r.at(root);
     vec3 outward_normal = (rec.p - m_center) / m_radius;
     rec.set_face_normal(r, outward_normal);
+    get_sphere_uv(outward_normal, rec.u, rec.v);
     rec.mat_ptr = m_mat_ptr;
 
+    return true;
+}
+
+bool sphere::bounding_box(double time0, double time1, aabb &output_box) const {
+    output_box = aabb(m_center - vec3(m_radius, m_radius, m_radius),
+                      m_center + vec3(m_radius, m_radius, m_radius));
     return true;
 }

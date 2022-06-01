@@ -1,14 +1,10 @@
 add_executable(InOneWeekend
-        main.cc
-        hittable.h
-        hittable_list.h
-        sphere.h
-        material.h
-        )
+    main.cc
+    )
 
 target_include_directories(InOneWeekend PUBLIC
-        ${CMAKE_SOURCE_DIR})
+    ${CMAKE_SOURCE_DIR})
 
 target_link_libraries(InOneWeekend PUBLIC
-        Common
-        )
+    Common
+    )

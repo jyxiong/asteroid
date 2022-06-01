@@ -13,14 +13,14 @@ public:
     double z() const { return m_element[2]; }
 
     // operator-
-    vec3 operator-() const { return vec3{-m_element[0], -m_element[1], -m_element[2]}; }
+    inline vec3 operator-() const { return vec3{-m_element[0], -m_element[1], -m_element[2]}; }
 
     // operator[]
-    double operator[](int i) const { return m_element[i]; }
-    double &operator[](int i) { return m_element[i]; };
+    inline double operator[](int i) const { return m_element[i]; }
+    inline double &operator[](int i) { return m_element[i]; };
 
     // operator+=
-    vec3 &operator+=(const vec3 &v) {
+    inline vec3 &operator+=(const vec3 &v) {
         m_element[0] += v[0];
         m_element[1] += v[1];
         m_element[2] += v[2];
@@ -128,14 +128,7 @@ inline vec3 unit_vector(vec3 v) {
 }
 
 // reflect vector
-vec3 reflect(const vec3 &v, const vec3 &n) {
-    return v - 2 * dot(n, v) * n;
-}
+vec3 reflect(const vec3 &v, const vec3 &n);
 
 // refract vector
-vec3 refract(const vec3 &v, const vec3 &n, double etai_over_etat) {
-    auto cos_theta = fmin(dot(-v, n), 1.0);
-    vec3 r_out_perp = etai_over_etat * (v + cos_theta * n);
-    vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_squared())) * n;
-    return r_out_perp + r_out_parallel;
-}
+vec3 refract(const vec3 &v, const vec3 &n, double etai_over_etat);
