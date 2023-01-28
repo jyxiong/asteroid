@@ -6,8 +6,8 @@ add_library(Common STATIC
     color.h
     perlin.h
     perlin.cpp
-    randomGenerator.h
     ray.h
+    rng.h
     utils.h
     vec3.h
     vec3.cpp

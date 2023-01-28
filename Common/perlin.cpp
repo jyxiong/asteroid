@@ -1,6 +1,6 @@
 #include "perlin.h"
 #include <cmath>
-#include "randomGenerator.h"
+#include "rng.h"
 
 perlin::perlin() {
     for (int i = 0; i < POINT_COUNT; ++i) {

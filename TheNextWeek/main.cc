@@ -28,7 +28,7 @@
 #include "Common/vec3.h"
 #include "Common/ray.h"
 #include "Common/color.h"
-#include "Common/randomGenerator.h"
+#include "Common/rng.h"
 #include "Common/camera.h"
 #include "Common/utils.h"
 

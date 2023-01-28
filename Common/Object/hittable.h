@@ -5,16 +5,16 @@
 #include "Common/ray.h"
 #include "Common/vec3.h"
 #include "Common/aabb.h"
-#include "Common/randomGenerator.h"
+#include "Common/rng.h"
 
 class material; // declare material without define
 
 struct hit_record {
-    point3 p;
-    double t{};
-    vec3 normal;
-    bool front_face;
-    std::shared_ptr<material> mat_ptr;
+    point3 p; // 碰撞点坐标
+    double t{}; // 碰撞点时间
+    vec3 normal; // 碰撞点法向量，本系列中定义法向量与光线方向大致相反
+    bool front_face; // 碰撞点是否在外表面
+    std::shared_ptr<material> mat_ptr; // 碰撞点材质指针
     double u, v;
 
     inline void set_face_normal(const ray &r, const vec3 &outward_normal) {

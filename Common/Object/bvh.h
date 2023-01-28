@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "Common/Object/hittable.h"
 #include "Common/Object/hittable_list.h"
-#include "Common/randomGenerator.h"
+#include "Common/rng.h"
 
 class bvh_node : public hittable {
 public:

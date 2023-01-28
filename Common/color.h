@@ -12,6 +12,7 @@ void write_color(const color &pixel_color, int samples_per_pixel, int pixel_inde
 
     auto scale = 1.0 / samples_per_pixel;
 
+    // gamma = 2
     r = sqrt(r * scale);
     g = sqrt(g * scale);
     b = sqrt(b * scale);

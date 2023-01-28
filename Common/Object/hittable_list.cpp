@@ -10,7 +10,7 @@ bool hittable_list::hit(const ray &r, double t_min, double t_max, hit_record &re
     bool hit = false;
     for (const auto &object : objects) {
         if (object->hit(r, t_min, tmp_t_max, rec)) {
-            tmp_t_max = rec.t;
+            tmp_t_max = rec.t; // 更新碰撞点的最大时间
             hit = true;
         }
     }

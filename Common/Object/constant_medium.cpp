@@ -1,5 +1,5 @@
 #include "constant_medium.h"
-#include "Common/randomGenerator.h"
+#include "Common/rng.h"
 #include "Common/utils.h"
 
 constant_medium::constant_medium(std::shared_ptr<hittable> object_ptr, double density, std::shared_ptr<texture> albedo)

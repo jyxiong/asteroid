@@ -10,38 +10,37 @@
 #include "Common/vec3.h"
 #include "Common/ray.h"
 #include "Common/color.h"
-#include "Common/randomGenerator.h"
+#include "Common/rng.h"
 #include "Common/camera.h"
 
 #include "Common/Material/lambertian.h"
 #include "Common/Material/metal.h"
 #include "Common/Material/dielectric.h"
 
-// blend (1.0, 1.0, 1.0) and (0.5, 0.7, 1.0) with height or ray.y()
 color ray_color(const ray &r, const hittable_list &world, int depth) {
-    if (depth <= 0) // case 1: if not hit within depth recursive
+    if (depth <= 0) // 第一种情况：深度终止
         return {0.0, 0.0, 0.0};
 
     hit_record rec;
 
-    // case 0: hit the world geometry
-    // set t_min to 0.001 rather than 0.0 due to the floating point approximation.
-    if (world.hit(r, 0.001, util::infinity, rec)) // step 1: record the hit information of input ray and world geometry
+    // 第二种情况：与世界中的物体发生碰撞
+    // t_min设置为0.001，避免浮点数精度问题导致的shadow ance
+    if (world.hit(r, 0.001, util::infinity, rec)) // 第一步：碰撞检测，计算入射光线与世界中的物体的碰撞信息rec
     {
         ray scattered;
         color attenuation;
 
-        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) // step 2: get the scattered ray by record info
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) // 第二步：散射着色，根据碰撞信息计算散射光线和颜色
             return attenuation
-                * ray_color(scattered, world, depth - 1); // step 3: blend the recursive color of the scattered ray
-        return {0.0, 0.0, 0.0}; // case 2: if not scatter
+                * ray_color(scattered, world, depth - 1); // 第三步：递归对散射光线进行光线追踪
+
+        return {0.0, 0.0, 0.0}; // 第二步：不散射光线
     }
 
-    // case 3: hit the sky
-    // cause viewport height is 2.0 in range (-1.0, 1.0)
+    // 第三种情况：与天空发生碰撞
     vec3 unit_direction = unit_vector(r.direction());
-    auto t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
+    auto t = 0.5 * (unit_direction.y() + 1.0); // y[-1, 1] ——> t[0, 1]
+    return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0); // 根据t将天空色(0.5, 0.7, 1.0)与白色混合
 }
 
 hittable_list random_scene() {

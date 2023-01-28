@@ -1,5 +1,5 @@
 #include "camera.h"
-#include "randomGenerator.h"
+#include "rng.h"
 #include "Common/utils.h"
 
 camera::camera(
