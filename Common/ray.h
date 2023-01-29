@@ -17,5 +17,5 @@ public:
 private:
     point3 m_origin;
     vec3 m_direction;
-    double m_time{};
+    double m_time{}; // 光线的时间，用于motion blur
 };

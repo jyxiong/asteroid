@@ -26,8 +26,10 @@ bool hittable_list::bounding_box(double time0, double time1, aabb &output_box) c
     bool first_box = true;
 
     for (const auto &object : objects) {
-        if (!object->bounding_box(time0, time1, temp_box))
-            return false;
+        // 求出单个物体的包围盒
+        if (!object->bounding_box(time0, time1, temp_box)) return false;
+
+        // 如果不是第一个物体，求该物体与之前物体的包围盒并集
         output_box = first_box ? temp_box : aabb::surrounding_box(output_box, temp_box);
         first_box = false;
     }

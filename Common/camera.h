@@ -26,5 +26,5 @@ private:
     vec3 m_vertical;
     vec3 m_u, m_v, m_w;
     double m_lens_radius;
-    double m_time0, m_time1;
+    double m_time0, m_time1; // 快门的开关时间，用于控制光线的时间
 };

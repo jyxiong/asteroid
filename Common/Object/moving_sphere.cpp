@@ -14,7 +14,7 @@ moving_sphere::moving_sphere(const vec3 &center0,
       m_mat_ptr(std::move(mat_ptr)) {}
 
 bool moving_sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
-    auto time_center = center(r.time());
+    auto time_center = center(r.time()); // 计算此时的球心
     vec3 oc = r.origin() - time_center;
     auto a = r.direction().length_squared();
     auto half_b = dot(r.direction(), oc);

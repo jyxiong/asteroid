@@ -44,11 +44,12 @@ bvh_node::bvh_node(const hittable_list &list, double time0, double time1)
     : bvh_node(list.objects, 0, list.objects.size(), time0, time1) {}
 
 bool bvh_node::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
-    if (!m_box.hit(r, t_min, t_max))
-        return false;
+    // 判断该bvh节点的包围盒是否与光线相交
+    if (!m_box.hit(r, t_min, t_max)) return false;
 
-    auto hit_left = m_left->hit(r, t_min, t_max, rec);
-    auto hit_right = m_right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
+    // 如果该节点与光线相交，则继续判断左右节点是否与光线相交
+    auto hit_left = m_left->hit(r, t_min, t_max, rec); // 判断左节点
+    auto hit_right = m_right->hit(r, t_min, hit_left ? rec.t : t_max, rec); // 判断右节点
 
     return hit_left || hit_right;
 }

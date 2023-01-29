@@ -32,27 +32,23 @@
 #include "Common/camera.h"
 #include "Common/utils.h"
 
-// blend (1.0, 1.0, 1.0) and (0.5, 0.7, 1.0) with height or ray.y()
 color ray_color(const ray &r, const color &background, const hittable_list &world, int depth) {
-    // case 0: if not hit within depth recursive
-    if (depth <= 0)
-        return {0.0, 0.0, 0.0};
+    // 第一种情况：深度终止
+    if (depth <= 0) return {0.0, 0.0, 0.0};
 
     hit_record rec;
 
-    // case 1: no hit
-    if (!world.hit(r, 0.001, util::infinity, rec))
-        return background;
+    // 第二种情况：未发生碰撞
+    if (!world.hit(r, 0.001, util::infinity, rec)) return background;
 
     ray scattered;
     color attenuation;
     color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
 
-    // case 2: no scatter
-    if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-        return emitted;
+    // 第三种情况：未发生散射
+    if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered)) return emitted;
 
-    // case 3: blend the recursive color of the scattered ray
+    // 第四种情况：发生散射，递归进行光线追踪
     return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
 }
 
@@ -281,7 +277,7 @@ int main() {
     auto aperture = 0.0;
     color background;
 
-    switch (0) {
+    switch (7) {
         case 1: {
             world = random_scene();
             background = color(0.70, 0.80, 1.00);
@@ -337,8 +333,8 @@ int main() {
         case 7: {
             world = cornell_smoke();
             aspect_ratio = 1.0;
-            image_width = 600;
-            samples_per_pixel = 200;
+            image_width = 60;
+            samples_per_pixel = 2000;
             lookfrom = point3(278, 278, -800);
             lookat = point3(278, 278, 0);
             vfov = 40.0;
@@ -384,7 +380,7 @@ int main() {
     }
 
     stbi_flip_vertically_on_write(true);
-    stbi_write_jpg("TheNextWeek1.jpg", image_width, image_height, 3, image.data(), 100);
+    stbi_write_jpg("TheNextWeek_Test.jpg", image_width, image_height, 3, image.data(), 100);
     std::cerr << "\rDone.\n";
 
     return 0;

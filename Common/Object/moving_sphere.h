@@ -20,8 +20,8 @@ private:
     vec3 center(double time) const;
 
 private:
-    vec3 m_center0, m_center1;
-    double m_time0{}, m_time1{};
+    vec3 m_center0, m_center1; // 在0-1之间线性移动
+    double m_time0{}, m_time1{}; // 对应0-1之间的时间
     double m_radius{};
     std::shared_ptr<material> m_mat_ptr;
 };
