@@ -13,7 +13,6 @@ constant_medium::constant_medium(std::shared_ptr<hittable> object_ptr, double de
       m_phase_function(std::make_shared<isotropic>(albedo)) {}
 
 bool constant_medium::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
-    // Print occasional samples when debugging. To enable, set enableDebug true.
     const bool enable_debug = false;
     const bool debugging = enable_debug && random_double() < 0.00001;
 

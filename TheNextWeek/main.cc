@@ -38,14 +38,16 @@ color ray_color(const ray &r, const color &background, const hittable_list &worl
 
     hit_record rec;
 
-    // 第二种情况：未发生碰撞
+    // 第二种情况：未发生碰撞，返回背景色
     if (!world.hit(r, 0.001, util::infinity, rec)) return background;
 
     ray scattered;
     color attenuation;
+
+    // 计算自发光
     color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
 
-    // 第三种情况：未发生散射
+    // 第三种情况：未发生散射，返回自发光
     if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered)) return emitted;
 
     // 第四种情况：发生散射，递归进行光线追踪
@@ -221,6 +223,7 @@ hittable_list final_scene() {
 
     hittable_list objects;
 
+    // 使用bvh加速hittable_list
     objects.add(std::make_shared<bvh_node>(boxes1, 0, 1));
 
     auto light = std::make_shared<diffuse_light>(color(7, 7, 7));
@@ -255,7 +258,8 @@ hittable_list final_scene() {
         boxes2.add(std::make_shared<sphere>(random_vec3(0, 165), 10, white));
     }
 
-    objects.add(std::make_shared<translate>(std::make_shared<rotate_y>(std::make_shared<bvh_node>(boxes2, 0.0, 1.0),
+    // 使用bvh加速这组hittable_list
+    objects.add(std::make_shared<translate>(std::make_shared<rotate_y>(std::make_shared<bvh_node>(boxes2, 0, 1),
                                                                        15), vec3(-100, 270, 395)));
 
     return objects;

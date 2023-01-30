@@ -8,14 +8,17 @@ bvh_node::bvh_node(const std::vector<std::shared_ptr<hittable>> &src_objects,
 
     auto objects = src_objects;
 
+    // 随机选取一个轴向来划分
     int axis = random_int(0, 2);
     auto comparator = (axis == 0) ? box_x_compare : (axis == 1) ? box_y_compare : box_z_compare;
 
     size_t object_span = end - start;
 
     if (object_span == 1) {
+        // 如果只有一个，放置相同的左右子节点，而不使用空指针（为了遍历时调用方便）
         m_left = m_right = objects[start];
     } else if (object_span == 2) {
+        // 如果有两个，按照大小放置左右节点
         if (comparator(objects[start], objects[start + 1])) {
             m_left = objects[start];
             m_right = objects[start + 1];
@@ -24,19 +27,23 @@ bvh_node::bvh_node(const std::vector<std::shared_ptr<hittable>> &src_objects,
             m_left = objects[start + 1];
         }
     } else {
+        // 按照选中的坐标轴排序
         std::sort(std::next(objects.begin(), static_cast<int>(start)),
                   std::next(objects.begin(), static_cast<int>(end)),
                   comparator);
 
+        // 平均划分左右子节点
         auto mid = start + object_span / 2;
         m_left = std::make_shared<bvh_node>(objects, start, mid, time0, time1);
         m_right = std::make_shared<bvh_node>(objects, mid, end, time0, time1);
     }
 
+    // 计算左右子节点的包围盒
     aabb box_left, box_right;
     if (!m_left->bounding_box(time0, time1, box_left) || !m_right->bounding_box(time0, time1, box_right))
         std::cerr << "No bounding box in bvh_node constructor.\n";
 
+    // 获取左右子节点包围盒的并集
     m_box = aabb::surrounding_box(box_left, box_right);
 }
 
@@ -62,9 +69,11 @@ bool bvh_node::bounding_box(double time0, double time1, aabb &output_box) const 
 inline bool box_compare(const std::shared_ptr<hittable> &a, const std::shared_ptr<hittable> &b, int axis) {
     aabb box_a, box_b;
 
+    // 计算左右子节点的包围盒
     if (!a->bounding_box(0, 0, box_a) || !b->bounding_box(0, 0, box_b))
         std::cerr << "No bounding box in bvh_node constructor." << std::endl;
 
+    // 比较包围盒的轴坐标大小
     if (axis == 0)
         return box_a.min().x() < box_b.min().x();
     else if (axis == 1)

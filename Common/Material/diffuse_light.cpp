@@ -11,7 +11,5 @@ bool diffuse_light::scatter(const ray &r_in, const hit_record &rec, color &atten
 }
 
 color diffuse_light::emitted(double u, double v, const point3 &p) const {
-    return m_emit->
-        value(u, v, p
-    );
+    return m_emit->value(u, v, p);
 }

@@ -23,7 +23,7 @@ color image_texture::value(double u, double v, const point3 &p) const {
         return color{0.0, 1.0, 1.0};
 
     u = util::clamp(u, 0.0, 1.0);
-    v = 1 - util::clamp(v, 0.0, 1.0);
+    v = 1 - util::clamp(v, 0.0, 1.0); // 翻转y轴，图像空间、纹理空间不一样
 
     auto i = static_cast<int>(u * m_width);
     auto j = static_cast<int>(v * m_height);

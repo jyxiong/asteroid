@@ -4,23 +4,30 @@ xy_rect::xy_rect(double x0, double x1, double y0, double y1, double k, std::shar
     : m_x0(x0), m_x1(x1), m_y0(y0), m_y1(y1), m_k(k), m_mat_ptr(std::move(mat_ptr)) {};
 
 bool xy_rect::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+    // 根据z=m_k计算射线的t值
     auto t = (m_k - r.origin().z()) / r.direction().z();
     if (t < t_min || t > t_max)
         return false;
 
+    // 根据t值计算出射线与平面的交点(x, y, m_k)
     auto x = r.origin().x() + t * r.direction().x();
     auto y = r.origin().y() + t * r.direction().y();
+
+    // 判断交点是否在矩形内部
     if (x < m_x0 || x > m_x1 || y < m_y0 || y > m_y1)
         return false;
 
     rec.t = t;
     rec.p = r.at(t);
 
+    // 法线朝z轴
     auto outward_normal = vec3(0, 0, 1);
     rec.set_face_normal(r, outward_normal);
 
+    // 计算交点在矩形上的归一化坐标
     rec.u = (x - m_x0) / (m_x1 - m_x0);
     rec.v = (y - m_y0) / (m_y1 - m_y0);
+
     rec.mat_ptr = m_mat_ptr;
 
     return true;

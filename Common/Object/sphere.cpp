@@ -1,5 +1,6 @@
 #include "sphere.h"
 
+// 球面法向量转球面uv坐标
 void get_sphere_uv(const point3 &p, double &u, double &v) {
     auto theta = acos(-p.y());
     auto phi = atan2(-p.z(), p.x()) + util::pi;
@@ -32,9 +33,9 @@ bool sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) cons
 
     rec.t = root;
     rec.p = r.at(root);
-    vec3 outward_normal = (rec.p - m_center) / m_radius;
+    vec3 outward_normal = (rec.p - m_center) / m_radius; // 球面单位法向量
     rec.set_face_normal(r, outward_normal);
-    get_sphere_uv(outward_normal, rec.u, rec.v);
+    get_sphere_uv(outward_normal, rec.u, rec.v); // 获取球面uv坐标
     rec.mat_ptr = m_mat_ptr;
 
     return true;
