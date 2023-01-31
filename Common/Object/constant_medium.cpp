@@ -18,9 +18,11 @@ bool constant_medium::hit(const ray &r, double t_min, double t_max, hit_record &
 
     hit_record rec1, rec2;
 
+    // m_boundary的第一个碰撞点
     if (!m_boundary->hit(r, -util::infinity, util::infinity, rec1))
         return false;
 
+    // m_boundary的第二个碰撞点
     if (!m_boundary->hit(r, rec1.t + 0.0001, util::infinity, rec2))
         return false;
 
@@ -35,10 +37,16 @@ bool constant_medium::hit(const ray &r, double t_min, double t_max, hit_record &
     if (rec1.t < 0)
         rec1.t = 0;
 
+    // 光线的传输速度
     const auto ray_length = r.direction().length();
+
+    // 光线穿过m_boundary的传输距离
     const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
+
+    // 假设光线随机发生碰撞
     const auto hit_distance = m_neg_inv_density * log(random_double());
 
+    // 如果碰撞发生在m_boundary外部，则认为没有发生碰撞
     if (hit_distance > distance_inside_boundary)
         return false;
 
@@ -51,8 +59,8 @@ bool constant_medium::hit(const ray &r, double t_min, double t_max, hit_record &
                   << "rec.p = " << rec.p << '\n';
     }
 
-    rec.normal = vec3(1, 0, 0);  // arbitrary
-    rec.front_face = true;     // also arbitrary
+    rec.normal = vec3(1, 0, 0); // 任意，因为材质无关
+    rec.front_face = true;     // 任意，因为材质无关
     rec.mat_ptr = m_phase_function;
 
     return true;
