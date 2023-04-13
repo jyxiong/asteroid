@@ -1,0 +1,6 @@
+[submodule "ray_tracing_in_one_weekend/3rdparty/stb"]
+	path = ray_tracing_in_one_weekend/3rdparty/stb
+	url = git@github.com:nothings/stb.git
+[submodule "ray_tracing_in_one_weekend/3rdparty/glm"]
+	path = ray_tracing_in_one_weekend/3rdparty/glm
+	url = git@github.com:g-truc/glm.git
