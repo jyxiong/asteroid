@@ -16,20 +16,20 @@ int main()
     auto position = glm::vec3(0);
     auto direction = glm::vec3(0, 0, -1);
     auto up = glm::vec3(0, 1, 1);
-    auto camera = std::make_shared<Camera>(position, direction,up);
+    Camera camera(position, direction,up);
     // 相机内参
     CameraParameters camera_params{};
     camera_params.fov = 120.f;
     camera_params.focal_length = 1.f;
     camera_params.viewport = { image_width, image_height };
-    camera->set_parameters(camera_params);
+    camera.set_parameters(camera_params);
 
     // framebuffer
     std::vector<glm::u8vec3> framebuffer(image_width * image_height);
 
     Renderer renderer(image_width, image_height);
     renderer.set_camera(camera);
-    renderer.render(framebuffer.data());
+    renderer.render(framebuffer);
 
     write_color(framebuffer, image_width, image_height);
 
