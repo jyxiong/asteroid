@@ -5,9 +5,7 @@ project(ray_tracing_in_one_weekend LANGUAGES CXX CUDA)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CUDA_ARCHITECTURES 80)
-
-find_package(CUDA REQUIRED)
+set(CMAKE_CUDA_ARCHITECTURES "50;60;70;80")
 
 add_subdirectory(3rdparty)
 add_subdirectory(one_weekend)
