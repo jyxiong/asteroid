@@ -1,79 +1,51 @@
 #pragma once
 
-#include <thrust/device_free.h>
-#include <thrust/device_malloc.h>
-#include <thrust/device_vector.h>
 #include "glm/glm.hpp"
 
-__device__
-glm::vec3 ray_color(const Ray &ray)
+#include "helper_cuda.h"
+
+#include "hittable.h"
+#include "sphere.h"
+#include "hittable_list.h"
+
+__device__ float hit_sphere(const glm::vec3 &center, float radius, const Ray &ray)
 {
+    auto oc = ray.origin - center;
+    auto a = glm::length(ray.direction);
+    auto half_b = glm::dot(oc, ray.direction);
+    auto c = glm::length(oc) - radius * radius;
+    auto discriminant = half_b * half_b - a * c;
+    if (discriminant < 0)
+        // 没有交点
+        return -1.f;
+    else
+        // 有交点，返回最近的交点
+        return (-half_b - sqrt(discriminant)) / a;
+}
+
+__device__ glm::vec3 ray_color(const Ray &ray, Hittable **world)
+{
+    HitRecord rec;
+    if ((*world)->hit(ray, 0.0, FLT_MAX, rec))
+    {
+        // 有交点，返回法向量颜色
+        return 0.5f * (rec.normal + 1.f);
+    }
+
+    // 没有交点，返回背景色
     auto unit_vector = glm::normalize(ray.direction);
-    auto t = 0.5 * (unit_vector.y + 1.f);
+    float t = (unit_vector.y + 1.f) * 0.5f;
     return glm::mix(glm::vec3(1.f), glm::vec3(0.5, 0.7, 1.0), t);
 }
 
-class RenderFunctor
+__global__ void render(unsigned int width, unsigned int height, Camera *camera, Hittable **world, glm::u8vec3 *fb)
 {
-private:
-    unsigned int m_width;
-    unsigned int m_height;
-    Camera *m_camera{ nullptr };
-public:
-    RenderFunctor(unsigned int image_width, unsigned int image_height)
-        : m_width(image_width), m_height(image_height) {}
+    auto i = threadIdx.x + blockIdx.x * blockDim.x;
+    auto j = threadIdx.y + blockIdx.y * blockDim.y;
 
-    void set_camera(Camera *camera)
-    {
-        m_camera = camera;
-    }
+    if (i >= width || j >= height) return;
 
-    __device__
-    glm::u8vec3 operator()(unsigned int pixel_index) const
-    {
-        auto idx = pixel_index % m_width;
-        auto idy = pixel_index / m_width;
+    auto ray = camera->generate_ray(i, j);
 
-        auto ray = m_camera->generate_ray(idx, idy);
-
-        return ray_color(ray) * 255.f;
-    }
-};
-
-class Renderer
-{
-private:
-    unsigned int m_width;
-    unsigned int m_height;
-    unsigned int m_fb_size;
-
-    thrust::device_vector<glm::u8vec3> m_d_framebuffer{};
-    thrust::device_vector<Camera> m_d_camera{ 1 };
-
-public:
-    Renderer(unsigned int width, unsigned int height)
-        : m_width(width), m_height(height)
-    {
-        m_fb_size = m_width * m_height;
-        m_d_framebuffer.resize(m_fb_size);
-    }
-
-    ~Renderer() = default;
-
-    void set_camera(const Camera &camera)
-    {
-        thrust::copy_n(&camera, 1, m_d_camera.begin());
-    }
-
-    void render(std::vector<glm::u8vec3> &framebuffer)
-    {
-        RenderFunctor functor(m_width, m_height);
-        functor.set_camera(m_d_camera.data().get());
-
-        thrust::counting_iterator<unsigned int> count_begin(0);
-        thrust::counting_iterator<unsigned int> count_end(m_fb_size);
-        thrust::transform(count_begin, count_end, m_d_framebuffer.begin(), functor);
-
-        thrust::copy(m_d_framebuffer.begin(), m_d_framebuffer.end(), framebuffer.begin());
-    }
-};
+    fb[j * width + i] = ray_color(ray, world) * 255.f;
+}

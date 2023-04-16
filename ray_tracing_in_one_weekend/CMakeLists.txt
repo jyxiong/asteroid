@@ -9,3 +9,4 @@ set(CMAKE_CUDA_ARCHITECTURES "50;60;70;80")
 
 add_subdirectory(3rdparty)
 add_subdirectory(one_weekend)
+add_subdirectory(test)

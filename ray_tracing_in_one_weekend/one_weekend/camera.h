@@ -5,11 +5,17 @@
 
 #include "ray.h"
 
+/**
+ *
+ * NDC：范围是[-1, 1]^3
+ * 屏幕坐标系：范围是[0, width]和[0, height]
+ */
+
 struct CameraParameters
 {
     float fov;
     float focal_length;
-    glm::uvec2 viewport;
+    glm::uvec2 film_size;
 };
 
 class Camera
@@ -22,7 +28,7 @@ public:
 
     float fov{};
     float focal_length{};
-    glm::uvec2 viewport;
+    glm::uvec2 film_size;
 
     float aspect{};
     float tan_half_fov{};
@@ -40,17 +46,17 @@ public:
     {
         fov = params.fov;
         focal_length = params.focal_length;
-        viewport = params.viewport;
+        film_size = params.film_size;
 
-        aspect = (float) viewport.x / (float) viewport.y;
+        aspect = (float) film_size.x / (float) film_size.y;
         tan_half_fov = tanf(glm::pi<float>() * fov / 180.f);
     }
 
-    __device__
-    Ray generate_ray(unsigned int x, unsigned int y) const
+    __device__ Ray generate_ray(unsigned int x, unsigned int y) const
     {
-        auto nx = 2.f * (((float) x + 0.5f) / (float) viewport.x) - 1.f;
-        auto ny = 1.f - 2.f * (((float) y + 0.5f) / (float) viewport.y);
+        // 焦平面转换到NDC
+        auto nx = 2.f * (((float) x + 0.5f) / (float) film_size.x) - 1.f;
+        auto ny = 1.f - 2.f * (((float) y + 0.5f) / (float) film_size.y);
 
         auto offset_x = nx * tan_half_fov * aspect;
         auto offset_y = ny * tan_half_fov;
