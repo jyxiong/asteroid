@@ -5,3 +5,5 @@
 [nori](https://wjakob.github.io/nori/)
 
 [pbrt](https://www.pbrt.org/)
+
+[CIS565-Fall-2022/Project3-CUDA-Path-Tracer](https://github.com/CIS565-Fall-2022/Project3-CUDA-Path-Tracer)
