@@ -1,8 +1,15 @@
 add_executable(main
-        main.cpp
-        renderer.cpp
-        renderer.h
+    application.h
+    main.cpp
+    renderer.cpp
+    renderer.h
 
-        opengl/shader.h
-        opengl/texture.h)
-target_link_libraries(main PUBLIC glad glfw glm)
+    core/window.cpp
+    core/window.h
+    core/log.cpp
+    core/log.h
+
+    opengl/context.h
+    opengl/shader.h
+    opengl/texture.h)
+target_link_libraries(main PUBLIC glad glfw glm spdlog)

@@ -26,3 +26,8 @@ if (NOT TARGET glm)
     set_target_properties(glm_static PROPERTIES FOLDER ${EXTERNAL_DIR}/glm)
     set_target_properties(uninstall PROPERTIES FOLDER ${EXTERNAL_DIR}/glm)
 endif ()
+
+if (NOT TARGET spdlog)
+    add_subdirectory(spdlog)
+    set_target_properties(spdlog PROPERTIES FOLDER ${EXTERNAL_DIR}/spdlog)
+endif ()

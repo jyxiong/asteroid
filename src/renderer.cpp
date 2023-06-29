@@ -60,17 +60,6 @@ void Renderer::initTextures() {
                  GL_UNSIGNED_BYTE, NULL);
 }
 
-GLuint Renderer::initShader() {
-    const char *attributeLocations[] = { "Position", "Tex" };
-//    GLuint program = glslUtility::createDefaultProgram(attributeLocations, 2);
-//    GLint location;
-//    glUseProgram(program);
-//    if ((location = glGetUniformLocation(program, "u_image")) != -1) {
-//        glUniform1i(location, 0);
-//    }
-//    return program;
-}
-
 void Renderer::deletePBO(GLuint *pbo)
 {
 

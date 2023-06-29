@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 #include <glad/gl.h>
@@ -21,7 +23,6 @@ public:
     void initPBO(GLuint *pbo);
     void initTextures();
     void initVAO();
-    GLuint initShader();
 
     void deletePBO(GLuint *pbo);
     void deleteTexture(GLuint *tex);
