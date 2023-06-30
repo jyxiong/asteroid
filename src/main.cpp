@@ -1,14 +1,9 @@
-#include "application.h"
+#include "util/application.h"
 
 int main()
 {
-    Application app{};
-
-    app.init();
-
-
-
-    app.run();
+    Application::awake();
+    Application::run();
 
     return 0;
 }
