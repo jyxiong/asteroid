@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(raytracing)
+project(asteroid)
 
 set(CMAKE_CXX_STANDARD 17)
+
+if (WIN32)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
+endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER CMakeTargets)
@@ -16,4 +20,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 find_package(CUDA REQUIRED)
 
 add_subdirectory(external)
-add_subdirectory(src)
+add_subdirectory(sandbox)
+add_subdirectory(source)
