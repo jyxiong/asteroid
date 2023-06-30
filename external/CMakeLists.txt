@@ -3,7 +3,7 @@ set(EXTERNAL_DIR "external")
 
 if (NOT TARGET glad)
     set(GLAD_SOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad)
-    add_subdirectory(${GLAD_SOURCES_DIR}/cmake glad_cmake)
+    add_subdirectory(${GLAD_SOURCES_DIR}/cmake)
     glad_add_library(glad REPRODUCIBLE API gl:core=4.6)
     set_target_properties(glad PROPERTIES FOLDER ${EXTERNAL_DIR}/glad)
 endif ()
