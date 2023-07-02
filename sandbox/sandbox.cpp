@@ -1,6 +1,8 @@
 #include "asteroid/core/application.h"
 #include "asteroid/core/entry_point.h"
 #include "asteroid/core/layer.h"
+#include "asteroid/core/input.h"
+#include "asteroid/core/key_code.h"
 #include "asteroid/imgui/imgui_layer.h"
 
 using namespace Asteroid;
@@ -15,12 +17,19 @@ public:
 
     void OnUpdate() override
     {
-        AST_INFO("ExampleLayer::Update");
+        if (Input::IsKeyPressed(AST_KEY_TAB))
+            AST_TRACE("Tab key is pressed (poll)!");
     }
 
     void OnEvent(Event& event) override
     {
-        AST_TRACE("{0}", event.ToString());
+        if (event.GetEventType() == EventType::KeyPressed)
+        {
+            KeyPressedEvent& e = (KeyPressedEvent&)event;
+            if (e.GetKeyCode() == AST_KEY_TAB)
+                AST_TRACE("Tab key is pressed (event)!");
+            AST_TRACE("{0}", (char)e.GetKeyCode());
+        }
     }
 
 };
