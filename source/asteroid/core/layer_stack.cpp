@@ -2,9 +2,7 @@
 
 using namespace Asteroid;
 
-LayerStack::LayerStack()
-{
-}
+LayerStack::LayerStack() = default;
 
 LayerStack::~LayerStack()
 {

@@ -65,7 +65,7 @@ public:
     EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 
 protected:
-    MouseButtonEvent(int button)
+    explicit MouseButtonEvent(int button)
         : m_Button(button) {}
 
     int m_Button;
@@ -74,7 +74,7 @@ protected:
 class MouseButtonPressedEvent : public MouseButtonEvent
 {
 public:
-    MouseButtonPressedEvent(int button)
+    explicit MouseButtonPressedEvent(int button)
         : MouseButtonEvent(button) {}
 
     std::string ToString() const override
@@ -90,7 +90,7 @@ public:
 class MouseButtonReleasedEvent : public MouseButtonEvent
 {
 public:
-    MouseButtonReleasedEvent(int button)
+    explicit MouseButtonReleasedEvent(int button)
         : MouseButtonEvent(button) {}
 
     std::string ToString() const override

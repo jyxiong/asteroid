@@ -16,4 +16,5 @@ target_link_libraries(asteroid PUBLIC spdlog glfw glad imgui)
 target_precompile_headers(asteroid PUBLIC astpch.h)
 target_compile_definitions(asteroid PUBLIC
     GLFW_INCLUDE_NONE
-    AST_PLATFORM_WINDOWS)
+    AST_PLATFORM_WINDOWS
+    AST_ENABLE_ASSERTS)

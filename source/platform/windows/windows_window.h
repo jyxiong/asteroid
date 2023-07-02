@@ -10,9 +10,9 @@ namespace Asteroid
 class WindowsWindow : public Window
 {
 public:
-    WindowsWindow(const WindowProps &props);
+    explicit WindowsWindow(const WindowProps &props);
 
-    virtual ~WindowsWindow();
+    ~WindowsWindow() override;
 
     void OnUpdate() override;
 
@@ -27,7 +27,7 @@ public:
 
     bool IsVSync() const override;
 
-    inline virtual void* GetNativeWindow() const { return m_Window; }
+    inline void* GetNativeWindow() const override { return m_Window; }
 
 private:
     void Init(const WindowProps &props);
@@ -35,7 +35,7 @@ private:
     void Shutdown();
 
 private:
-    GLFWwindow *m_Window;
+    GLFWwindow *m_Window{};
 
     struct WindowData
     {

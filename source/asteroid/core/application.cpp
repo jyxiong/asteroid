@@ -6,9 +6,7 @@
 
 using namespace Asteroid;
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
-
-Application* Application::s_Instance = nullptr;
+Application *Application::s_Instance = nullptr;
 
 Application::Application()
 {
@@ -16,15 +14,16 @@ Application::Application()
     s_Instance = this;
 
     m_Window = std::unique_ptr<Window>(Window::Create());
-    m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+
+    m_Window->SetEventCallback([this](Event &e) -> void {
+        OnEvent(e);
+    });
 
     m_ImGuiLayer = new ImGuiLayer();
     PushOverlay(m_ImGuiLayer);
 }
 
-Application::~Application()
-{
-}
+Application::~Application() = default;
 
 void Application::PushLayer(Layer *layer)
 {
@@ -42,7 +41,9 @@ void Application::PushOverlay(Layer *layer)
 void Application::OnEvent(Event &e)
 {
     EventDispatcher dispatcher(e);
-    dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+    dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent &e) -> bool {
+        return OnWindowClose(e);
+    });
 
     for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
     {
@@ -56,14 +57,14 @@ void Application::Run()
 {
     while (m_Running)
     {
-        glClearColor(1, 0, 1, 1);
+        glClearColor(0.1f, 0.1f, 0.1f, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        for (Layer* layer : m_LayerStack)
+        for (Layer *layer: m_LayerStack)
             layer->OnUpdate();
 
         m_ImGuiLayer->Begin();
-        for (Layer* layer : m_LayerStack)
+        for (Layer *layer: m_LayerStack)
             layer->OnImGuiRender();
         m_ImGuiLayer->End();
 

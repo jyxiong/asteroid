@@ -15,7 +15,7 @@ public:
     EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 
 protected:
-    KeyEvent(int keycode)
+    explicit KeyEvent(int keycode)
         : m_KeyCode(keycode) {}
 
     int m_KeyCode;
@@ -45,7 +45,7 @@ private:
 class KeyReleasedEvent : public KeyEvent
 {
 public:
-    KeyReleasedEvent(int keycode)
+    explicit KeyReleasedEvent(int keycode)
         : KeyEvent(keycode) {}
 
     std::string ToString() const override
@@ -61,7 +61,7 @@ public:
 class KeyTypedEvent : public KeyEvent
 {
 public:
-    KeyTypedEvent(int keycode)
+    explicit KeyTypedEvent(int keycode)
         : KeyEvent(keycode) {}
 
     std::string ToString() const override

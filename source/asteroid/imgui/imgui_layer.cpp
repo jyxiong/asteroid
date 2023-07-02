@@ -1,6 +1,5 @@
 #include "asteroid/imgui/imgui_layer.h"
 
-#include "glad/gl.h"
 #include "GLFW/glfw3.h"
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -15,9 +14,7 @@ ImGuiLayer::ImGuiLayer()
 {
 }
 
-ImGuiLayer::~ImGuiLayer()
-{
-}
+ImGuiLayer::~ImGuiLayer() = default;
 
 void ImGuiLayer::OnAttach()
 {
@@ -26,7 +23,7 @@ void ImGuiLayer::OnAttach()
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+//    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
     //io.ConfigViewportsNoAutoMerge = true;
@@ -45,7 +42,7 @@ void ImGuiLayer::OnAttach()
     }
 
     Application& app = Application::Get();
-    GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
+    auto* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);

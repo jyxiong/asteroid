@@ -50,7 +50,7 @@ void WindowsWindow::Init(const WindowProps &props)
     glfwMakeContextCurrent(m_Window);
 
     auto status = gladLoadGL(glfwGetProcAddress);
-    AST_CORE_ASSERT(status, "Failed to initialize Glad!");
+    AST_CORE_ASSERT(status, "Failed to initialize Glad!")
 
     glfwSetWindowUserPointer(m_Window, &m_Data);
     SetVSync(true);
@@ -100,7 +100,7 @@ void WindowsWindow::Init(const WindowProps &props)
     glfwSetCharCallback(m_Window, [](GLFWwindow *window, unsigned int keycode) {
         WindowData &data = *(WindowData *) glfwGetWindowUserPointer(window);
 
-        KeyTypedEvent event(keycode);
+        KeyTypedEvent event((int)keycode);
         data.EventCallback(event);
     });
 
