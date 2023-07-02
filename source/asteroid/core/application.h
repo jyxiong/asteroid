@@ -5,6 +5,7 @@
 #include "asteroid/core/window.h"
 #include "asteroid/core/layer.h"
 #include "asteroid/core/layer_stack.h"
+#include "asteroid/imgui/imgui_layer.h"
 
 namespace Asteroid {
 
@@ -31,6 +32,7 @@ private:
     bool OnWindowClose(WindowCloseEvent& e);
 
     std::unique_ptr<Window> m_Window;
+    ImGuiLayer* m_ImGuiLayer;
     bool m_Running = true;
 
     LayerStack m_LayerStack;

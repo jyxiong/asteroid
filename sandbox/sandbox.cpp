@@ -1,3 +1,5 @@
+#include "imgui.h"
+
 #include "asteroid/core/application.h"
 #include "asteroid/core/entry_point.h"
 #include "asteroid/core/layer.h"
@@ -21,6 +23,13 @@ public:
             AST_TRACE("Tab key is pressed (poll)!");
     }
 
+    void OnImGuiRender() override
+    {
+        ImGui::Begin("Test");
+        ImGui::Text("Hello World");
+        ImGui::End();
+    }
+
     void OnEvent(Event& event) override
     {
         if (event.GetEventType() == EventType::KeyPressed)
@@ -40,7 +49,6 @@ public:
     Sandbox()
     {
         PushLayer(new ExampleLayer());
-        PushOverlay(new ImGuiLayer());
     }
 
     ~Sandbox()
