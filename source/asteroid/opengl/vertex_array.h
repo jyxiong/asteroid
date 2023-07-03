@@ -2,7 +2,8 @@
 
 #include <memory>
 #include <vector>
-#include "asteroid/opengl/buffer.h"
+#include "asteroid/opengl/index_buffer.h"
+#include "asteroid/opengl/vertex_buffer.h"
 
 namespace Asteroid {
 

@@ -148,23 +148,4 @@ namespace Asteroid
         uint32_t m_RendererID;
         BufferLayout m_Layout;
     };
-
-    class IndexBuffer
-    {
-    public:
-        IndexBuffer(unsigned int *indices, size_t count);
-
-        ~IndexBuffer();
-
-        void Bind() const;
-
-        void Unbind() const;
-
-        size_t GetCount() const { return m_Count; }
-
-    private:
-        unsigned int m_RendererID{};
-        unsigned int m_Count;
-    };
-
 }

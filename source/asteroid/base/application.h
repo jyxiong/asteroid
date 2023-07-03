@@ -6,9 +6,6 @@
 #include "asteroid/base/layer.h"
 #include "asteroid/base/layer_stack.h"
 #include "asteroid/imgui/imgui_layer.h"
-#include "asteroid/opengl/shader.h"
-#include "asteroid/opengl/buffer.h"
-#include "asteroid/opengl/vertex_array.h"
 
 namespace Asteroid {
 
@@ -34,10 +31,12 @@ private:
 
     bool OnWindowClose(WindowCloseEvent& e);
 
+    bool OnWindowResize(WindowResizeEvent& e);
+
     std::unique_ptr<Window> m_Window;
     ImGuiLayer* m_ImGuiLayer;
     bool m_Running = true;
-
+    bool m_Minimized = false;
     LayerStack m_LayerStack;
 
 private:

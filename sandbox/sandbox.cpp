@@ -4,6 +4,10 @@
 #include "asteroid/base/entry_point.h"
 #include "asteroid/base/layer.h"
 #include "asteroid/imgui/imgui_layer.h"
+#include "asteroid/opengl/shader.h"
+#include "asteroid/opengl/vertex_buffer.h"
+#include "asteroid/opengl/vertex_array.h"
+#include "asteroid/opengl/texture2d.h"
 
 using namespace Asteroid;
 
@@ -13,103 +17,56 @@ public:
     ExampleLayer()
         : Layer("Example")
     {
-        m_VertexArray = std::make_shared<VertexArray>();
-
-        float vertices[3 * 7] = {
-            -0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-            0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-            0.0f, 0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
-        };
-
-        auto vertexBuffer = std::make_shared<VertexBuffer>(vertices, sizeof(vertices));
-        BufferLayout layout = {
-            { ShaderDataType::Float3, "a_Position" },
-            { ShaderDataType::Float4, "a_Color" }
-        };
-        vertexBuffer->SetLayout(layout);
-        m_VertexArray->AddVertexBuffer(vertexBuffer);
-
-        unsigned int indices[3] = { 0, 1, 2 };
-        auto indexBuffer = std::make_shared<IndexBuffer>(indices, sizeof(indices) / sizeof(unsigned int));
-        m_VertexArray->SetIndexBuffer(indexBuffer);
-
         m_SquareVA = std::make_shared<VertexArray>();
 
-        float squareVertices[3 * 4] = {
-            -0.75f, -0.75f, 0.0f,
-            0.75f, -0.75f, 0.0f,
-            0.75f, 0.75f, 0.0f,
-            -0.75f, 0.75f, 0.0f
+        float squareVertices[5 * 4] = {
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
         };
 
         auto squareVB = std::make_shared<VertexBuffer>(squareVertices, sizeof(squareVertices));
-        squareVB->SetLayout({
-                                { ShaderDataType::Float3, "a_Position" }
-                            });
+        squareVB->SetLayout({{ ShaderDataType::Float3, "a_Position" },
+                             { ShaderDataType::Float2, "a_TexCoord" }});
         m_SquareVA->AddVertexBuffer(squareVB);
 
         unsigned int squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
         auto squareIB = std::make_shared<IndexBuffer>(squareIndices, sizeof(squareIndices) / sizeof(unsigned int));
         m_SquareVA->SetIndexBuffer(squareIB);
 
-        std::string vertexSrc = R"(
+        std::string textureShaderVertexSrc = R"(
 			#version 330 core
 
-			layout(location = 0) in vec3 a_Position;
-            layout(location = 1) in vec4 a_Color;
-
-			out vec3 v_Position;
-            out vec4 v_Color;
-
+            layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TexCoord;
+			out vec2 v_TexCoord;
 			void main()
 			{
-				v_Position = a_Position;
-                v_Color = a_Color;
-
-                gl_Position = vec4(a_Position, 1.0);
-			}
-		)";
-
-        std::string fragmentSrc = R"(
-			#version 330 core
-
-			layout(location = 0) out vec4 color;
-			in vec3 v_Position;
-            in vec4 v_Color;
-
-            void main()
-			{
-				color = vec4(v_Position * 0.5 + 0.5, 1.0);
-                color = v_Color;
-			}
-		)";
-
-        m_Shader = std::make_shared<Shader>(vertexSrc, fragmentSrc);
-
-        std::string blueShaderVertexSrc = R"(
-			#version 330 core
-
-			layout(location = 0) in vec3 a_Position;
-			out vec3 v_Position;
-			void main()
-			{
-				v_Position = a_Position;
+				v_TexCoord = a_TexCoord;
 				gl_Position = vec4(a_Position, 1.0);
 			}
 		)";
 
-        std::string blueShaderFragmentSrc = R"(
+        std::string textureShaderFragmentSrc = R"(
 			#version 330 core
 
-			layout(location = 0) out vec4 color;
-			in vec3 v_Position;
+            layout(location = 0) out vec4 color;
+			in vec2 v_TexCoord;
+
+			uniform sampler2D u_Texture;
 			void main()
 			{
-				color = vec4(0.2, 0.3, 0.8, 1.0);
+				color = texture(u_Texture, v_TexCoord);
 			}
 		)";
 
-        m_BlueShader = std::make_shared<Shader>(blueShaderVertexSrc, blueShaderFragmentSrc);
+        m_TextureShader = std::make_shared<Shader>(textureShaderVertexSrc, textureShaderFragmentSrc);
+
+        m_Texture = std::make_shared<Texture2D>(R"(D:\Learning\asteroid\asset\texture\bennu_dec10.png)");
+
+        m_TextureShader->Bind();
+        m_TextureShader->UploadUniformInt("u_Texture", 0);
     }
 
     void OnUpdate() override
@@ -117,13 +74,10 @@ public:
         glClearColor(0.1f, 0.1f, 0.1f, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        m_BlueShader->Bind();
+        m_Texture->Bind();
+        m_TextureShader->Bind();
         m_SquareVA->Bind();
         glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-
-        m_Shader->Bind();
-        m_VertexArray->Bind();
-        glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
     }
 
     void OnImGuiRender() override
@@ -135,11 +89,10 @@ public:
     }
 
 private:
-    std::shared_ptr<Shader> m_Shader;
-    std::shared_ptr<VertexArray> m_VertexArray;
-
-    std::shared_ptr<Shader> m_BlueShader;
+    std::shared_ptr<Shader> m_TextureShader;
     std::shared_ptr<VertexArray> m_SquareVA;
+
+    std::shared_ptr<Texture2D> m_Texture;
 };
 
 class Sandbox : public Application

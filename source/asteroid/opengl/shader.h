@@ -19,6 +19,8 @@ namespace Asteroid
 
         void Unbind() const;
 
+        void UploadUniformInt(const std::string& name, int value);
+
     private:
         uint32_t m_RendererID;
     };

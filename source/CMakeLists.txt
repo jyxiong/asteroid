@@ -14,9 +14,10 @@ add_library(asteroid STATIC
     ${UTIL_SOURCES}
     )
 target_include_directories(asteroid PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(asteroid PUBLIC spdlog glfw glad imgui)
+target_link_libraries(asteroid PUBLIC glad glfw imgui spdlog stb)
 target_precompile_headers(asteroid PUBLIC astpch.h)
 target_compile_definitions(asteroid PUBLIC
     GLFW_INCLUDE_NONE
+    STB_IMAGE_IMPLEMENTATION
     AST_PLATFORM_WINDOWS
     AST_ENABLE_ASSERTS)

@@ -36,3 +36,8 @@ if (NOT TARGET spdlog)
     add_subdirectory(spdlog)
     set_target_properties(spdlog PROPERTIES FOLDER ${EXTERNAL_DIR}/spdlog)
 endif ()
+
+if (NOT TARGET stb)
+    include(stb)
+    set_target_properties(stb PROPERTIES FOLDER ${EXTERNAL_DIR}/stb)
+endif ()
