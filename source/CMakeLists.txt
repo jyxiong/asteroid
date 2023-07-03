@@ -1,7 +1,7 @@
 file(GLOB CORE_SOURCES asteroid/core/*.h asteroid/core/*.cpp)
 file(GLOB EVENT_SOURCES asteroid/event/*.h asteroid/event/*.cpp)
 file(GLOB IMGUI_SOURCES asteroid/imgui/*.h asteroid/imgui/*.cpp)
-file(GLOB OPENGL_SOURCES platform/opengl/*.h platform/opengl/*.cpp)
+file(GLOB OPENGL_SOURCES asteroid/opengl/*.h asteroid/opengl/*.cpp)
 file(GLOB WINDOWS_SOURCES platform/windows/*.h platform/windows/*.cpp)
 
 add_library(asteroid STATIC

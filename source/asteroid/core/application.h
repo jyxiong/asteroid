@@ -6,6 +6,9 @@
 #include "asteroid/core/layer.h"
 #include "asteroid/core/layer_stack.h"
 #include "asteroid/imgui/imgui_layer.h"
+#include "asteroid/opengl/shader.h"
+#include "asteroid/opengl/buffer.h"
+#include "asteroid/opengl/vertex_array.h"
 
 namespace Asteroid {
 
@@ -36,6 +39,12 @@ private:
     bool m_Running = true;
 
     LayerStack m_LayerStack;
+
+    std::shared_ptr<Shader> m_Shader;
+    std::shared_ptr<VertexArray> m_VertexArray;
+
+    std::shared_ptr<Shader> m_BlueShader;
+    std::shared_ptr<VertexArray> m_SquareVA;
 
 private:
     static Application* s_Instance;
