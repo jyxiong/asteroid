@@ -1,7 +1,7 @@
 #include "asteroid/opengl/vertex_array.h"
 
 #include "glad/gl.h"
-#include "asteroid/core/macro.h"
+#include "asteroid/util/macro.h"
 
 using namespace Asteroid;
 

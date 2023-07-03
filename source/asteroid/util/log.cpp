@@ -1,4 +1,4 @@
-#include "asteroid/core/log.h"
+#include "log.h"
 
 using namespace Asteroid;
 

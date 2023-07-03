@@ -5,7 +5,7 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-#include "asteroid/core/application.h"
+#include "asteroid/base/application.h"
 
 using namespace Asteroid;
 
@@ -94,6 +94,6 @@ void ImGuiLayer::End()
 
 void ImGuiLayer::OnImGuiRender()
 {
-    static bool show = true;
-    ImGui::ShowDemoWindow(&show);
+//    static bool show = true;
+//    ImGui::ShowDemoWindow(&show);
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utility>
-#include "asteroid/core/macro.h"
+#include "asteroid/util/macro.h"
 namespace Asteroid
 {
 

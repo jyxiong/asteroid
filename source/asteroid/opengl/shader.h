@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 
 namespace Asteroid
 {
@@ -8,6 +9,8 @@ namespace Asteroid
     class Shader
     {
     public:
+        Shader(const std::filesystem::path &vertexPath, const std::filesystem::path &fragmentPath);
+
         Shader(const std::string &vertexSrc, const std::string &fragmentSrc);
 
         ~Shader();

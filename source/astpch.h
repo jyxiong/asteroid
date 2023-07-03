@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "asteroid/core/log.h"
+#include "asteroid/util/log.h"
 
 #ifdef AST_PLATFORM_WINDOWS
 #include <windows.h>

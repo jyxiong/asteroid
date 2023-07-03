@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "asteroid/core/macro.h"
-#include "asteroid/core/layer.h"
+#include "asteroid/util/macro.h"
+#include "asteroid/base/layer.h"
 
 namespace Asteroid
 {

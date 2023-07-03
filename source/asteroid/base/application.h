@@ -2,9 +2,9 @@
 
 #include "asteroid/event/event.h"
 #include "asteroid/event/application_event.h"
-#include "asteroid/core/window.h"
-#include "asteroid/core/layer.h"
-#include "asteroid/core/layer_stack.h"
+#include "asteroid/base/window.h"
+#include "asteroid/base/layer.h"
+#include "asteroid/base/layer_stack.h"
 #include "asteroid/imgui/imgui_layer.h"
 #include "asteroid/opengl/shader.h"
 #include "asteroid/opengl/buffer.h"
@@ -39,12 +39,6 @@ private:
     bool m_Running = true;
 
     LayerStack m_LayerStack;
-
-    std::shared_ptr<Shader> m_Shader;
-    std::shared_ptr<VertexArray> m_VertexArray;
-
-    std::shared_ptr<Shader> m_BlueShader;
-    std::shared_ptr<VertexArray> m_SquareVA;
 
 private:
     static Application* s_Instance;
