@@ -1,8 +1,9 @@
 #pragma once
 
-#include <utility>
-
-#include "asteroid/core/core.h"
+#include <string>
+#include <functional>
+#include "glad/gl.h"
+#include "GLFW/glfw3.h"
 #include "asteroid/event/event.h"
 
 namespace Asteroid
@@ -22,30 +23,50 @@ struct WindowProps
     }
 };
 
-// Interface representing a desktop system based Window
 class Window
 {
 public:
     using EventCallbackFn = std::function<void(Event &)>;
 
-    virtual ~Window() = default;
+    explicit Window(const WindowProps &props);
 
-    virtual void OnUpdate() = 0;
+    ~Window();
 
-    virtual unsigned int GetWidth() const = 0;
+    void OnUpdate();
 
-    virtual unsigned int GetHeight() const = 0;
+    inline unsigned int GetWidth() const { return m_Data.Width; }
+
+    inline unsigned int GetHeight() const { return m_Data.Height; }
 
     // Window attributes
-    virtual void SetEventCallback(const EventCallbackFn &callback) = 0;
+    inline void SetEventCallback(const EventCallbackFn &callback) { m_Data.EventCallback = callback; }
 
-    virtual void SetVSync(bool enabled) = 0;
+    void SetVSync(bool enabled);
 
-    virtual bool IsVSync() const = 0;
+    bool IsVSync() const;
 
-    virtual void *GetNativeWindow() const = 0;
+    inline void* GetNativeWindow() const { return m_Window; }
 
     static Window *Create(const WindowProps &props = WindowProps());
+
+private:
+    void Init(const WindowProps &props);
+
+    void Shutdown();
+
+private:
+    GLFWwindow *m_Window{};
+
+    struct WindowData
+    {
+        std::string Title;
+        unsigned int Width, Height;
+        bool VSync;
+
+        EventCallbackFn EventCallback;
+    };
+
+    WindowData m_Data;
 };
 
 }

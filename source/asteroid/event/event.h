@@ -3,7 +3,7 @@
 #include <string>
 #include <ostream>
 #include <functional>
-#include "asteroid/core/core.h"
+#include "asteroid/core/macro.h"
 
 namespace Asteroid
 {

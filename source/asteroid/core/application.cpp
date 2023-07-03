@@ -4,7 +4,7 @@
 #include "glad/gl.h"
 #include "asteroid/event/application_event.h"
 #include "asteroid/core/log.h"
-#include "asteroid/core/core.h"
+#include "asteroid/core/macro.h"
 
 using namespace Asteroid;
 

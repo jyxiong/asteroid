@@ -1,11 +1,10 @@
-#include "platform/windows/windows_window.h"
+#include "window.h"
 #include "asteroid/core/log.h"
 #include "asteroid/event/application_event.h"
 #include "asteroid/event/mouse_event.h"
 #include "asteroid/event/key_event.h"
 
-namespace Asteroid
-{
+using namespace Asteroid;
 
 static bool s_GLFWInitialized = false;
 
@@ -16,20 +15,20 @@ static void GLFWErrorCallback(int error, const char *description)
 
 Window *Window::Create(const WindowProps &props)
 {
-    return new WindowsWindow(props);
+    return new Window(props);
 }
 
-WindowsWindow::WindowsWindow(const WindowProps &props)
+Window::Window(const WindowProps &props)
 {
     Init(props);
 }
 
-WindowsWindow::~WindowsWindow()
+Window::~Window()
 {
     Shutdown();
 }
 
-void WindowsWindow::Init(const WindowProps &props)
+void Window::Init(const WindowProps &props)
 {
     m_Data.Title = props.Title;
     m_Data.Width = props.Width;
@@ -100,7 +99,7 @@ void WindowsWindow::Init(const WindowProps &props)
     glfwSetCharCallback(m_Window, [](GLFWwindow *window, unsigned int keycode) {
         WindowData &data = *(WindowData *) glfwGetWindowUserPointer(window);
 
-        KeyTypedEvent event((int)keycode);
+        KeyTypedEvent event((int) keycode);
         data.EventCallback(event);
     });
 
@@ -139,18 +138,18 @@ void WindowsWindow::Init(const WindowProps &props)
     });
 }
 
-void WindowsWindow::Shutdown()
+void Window::Shutdown()
 {
     glfwDestroyWindow(m_Window);
 }
 
-void WindowsWindow::OnUpdate()
+void Window::OnUpdate()
 {
     glfwPollEvents();
     glfwSwapBuffers(m_Window);
 }
 
-void WindowsWindow::SetVSync(bool enabled)
+void Window::SetVSync(bool enabled)
 {
     if (enabled)
         glfwSwapInterval(1);
@@ -160,9 +159,7 @@ void WindowsWindow::SetVSync(bool enabled)
     m_Data.VSync = enabled;
 }
 
-bool WindowsWindow::IsVSync() const
+bool Window::IsVSync() const
 {
     return m_Data.VSync;
-}
-
 }

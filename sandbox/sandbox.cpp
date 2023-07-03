@@ -3,8 +3,8 @@
 #include "asteroid/core/application.h"
 #include "asteroid/core/entry_point.h"
 #include "asteroid/core/layer.h"
-#include "asteroid/core/input.h"
-#include "asteroid/core/key_code.h"
+#include "asteroid/input/input.h"
+#include "asteroid/input/key_code.h"
 #include "asteroid/imgui/imgui_layer.h"
 
 using namespace Asteroid;

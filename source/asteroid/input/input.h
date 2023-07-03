@@ -1,8 +1,5 @@
 #pragma once
 
-#include <utility>
-#include "asteroid/core/core.h"
-
 namespace Asteroid
 {
 
@@ -20,15 +17,15 @@ public:
     inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
 protected:
-    virtual bool IsKeyPressedImpl(int keycode) = 0;
+    bool IsKeyPressedImpl(int keycode);
 
-    virtual bool IsMouseButtonPressedImpl(int button) = 0;
+    bool IsMouseButtonPressedImpl(int button);
 
-    virtual std::pair<float, float> GetMousePositionImpl() = 0;
+    std::pair<float, float> GetMousePositionImpl();
 
-    virtual float GetMouseXImpl() = 0;
+    float GetMouseXImpl();
 
-    virtual float GetMouseYImpl() = 0;
+    float GetMouseYImpl();
 
 private:
     static Input *s_Instance;

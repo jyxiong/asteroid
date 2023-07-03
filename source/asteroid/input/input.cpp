@@ -1,27 +1,27 @@
-#include "platform/windows/windows_input.h"
+#include "input.h"
 
 #include "GLFW/glfw3.h"
 #include "asteroid/core/application.h"
 
 using namespace Asteroid;
 
-Input* Input::s_Instance = new WindowsInput();
+Input* Input::s_Instance = new Input();
 
-bool WindowsInput::IsKeyPressedImpl(int keycode)
+bool Input::IsKeyPressedImpl(int keycode)
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
     auto state = glfwGetKey(window, keycode);
     return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-bool WindowsInput::IsMouseButtonPressedImpl(int button)
+bool Input::IsMouseButtonPressedImpl(int button)
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
     auto state = glfwGetMouseButton(window, button);
     return state == GLFW_PRESS;
 }
 
-std::pair<float, float> WindowsInput::GetMousePositionImpl()
+std::pair<float, float> Input::GetMousePositionImpl()
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
     double xpos, ypos;
@@ -30,13 +30,13 @@ std::pair<float, float> WindowsInput::GetMousePositionImpl()
     return { (float)xpos, (float)ypos };
 }
 
-float WindowsInput::GetMouseXImpl()
+float Input::GetMouseXImpl()
 {
     auto[x, y] = GetMousePositionImpl();
     return x;
 }
 
-float WindowsInput::GetMouseYImpl()
+float Input::GetMouseYImpl()
 {
     auto[x, y] = GetMousePositionImpl();
     return y;

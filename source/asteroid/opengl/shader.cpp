@@ -1,7 +1,7 @@
 #include "asteroid/opengl/shader.h"
 
 #include "glad/gl.h"
-#include "asteroid/core/core.h"
+#include "asteroid/core/macro.h"
 
 using namespace Asteroid;
 
