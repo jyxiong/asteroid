@@ -11,6 +11,7 @@ enum class ImageFormat
     R8,
     RGB8,
     RGBA8,
+    RGBA8UI,
     RGBA32F
 };
 

@@ -15,6 +15,8 @@ static unsigned int HazelImageFormatToGLDataFormat(ImageFormat format)
             return GL_RGB;
         case ImageFormat::RGBA8:
             return GL_RGBA;
+        case ImageFormat::RGBA8UI:
+            return GL_RGBA8UI;
         default: AST_CORE_ASSERT(false, "Unknown ImageFormat!")
             return 0;
     }
@@ -28,6 +30,8 @@ static unsigned int HazelImageFormatToGLInternalFormat(ImageFormat format)
             return GL_RGB8;
         case ImageFormat::RGBA8:
             return GL_RGBA8;
+        case ImageFormat::RGBA8UI:
+            return GL_RGBA8UI;
         default: AST_CORE_ASSERT(false, "Unknown ImageFormat!")
             return 0;
     }

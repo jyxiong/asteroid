@@ -29,12 +29,12 @@ endif ()
 
 if (NOT TARGET imgui)
     include(imgui)
-    set_target_properties(imgui PROPERTIES FOLDER ${THIRD_PARTY_DIR}/imgui)
+    set_target_properties(imgui PROPERTIES FOLDER ${EXTERNAL_DIR}/imgui)
 endif ()
 
 if (NOT TARGET spdlog)
     add_subdirectory(spdlog)
-    set_target_properties(spdlog PROPERTIES FOLDER ${EXTERNAL_DIR}/spdlog)
+    set_target_properties(spdlog_headers_for_ide PROPERTIES FOLDER ${EXTERNAL_DIR}/spdlog)
 endif ()
 
 if (NOT TARGET stb)
