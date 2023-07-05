@@ -12,6 +12,8 @@ class ExampleLayer : public Layer
 public:
     ExampleLayer();
 
+    ~ExampleLayer();
+
     void OnUpdate() override;
 
     void OnImGuiRender() override;
@@ -37,7 +39,7 @@ private:
     std::shared_ptr<Texture2D> m_Texture;
 
     cudaGraphicsResource_t m_CudaResource;
-    unsigned char *m_Data;
+    unsigned int *m_Data;
 };
 
 }

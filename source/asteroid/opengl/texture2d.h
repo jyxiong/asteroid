@@ -52,10 +52,10 @@ private:
     TextureSpecification m_Specification;
 
     std::string m_Path;
-    bool m_IsLoaded = false;
-    int m_Width, m_Height;
+    bool m_IsLoaded{false};
+    int m_Width{}, m_Height{};
     unsigned int m_RendererID{};
-    unsigned int m_InternalFormat, m_DataFormat;
+    unsigned int m_InternalFormat{}, m_DataFormat{};
 };
 
 }

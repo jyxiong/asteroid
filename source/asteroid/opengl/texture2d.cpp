@@ -6,7 +6,6 @@
 
 using namespace Asteroid;
 
-
 static unsigned int HazelImageFormatToGLDataFormat(ImageFormat format)
 {
     switch (format)
@@ -55,12 +54,12 @@ Texture2D::Texture2D(const TextureSpecification &specification)
     glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
-Texture2D::Texture2D(const std::string& path)
+Texture2D::Texture2D(const std::string &path)
     : m_Path(path)
 {
     int width, height, channels;
-    stbi_set_flip_vertically_on_load(1);
-    stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 
     if (data)
     {
@@ -74,8 +73,7 @@ Texture2D::Texture2D(const std::string& path)
         {
             internalFormat = GL_RGBA8;
             dataFormat = GL_RGBA;
-        }
-        else if (channels == 3)
+        } else if (channels == 3)
         {
             internalFormat = GL_RGB8;
             dataFormat = GL_RGB;
@@ -108,9 +106,10 @@ Texture2D::~Texture2D()
 
 void Texture2D::SetData(void *data, unsigned int size) const
 {
-    unsigned int bpp = m_DataFormat == GL_RGBA ? 4 : 3;
+    unsigned int bpp = 4;// m_DataFormat == GL_RGBA ? 4 : 3;
     AST_CORE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture!")
-    glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
+    //glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI, m_Width, m_Height, 0, GL_UNSIGNED_BYTE, GL_RGBA_INTEGER, nullptr);
 }
 
 void Texture2D::Bind(unsigned int slot) const

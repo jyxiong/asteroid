@@ -2,12 +2,16 @@
 
 #include "glad/gl.h"
 #include "cuda_gl_interop.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 #include "asteroid/base/application.h"
+#include "asteroid/util/helper_cuda.h"
 
 using namespace Asteroid;
 
 extern "C" void launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
-                                   unsigned char *g_odata, int imgw);
+    unsigned int* g_odata, int imgw);
 
 ExampleLayer::ExampleLayer()
     : Layer("Example")
@@ -18,8 +22,15 @@ ExampleLayer::ExampleLayer()
 
     InitShader();
 
+    InitCuda();
+
     m_TextureShader->Bind();
     m_TextureShader->UploadUniformInt("u_Texture", 0);
+}
+
+ExampleLayer::~ExampleLayer()
+{
+    cudaFree(m_Data);
 }
 
 void ExampleLayer::OnUpdate()
@@ -55,13 +66,13 @@ void ExampleLayer::InitShader()
     std::string textureShaderFragmentSrc = R"(
 			#version 330 core
 
-            layout(location = 0) out vec4 color;
+            layout(location = 0) out uvec4 color;
 			in vec2 v_TexCoord;
 
 			uniform sampler2D u_Texture;
 			void main()
 			{
-				color = texture(u_Texture, v_TexCoord);
+				color = uvec4(texture(u_Texture, v_TexCoord).rgb * 255.0, 255.0);
 			}
 		)";
 
@@ -92,8 +103,6 @@ void ExampleLayer::InitVao()
 
 void ExampleLayer::InitTexture()
 {
-    //m_Texture = std::make_shared<Texture2D>(R"(D:\Learning\asteroid\asset\texture\bennu_dec10.png)");
-
     Application& app = Application::Get();
     auto width = app.GetWindow().GetWidth();
     auto height = app.GetWindow().GetHeight();
@@ -105,9 +114,8 @@ void ExampleLayer::InitTexture()
     texSpec.GenerateMips = false;
     m_Texture = std::make_shared<Texture2D>(texSpec);
 
-
-    // register this texture with CUDA
-    cudaGraphicsGLRegisterImage(&m_CudaResource, m_Texture->GetRendererID(), GL_TEXTURE_2D, cudaGraphicsMapFlagsWriteDiscard);
+    // 将纹理注册为资源
+    checkCudaErrors(cudaGraphicsGLRegisterImage(&m_CudaResource, m_Texture->GetRendererID(), GL_TEXTURE_2D, cudaGraphicsMapFlagsWriteDiscard));
 }
 
 void ExampleLayer::InitCuda()
@@ -119,8 +127,8 @@ void ExampleLayer::InitCuda()
     // set up vertex data parameter
     int num_texels = width * height;
     int num_values = num_texels * 4;
-    int size_tex_data = sizeof(unsigned char) * num_values;
-    cudaMalloc((void**)&m_Data, size_tex_data);
+    int size_tex_data = sizeof(GLubyte) * num_values;
+    checkCudaErrors(cudaMalloc((void**)&m_Data, size_tex_data));
 }
 
 void ExampleLayer::UpdateCuda()
@@ -129,35 +137,42 @@ void ExampleLayer::UpdateCuda()
     auto width = app.GetWindow().GetWidth();
     auto height = app.GetWindow().GetHeight();
 
-    // run the Cuda kernel
-    // calculate grid size
     dim3 block(16, 16, 1);
-    // dim3 block(16, 16, 1);
     dim3 grid(width / block.x, height / block.y, 1);
-    // execute CUDA kernel
     launch_cudaProcess(grid, block, 0, m_Data, width);
 
-    // map the texture and blit the result thanks to CUDA API
-    // We want to copy out_data data to the texture
-    // map buffer objects to get CUDA device pointers
-    cudaArray *texture_ptr;
-    cudaGraphicsMapResources(1, &m_CudaResource, 0);
-    cudaGraphicsSubResourceGetMappedArray(
-        &texture_ptr, m_CudaResource, 0, 0);
+    // 锁定资源，并获取资源指针
+    cudaArray_t texture_ptr;
+    checkCudaErrors(cudaGraphicsMapResources(1, &m_CudaResource, 0));
+    checkCudaErrors(cudaGraphicsSubResourceGetMappedArray(&texture_ptr, m_CudaResource, 0, 0));
 
+    // 将结果拷贝到资源指针
     int num_texels = width * height;
     int num_values = num_texels * 4;
-    int size_tex_data = sizeof(unsigned char) * num_values;
-    cudaMemcpyToArray(texture_ptr, 0, 0, m_Data,
-                                      size_tex_data, cudaMemcpyDeviceToDevice);
+    int size_tex_data = sizeof(GLubyte) * num_values;
+    checkCudaErrors(cudaMemcpyToArray(texture_ptr, 0, 0, m_Data, size_tex_data, cudaMemcpyDeviceToDevice));
 
-    cudaGraphicsUnmapResources(1, &m_CudaResource, 0);
-
+    // 解除资源锁定
+    checkCudaErrors(cudaGraphicsUnmapResources(1, &m_CudaResource, 0));
 }
 
 void ExampleLayer::UpdateOpengl()
 {
-    glClearColor(0.1f, 0.1f, 0.1f, 1);
+    m_Texture->Bind();
+
+    Application& app = Application::Get();
+    auto width = app.GetWindow().GetWidth();
+    auto height = app.GetWindow().GetHeight();
+
+    int num_texels = width * height;
+    int num_values = num_texels * 4;
+    int size_tex_data = sizeof(GLubyte) * num_values;
+    std::vector<unsigned char> data(num_values, 255);
+    //glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, data.data());
+    
+    m_Texture->SetData(data.data(), num_values);
+
+    glClearColor(1.f, 0.5f, 0.5f, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_Texture->Bind();
