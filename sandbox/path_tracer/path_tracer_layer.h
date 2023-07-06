@@ -4,6 +4,7 @@
 #include "asteroid/opengl/shader.h"
 #include "asteroid/opengl/vertex_array.h"
 #include "asteroid/opengl/texture2d.h"
+#include "asteroid/opengl/pixel_buffer.h"
 
 namespace Asteroid
 {
@@ -25,6 +26,8 @@ private:
 
     void InitVao();
 
+    void InitPbo();
+
     void InitTexture();
 
     void InitCuda();
@@ -37,9 +40,9 @@ private:
     std::shared_ptr<Shader> m_TextureShader;
     std::shared_ptr<VertexArray> m_SquareVA;
     std::shared_ptr<Texture2D> m_Texture;
+    std::shared_ptr<PixelBuffer> m_Pbo;
 
-    cudaGraphicsResource_t m_CudaResource;
-    unsigned int *m_Data;
+    cudaGraphicsResource_t m_resource;
 };
 
 }

@@ -4,22 +4,36 @@
 
 namespace Asteroid
 {
-
-enum class ImageFormat
+// https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexStorage2D.xhtml
+enum class InternalFormat
 {
     None = 0,
-    R8,
-    RGB8,
     RGBA8,
     RGBA8UI,
-    RGBA32F
+};
+
+// https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexSubImage2D.xhtml
+enum class PixelFormat
+{
+    None = 0,
+    RGBA,
+    BGRA,
+};
+
+// https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexSubImage2D.xhtml
+enum class PixelType
+{
+    None = 0,
+    UNSIGNED_BYTE,
+    UNSIGNED_INT,
 };
 
 struct TextureSpecification
 {
     int Width = 1;
     int Height = 1;
-    ImageFormat Format = ImageFormat::RGBA8;
+    InternalFormat Format = InternalFormat::None;
+    PixelFormat pixel_format = PixelFormat::None;
     bool GenerateMips = true;
 };
 

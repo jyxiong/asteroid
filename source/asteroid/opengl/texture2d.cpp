@@ -6,43 +6,51 @@
 
 using namespace Asteroid;
 
-static unsigned int HazelImageFormatToGLDataFormat(ImageFormat format)
+static unsigned int GetGLPixelFormat(PixelFormat format)
 {
     switch (format)
     {
-        case ImageFormat::RGB8:
-            return GL_RGB;
-        case ImageFormat::RGBA8:
+        case PixelFormat::BGRA:
+            return GL_BGRA;
+        case PixelFormat::RGBA:
             return GL_RGBA;
-        case ImageFormat::RGBA8UI:
-            return GL_RGBA8UI;
-        default: AST_CORE_ASSERT(false, "Unknown ImageFormat!")
+        default: AST_CORE_ASSERT(false, "Unknown PixelFormat!")
             return 0;
     }
 }
 
-static unsigned int HazelImageFormatToGLInternalFormat(ImageFormat format)
+static unsigned int GetGLInternalFormat(InternalFormat format)
 {
     switch (format)
     {
-        case ImageFormat::RGB8:
-            return GL_RGB8;
-        case ImageFormat::RGBA8:
+        case InternalFormat::RGBA8:
             return GL_RGBA8;
-        case ImageFormat::RGBA8UI:
+        case InternalFormat::RGBA8UI:
             return GL_RGBA8UI;
-        default: AST_CORE_ASSERT(false, "Unknown ImageFormat!")
+        default: AST_CORE_ASSERT(false, "Unknown InternalFormat!")
             return 0;
     }
 }
 
+static unsigned int GetGLPixelType(PixelType type)
+{
+    switch (type)
+    {
+    case PixelType::UNSIGNED_BYTE:
+        return GL_UNSIGNED_BYTE;
+    case PixelType::UNSIGNED_INT:
+        return GL_UNSIGNED_INT;
+    default: AST_CORE_ASSERT(false, "Unknown InternalFormat!")
+        return 0;
+    }
+}
 
 Texture2D::Texture2D(const TextureSpecification &specification)
     : m_Specification(specification), m_Width(m_Specification.Width), m_Height(m_Specification.Height)
 {
 
-    m_InternalFormat = HazelImageFormatToGLInternalFormat(m_Specification.Format);
-    m_DataFormat = HazelImageFormatToGLDataFormat(m_Specification.Format);
+    m_InternalFormat = GetGLInternalFormat(m_Specification.Format);
+    m_DataFormat = GetGLPixelFormat(m_Specification.pixel_format);
 
     glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
     glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
@@ -105,11 +113,10 @@ Texture2D::~Texture2D()
 }
 
 void Texture2D::SetData(void *data, unsigned int size) const
-{
-    unsigned int bpp = 4;// m_DataFormat == GL_RGBA ? 4 : 3;
-    AST_CORE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture!")
-    //glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI, m_Width, m_Height, 0, GL_UNSIGNED_BYTE, GL_RGBA_INTEGER, nullptr);
+{/*
+    unsigned int bpp = m_DataFormat == GL_RGBA ? 4 : 3;
+    AST_CORE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture!")*/
+    glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
 }
 
 void Texture2D::Bind(unsigned int slot) const

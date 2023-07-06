@@ -11,7 +11,7 @@
 using namespace Asteroid;
 
 extern "C" void launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
-    unsigned int* g_odata, int imgw);
+    uchar4* g_odata, int imgw);
 
 ExampleLayer::ExampleLayer()
     : Layer("Example")
@@ -24,13 +24,14 @@ ExampleLayer::ExampleLayer()
 
     InitCuda();
 
+    InitPbo();
+
     m_TextureShader->Bind();
     m_TextureShader->UploadUniformInt("u_Texture", 0);
 }
 
 ExampleLayer::~ExampleLayer()
 {
-    cudaFree(m_Data);
 }
 
 void ExampleLayer::OnUpdate()
@@ -66,13 +67,13 @@ void ExampleLayer::InitShader()
     std::string textureShaderFragmentSrc = R"(
 			#version 330 core
 
-            layout(location = 0) out uvec4 color;
+            layout(location = 0) out vec4 color;
 			in vec2 v_TexCoord;
 
 			uniform sampler2D u_Texture;
 			void main()
 			{
-				color = uvec4(texture(u_Texture, v_TexCoord).rgb * 255.0, 255.0);
+				color = texture(u_Texture, v_TexCoord);
 			}
 		)";
 
@@ -85,20 +86,36 @@ void ExampleLayer::InitVao()
     m_SquareVA = std::make_shared<VertexArray>();
 
     float squareVertices[5 * 4] = {
-        -1.f, -1.f, 0.f, 0.f, 0.f,
-        1.f, -1.f, 0.f, 1.f, 0.f,
-        1.f, 1.f, 0.f, 1.f, 1.f,
-        -1.f, 1.f, 0.f, 0.f, 1.f
+        -1.f, -1.f, 0.f, 1.f, 1.f,
+        1.f, -1.f, 0.f, 0.f, 1.f,
+        1.f, 1.f, 0.f, 0.f, 0.f,
+        -1.f, 1.f, 0.f, 1.f, 0.f
     };
 
     auto squareVB = std::make_shared<VertexBuffer>(squareVertices, sizeof(squareVertices));
-    squareVB->SetLayout({{ ShaderDataType::Float3, "a_Position" },
-                         { ShaderDataType::Float2, "a_TexCoord" }});
+    squareVB->SetLayout({ { ShaderDataType::Float3, "a_Position" },
+                         { ShaderDataType::Float2, "a_TexCoord" } });
     m_SquareVA->AddVertexBuffer(squareVB);
 
-    unsigned int squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
+    unsigned int squareIndices[6] = { 0, 1, 3, 3, 1, 2 };
     auto squareIB = std::make_shared<IndexBuffer>(squareIndices, sizeof(squareIndices) / sizeof(unsigned int));
     m_SquareVA->SetIndexBuffer(squareIB);
+}
+
+void ExampleLayer::InitPbo()
+{
+    Application& app = Application::Get();
+    auto width = app.GetWindow().GetWidth();
+    auto height = app.GetWindow().GetHeight();
+
+    int num_texels = width * height;
+    int num_values = num_texels * 4;
+    size_t size_tex_data = sizeof(GLubyte) * num_values;
+
+    m_Pbo = std::make_shared<PixelBuffer>(size_tex_data);
+
+    // 注册到cuda
+    cudaGraphicsGLRegisterBuffer(&m_resource, m_Pbo->GetRendererID(), cudaGraphicsMapFlagsNone);
 }
 
 void ExampleLayer::InitTexture()
@@ -110,12 +127,10 @@ void ExampleLayer::InitTexture()
     TextureSpecification texSpec{};
     texSpec.Width = width;
     texSpec.Height = height;
-    texSpec.Format = ImageFormat::RGBA8UI;
+    texSpec.Format = InternalFormat::RGBA8;
+    texSpec.pixel_format = PixelFormat::RGBA;
     texSpec.GenerateMips = false;
     m_Texture = std::make_shared<Texture2D>(texSpec);
-
-    // 将纹理注册为资源
-    checkCudaErrors(cudaGraphicsGLRegisterImage(&m_CudaResource, m_Texture->GetRendererID(), GL_TEXTURE_2D, cudaGraphicsMapFlagsWriteDiscard));
 }
 
 void ExampleLayer::InitCuda()
@@ -127,8 +142,8 @@ void ExampleLayer::InitCuda()
     // set up vertex data parameter
     int num_texels = width * height;
     int num_values = num_texels * 4;
-    int size_tex_data = sizeof(GLubyte) * num_values;
-    checkCudaErrors(cudaMalloc((void**)&m_Data, size_tex_data));
+    int size_tex_data = sizeof(unsigned char) * num_values;
+    //checkCudaErrors(cudaMalloc((void**)&m_Data, size_tex_data));
 }
 
 void ExampleLayer::UpdateCuda()
@@ -137,47 +152,29 @@ void ExampleLayer::UpdateCuda()
     auto width = app.GetWindow().GetWidth();
     auto height = app.GetWindow().GetHeight();
 
+    size_t num_bytes;
+
+    uchar4* dptr = NULL;
+    cudaGraphicsMapResources(1, &m_resource, 0);
+    cudaGraphicsResourceGetMappedPointer((void**)&dptr, &num_bytes, m_resource);
+
+    // Execute the kernel
     dim3 block(16, 16, 1);
     dim3 grid(width / block.x, height / block.y, 1);
-    launch_cudaProcess(grid, block, 0, m_Data, width);
+    launch_cudaProcess(grid, block, 0, dptr, width);
 
-    // 锁定资源，并获取资源指针
-    cudaArray_t texture_ptr;
-    checkCudaErrors(cudaGraphicsMapResources(1, &m_CudaResource, 0));
-    checkCudaErrors(cudaGraphicsSubResourceGetMappedArray(&texture_ptr, m_CudaResource, 0, 0));
-
-    // 将结果拷贝到资源指针
-    int num_texels = width * height;
-    int num_values = num_texels * 4;
-    int size_tex_data = sizeof(GLubyte) * num_values;
-    checkCudaErrors(cudaMemcpyToArray(texture_ptr, 0, 0, m_Data, size_tex_data, cudaMemcpyDeviceToDevice));
-
-    // 解除资源锁定
-    checkCudaErrors(cudaGraphicsUnmapResources(1, &m_CudaResource, 0));
+    // Unmap buffer object
+    cudaGraphicsUnmapResources(1, &m_resource, 0);
 }
 
 void ExampleLayer::UpdateOpengl()
 {
+    // https://www.cnblogs.com/crsky/p/7870835.html
+    m_Pbo->BindUnpack();
     m_Texture->Bind();
-
-    Application& app = Application::Get();
-    auto width = app.GetWindow().GetWidth();
-    auto height = app.GetWindow().GetHeight();
-
-    int num_texels = width * height;
-    int num_values = num_texels * 4;
-    int size_tex_data = sizeof(GLubyte) * num_values;
-    std::vector<unsigned char> data(num_values, 255);
-    //glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, data.data());
-    
-    m_Texture->SetData(data.data(), num_values);
-
-    glClearColor(1.f, 0.5f, 0.5f, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    m_Texture->Bind();
-    m_TextureShader->Bind();
+    m_Texture->SetData(nullptr, 0);
     m_SquareVA->Bind();
-    glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+    m_TextureShader->Bind();
+    glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0);
 }
 
