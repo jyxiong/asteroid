@@ -85,12 +85,12 @@ void initPBO() {
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
         // Allocate data for the buffer. 4-channel 8-bit image
         glBufferData(GL_PIXEL_UNPACK_BUFFER, size_tex_data, NULL, GL_DYNAMIC_COPY);
-        // ע�ᵽcuda
+        // ע�ᵽcuda
         cudaGraphicsGLRegisterBuffer(&m_resource, m_pbo, cudaGraphicsMapFlagsNone);
 }
 
 void initVAO() {
-    m_SquareVA = std::make_shared<VertexArray>();
+    m_Vao = std::make_shared<VertexArray>();
 
     float squareVertices[5 * 4] = {
         -1.f, -1.f, 0.f, 1.f, 1.f,
@@ -102,11 +102,11 @@ void initVAO() {
     auto squareVB = std::make_shared<VertexBuffer>(squareVertices, sizeof(squareVertices));
     squareVB->SetLayout({ { ShaderDataType::Float3, "a_Position" },
                          { ShaderDataType::Float2, "a_TexCoord" } });
-    m_SquareVA->AddVertexBuffer(squareVB);
+    m_Vao->AddVertexBuffer(squareVB);
 
     unsigned int squareIndices[6] = { 0, 1, 3, 3, 1, 2 };
     auto squareIB = std::make_shared<IndexBuffer>(squareIndices, sizeof(squareIndices) / sizeof(unsigned int));
-    m_SquareVA->SetIndexBuffer(squareIB);
+    m_Vao->SetIndexBuffer(squareIB);
 }
 
 void initCUDA() {
@@ -156,7 +156,7 @@ void initShader() {
 			}
 		)";
 
-    m_TextureShader = std::make_shared<Shader>(textureShaderVertexSrc, textureShaderFragmentSrc);
+    m_Shader = std::make_shared<Shader>(textureShaderVertexSrc, textureShaderFragmentSrc);
 }
 
 // ====================================
@@ -191,9 +191,9 @@ void mainLoop() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // VAO, shader program, and texture already bound
-        m_SquareVA->Bind();
-        m_TextureShader->Bind();
-        glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0);
+        m_Vao->Bind();
+        m_Shader->Bind();
+        glDrawElements(GL_TRIANGLES, m_Vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(m_window);
     }
     glfwDestroyWindow(m_window);

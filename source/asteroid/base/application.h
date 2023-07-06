@@ -20,14 +20,20 @@ public:
     void PushLayer(Layer* layer);
     void PushOverlay(Layer* layer);
 
-    void OnEvent(Event& e);
-
     void Run();
 
 public:
     inline static Application& Get() { return *s_Instance; }
 
 private:
+
+    void InitWindow();
+
+    void InitLayer();
+
+    void InitOpengl();
+
+    void OnEvent(Event& e);
 
     bool OnWindowClose(WindowCloseEvent& e);
 

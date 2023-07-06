@@ -27,8 +27,8 @@ int                m_minor;
 
 cudaGraphicsResource_t m_resource;
 
-std::shared_ptr<Shader> m_TextureShader;
-std::shared_ptr<VertexArray> m_SquareVA;
+std::shared_ptr<Shader> m_Shader;
+std::shared_ptr<VertexArray> m_Vao;
 std::shared_ptr<Texture2D> m_Texture;
 
 // ====================================

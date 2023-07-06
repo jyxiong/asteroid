@@ -14,14 +14,9 @@ Application::Application()
     AST_CORE_ASSERT(!s_Instance, "Application already exists!")
     s_Instance = this;
 
-    m_Window = std::unique_ptr<Window>(Window::Create());
+    InitWindow();
 
-    m_Window->SetEventCallback([this](Event &e) -> void {
-        OnEvent(e);
-    });
-
-    m_ImGuiLayer = new ImGuiLayer();
-    PushOverlay(m_ImGuiLayer);
+    InitLayer();
 }
 
 Application::~Application() = default;
@@ -36,26 +31,6 @@ void Application::PushOverlay(Layer *layer)
 {
     m_LayerStack.PushOverlay(layer);
     layer->OnAttach();
-}
-
-
-void Application::OnEvent(Event &e)
-{
-    EventDispatcher dispatcher(e);
-    dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent &e) -> bool {
-        return OnWindowClose(e);
-    });
-
-    dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent &e) -> bool {
-        return OnWindowResize(e);
-    });
-
-    for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
-    {
-        (*--it)->OnEvent(e);
-        if (e.Handled)
-            break;
-    }
 }
 
 void Application::Run()
@@ -74,6 +49,44 @@ void Application::Run()
         m_ImGuiLayer->End();
 
         m_Window->OnUpdate();
+    }
+}
+
+void Application::InitWindow()
+{
+    m_Window = std::unique_ptr<Window>(Window::Create());
+    m_Window->SetEventCallback([this](Event &e) -> void {
+        OnEvent(e);
+    });
+}
+
+void Application::InitLayer()
+{
+    m_ImGuiLayer = new ImGuiLayer();
+    PushOverlay(m_ImGuiLayer);
+}
+
+void Application::InitOpengl()
+{
+
+}
+
+void Application::OnEvent(Event &e)
+{
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent &e) -> bool {
+        return OnWindowClose(e);
+    });
+
+    dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent &e) -> bool {
+        return OnWindowResize(e);
+    });
+
+    for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
+    {
+        (*--it)->OnEvent(e);
+        if (e.Handled)
+            break;
     }
 }
 
