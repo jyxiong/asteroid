@@ -5,7 +5,6 @@
 #include "asteroid/opengl/shader.h"
 #include "asteroid/opengl/vertex_array.h"
 #include "asteroid/opengl/texture2d.h"
-#include "asteroid/opengl/framebuffer.h"
 
 namespace Asteroid
 {
@@ -28,7 +27,6 @@ private:
 
     void InitShader();
     void InitVao();
-    void InitFbo();
 
     void Render();
 
@@ -37,11 +35,8 @@ private:
 private:
     uchar4* m_ImageData = nullptr;
     std::shared_ptr<Image> m_Image;
-    std::shared_ptr<Texture2D> m_Texture;
     std::shared_ptr<Shader> m_Shader;
     std::shared_ptr<VertexArray> m_Vao;
-
-    std::shared_ptr<Framebuffer> m_Fbo;
 };
 
 }

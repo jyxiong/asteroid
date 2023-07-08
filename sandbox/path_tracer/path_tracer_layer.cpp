@@ -21,8 +21,6 @@ ExampleLayer::ExampleLayer()
 
     InitShader();
 
-    InitFbo();
-
     InitCuda();
 
     m_Shader->Bind();
@@ -47,9 +45,9 @@ void ExampleLayer::OnImGuiRender()
     auto height = (float)app.GetWindow().GetHeight();
 
     ImGui::Begin("OpenGL Texture Text");
-    ImGui::Text("pointer = %p", m_Texture->GetRendererID());
+    ImGui::Text("pointer = %p", m_Image->GetRendererID());
     ImGui::Text("size = %f x %f", width, height);
-    ImGui::Image((void*)(intptr_t)m_Texture->GetRendererID(), ImVec2(width, height));
+    ImGui::Image((void*)(intptr_t)m_Image->GetRendererID(), ImVec2(width, height));
     ImGui::End();
 }
 
@@ -71,8 +69,6 @@ void ExampleLayer::InitImage()
     texSpec.GenerateMips = false;
 
     m_Image = std::make_shared<Image>(texSpec);
-
-    m_Texture = std::make_shared<Texture2D>("D:/Learning/asteroid/asset/texture/bennu_dec10.png");
 }
 
 void ExampleLayer::InitShader()
@@ -128,18 +124,6 @@ void ExampleLayer::InitVao()
     m_Vao->SetIndexBuffer(squareIB);
 }
 
-void ExampleLayer::InitFbo()
-{
-    Application& app = Application::Get();
-    auto width = app.GetWindow().GetWidth();
-    auto height = app.GetWindow().GetHeight();
-
-    FramebufferSpecification spec{};
-    spec.Width = width;
-    spec.Height = height;
-    m_Fbo = std::make_shared<Framebuffer>(spec);
-}
-
 void ExampleLayer::InitCuda()
 {
     Application& app = Application::Get();
@@ -175,14 +159,9 @@ void ExampleLayer::Preview()
     int size_tex_data = sizeof(unsigned char) * num_values;
 
     m_Image->SetData(m_ImageData, size_tex_data);
-    m_Texture->Bind();
     m_Vao->Bind();
     m_Shader->Bind();
     m_Shader->UploadUniformInt("u_Texture", 0);
-    m_Fbo->Bind();
-    glDrawElements(GL_TRIANGLES, m_Vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0);
-    m_Fbo->Unbind();
-    glBindTexture(GL_TEXTURE_2D, m_Fbo->GetColorAttachmentRendererID());
     glDrawElements(GL_TRIANGLES, m_Vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, 0);
 }
 

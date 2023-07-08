@@ -18,10 +18,13 @@ namespace Asteroid
 
 		void Resize(unsigned int width, unsigned int);
 
+		unsigned int GetRendererID() { return m_Texture->GetRendererID(); }
+
 		void UnRegist();
 
 		void Regist();
 
+	private:
 		unsigned int m_Width;
 
 		unsigned int m_Height;

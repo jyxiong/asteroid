@@ -11,7 +11,7 @@ __global__ void cudaProcess(uchar4* g_odata, int imgw) {
     int x = blockIdx.x * bw + tx;
     int y = blockIdx.y * bh + ty;
 
-    uchar4 c4 = make_uchar4((x & 0x20) ? 100 : 0, 0, (y & 0x20) ? 100 : 0, 0);
+    uchar4 c4 = make_uchar4((x & 0x20) ? 100 : 0, 0, (y & 0x20) ? 100 : 0, 255);
     g_odata[y * imgw + x] = c4;
 }
 
