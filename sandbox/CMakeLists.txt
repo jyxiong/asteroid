@@ -1,2 +1,1 @@
-add_subdirectory(cuda_opengl)
 add_subdirectory(path_tracer)
