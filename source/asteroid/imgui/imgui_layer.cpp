@@ -9,6 +9,8 @@
 
 using namespace Asteroid;
 
+bool ImGuiLayer::m_ShowDockSpace = true;
+
 ImGuiLayer::ImGuiLayer()
     : Layer("ImGuiLayer")
 {
@@ -46,7 +48,7 @@ void ImGuiLayer::OnAttach()
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 410");
+    ImGui_ImplOpenGL3_Init("#version 460");
 }
 
 void ImGuiLayer::OnDetach()
@@ -63,13 +65,14 @@ void ImGuiLayer::Begin()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+
+    ShowDockSpaceBegin();
 }
 
 void ImGuiLayer::End()
-{
-    // End of "DockSpace Demo" in OnImGUIRender()
-    ImGui::End();
-    
+{   
+    ShowDockSpaceEnd();
+
     ImGuiIO& io = ImGui::GetIO();
     Application& app = Application::Get();
     io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
@@ -96,8 +99,11 @@ void ImGuiLayer::End()
 }
 
 void ImGuiLayer::OnImGuiRender()
+{ 
+}
+
+void ImGuiLayer::ShowDockSpaceBegin()
 {
-    static bool dockspaceOpen = true;
     static bool opt_fullscreen = true;
     static bool opt_padding = false;
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -107,24 +113,24 @@ void ImGuiLayer::OnImGuiRender()
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
     if (opt_fullscreen)
     {
-       const ImGuiViewport* viewport = ImGui::GetMainViewport();
-       ImGui::SetNextWindowPos(viewport->WorkPos);
-       ImGui::SetNextWindowSize(viewport->WorkSize);
-       ImGui::SetNextWindowViewport(viewport->ID);
-       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-       ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-       window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-       window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        const ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
     }
     else
     {
-       dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+        dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
     }
 
     // When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
     // and handle the pass-thru hole, so we ask Begin() to not render a background.
     if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-       window_flags |= ImGuiWindowFlags_NoBackground;
+        window_flags |= ImGuiWindowFlags_NoBackground;
 
     // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
     // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
@@ -132,19 +138,24 @@ void ImGuiLayer::OnImGuiRender()
     // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
     // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
     if (!opt_padding)
-       ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("DockSpace Demo", &m_ShowDockSpace, window_flags);
     if (!opt_padding)
-       ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
 
     if (opt_fullscreen)
-       ImGui::PopStyleVar(2);
+        ImGui::PopStyleVar(2);
 
     // Submit the DockSpace
     ImGuiIO& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
     {
-       ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-       ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+        ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
     }
+}
+
+void ImGuiLayer::ShowDockSpaceEnd()
+{
+    ImGui::End();
 }

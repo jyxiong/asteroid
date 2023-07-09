@@ -3,33 +3,38 @@
 #include <memory>
 #include "glad/gl.h"
 #include "cuda_gl_interop.h"
-#include "asteroid/opengl/texture2d.h"
 
 namespace Asteroid
 {
 	class Image
 	{
 	public:
-		explicit Image(const TextureSpecification& specification);
+		Image(unsigned int width, unsigned int height);
 
 		~Image();
 
-		void SetData(const void* data, size_t size);
+		void SetData(const void* data);
 
 		void Resize(unsigned int width, unsigned int);
 
-		unsigned int GetRendererID() { return m_Texture->GetRendererID(); }
+		int GetWidth() const { return m_Width; }
 
-		void UnRegist();
+		int GetHeight() const { return m_Height; }
 
-		void Regist();
+		unsigned int GetRendererID() const { return m_RendererID; }
+
+	private:
+		void Allocate();
+
+		void Release();
 
 	private:
 		unsigned int m_Width;
 
 		unsigned int m_Height;
-	
-		std::shared_ptr<Texture2D> m_Texture;
+
+		unsigned int m_RendererID{};
+
 		cudaGraphicsResource_t m_resource;
 	};
 }

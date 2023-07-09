@@ -26,7 +26,14 @@ public:
     void End();
 
 private:
+    void ShowDockSpaceBegin();
+
+    void ShowDockSpaceEnd();
+
+private:
     float m_Time = 0.0f;
+
+    static bool m_ShowDockSpace;
 };
 
 }

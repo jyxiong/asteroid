@@ -1,10 +1,9 @@
 #include <memory>
 #include "cuda_runtime.h"
+#include "glm/glm.hpp"
 #include "asteroid/base/layer.h"
 #include "asteroid/base/image.h"
-#include "asteroid/opengl/shader.h"
-#include "asteroid/opengl/vertex_array.h"
-#include "asteroid/opengl/texture2d.h"
+#include "asteroid/renderer/renderer.h"
 
 namespace Asteroid
 {
@@ -22,21 +21,12 @@ public:
     void OnEvent(Event &event) override;
 
 private:
-    void InitCuda();
-    void InitImage();
-
-    void InitShader();
-    void InitVao();
-
     void Render();
 
-    void Preview();
-
 private:
-    uchar4* m_ImageData = nullptr;
-    std::shared_ptr<Image> m_Image;
-    std::shared_ptr<Shader> m_Shader;
-    std::shared_ptr<VertexArray> m_Vao;
+    Renderer m_Renderer;
+
+    unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
 };
 
 }

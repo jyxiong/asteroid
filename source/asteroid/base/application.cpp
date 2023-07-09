@@ -66,11 +66,6 @@ void Application::InitLayer()
     PushOverlay(m_ImGuiLayer);
 }
 
-void Application::InitOpengl()
-{
-
-}
-
 void Application::OnEvent(Event &e)
 {
     EventDispatcher dispatcher(e);

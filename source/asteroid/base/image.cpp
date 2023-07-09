@@ -2,48 +2,62 @@
 
 using namespace Asteroid;
 
-Image::Image(const TextureSpecification& specification)
+Image::Image(unsigned int width, unsigned int height)
+    : m_Width(width), m_Height(height)
 {
-	m_Texture = std::make_shared<Texture2D>(specification);
-	cudaGraphicsGLRegisterImage(&m_resource, m_Texture->GetRendererID(), GL_TEXTURE_2D, cudaGraphicsRegisterFlagsWriteDiscard);
+    Allocate();
 }
 
-Image::~Image() = default;
-
-void Image::SetData(const void* data, size_t size)
+Image::~Image()
 {
-    cudaArray* texture_ptr;
+    Release();
+}
+
+void Image::SetData(const void* data)
+{
     cudaGraphicsMapResources(1, &m_resource, 0);
+
+    cudaArray* texture_ptr;
     cudaGraphicsSubResourceGetMappedArray(&texture_ptr, m_resource, 0, 0);
+
+    size_t size = m_Width * m_Height * sizeof(uchar4);
     cudaMemcpyToArray(texture_ptr, 0, 0, data, size, cudaMemcpyDeviceToDevice);
+    
     cudaGraphicsUnmapResources(1, &m_resource, 0);
 }
 
 void Image::Resize(unsigned int width, unsigned int height)
 {
-    if (m_Texture && m_Width == width && m_Height == height)
+    if (m_Width == width && m_Height == height)
     {
 		return;
     }
 
-	// TODO: max size?
-	m_Width = width;
-	m_Height = height;
-        
-    auto spec = m_Texture->GetSpecification();
-    spec.Width = width;
-    spec.Height = height;
-    m_Texture = std::make_shared<Texture2D>(spec);
-    cudaGraphicsGLRegisterImage(&m_resource, m_Texture->GetRendererID(), GL_TEXTURE_2D, cudaGraphicsRegisterFlagsWriteDiscard);
+    Release();
+
+    m_Width = width;
+    m_Height = height;
+
+    Allocate();
 }
 
-void Image::Regist()
+void Image::Allocate()
 {
-   cudaGraphicsGLRegisterImage(&m_resource, m_Texture->GetRendererID(), GL_TEXTURE_2D, cudaGraphicsRegisterFlagsWriteDiscard);
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
+    glTextureStorage2D(m_RendererID, 1, GL_RGBA8, m_Width, m_Height);
 
+    glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	cudaGraphicsGLRegisterImage(&m_resource, m_RendererID, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsWriteDiscard);
 }
 
-void Image::UnRegist()
+void Image::Release()
 {
     cudaGraphicsUnregisterResource(m_resource);
+
+    glDeleteTextures(1, &m_RendererID);
 }

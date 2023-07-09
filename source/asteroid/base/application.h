@@ -31,8 +31,6 @@ private:
 
     void InitLayer();
 
-    void InitOpengl();
-
     void OnEvent(Event& e);
 
     bool OnWindowClose(WindowCloseEvent& e);

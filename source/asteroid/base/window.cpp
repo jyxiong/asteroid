@@ -51,6 +51,11 @@ void Window::Init(const WindowProps &props)
     auto status = gladLoadGL(glfwGetProcAddress);
     AST_CORE_ASSERT(status, "Failed to initialize Glad!")
 
+    AST_CORE_INFO("OpenGL Info:");
+    AST_CORE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
+    AST_CORE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
+    AST_CORE_INFO("  Version: {0}", glGetString(GL_VERSION));
+
     glfwSetWindowUserPointer(m_Window, &m_Data);
     SetVSync(true);
 
