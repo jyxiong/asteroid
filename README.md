@@ -7,3 +7,11 @@
 [pbrt](https://www.pbrt.org/)
 
 [CIS565-Fall-2022/Project3-CUDA-Path-Tracer](https://github.com/CIS565-Fall-2022/Project3-CUDA-Path-Tracer)
+
+## TODO
+
+1. checkcuda & checkgl
+
+2. .cu & .cuh
+
+3. cuda buffer
