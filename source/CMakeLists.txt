@@ -26,3 +26,5 @@ target_compile_definitions(asteroid PUBLIC
     STB_IMAGE_IMPLEMENTATION
     AST_PLATFORM_WINDOWS
     AST_ENABLE_ASSERTS)
+
+set_target_properties(asteroid PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
