@@ -6,13 +6,9 @@
 #include "glm/glm.hpp"
 
 #include "asteroid/base/application.h"
-#include "asteroid/util/helper_cuda.h"
 #include "asteroid/util/timer.h"
 
 using namespace Asteroid;
-
-extern "C" void launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
-    glm::u8vec4* g_odata, int imgw);
 
 ExampleLayer::ExampleLayer()
     : Layer("Example")

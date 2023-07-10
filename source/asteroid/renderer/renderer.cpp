@@ -1,5 +1,4 @@
 #include "asteroid/renderer/renderer.h"
-#include "asteroid/util/helper_cuda.h"
 
 #include "asteroid/renderer/kernel.h"
 
@@ -23,11 +22,11 @@ void Renderer::OnResize(unsigned int width, unsigned int height)
 	int num_texels = width * height;
 
 
-	checkCudaErrors(cudaFree(m_ImageData));
-	checkCudaErrors(cudaMalloc((void**)&m_ImageData, sizeof(glm::u8vec4) * num_texels));
+	cudaFree(m_ImageData);
+	cudaMalloc((void**)&m_ImageData, sizeof(glm::u8vec4) * num_texels);
 
-	checkCudaErrors(cudaFree(m_AccumulationData));
-	checkCudaErrors(cudaMalloc((void**)&m_AccumulationData, sizeof(glm::vec4) * num_texels));
+	cudaFree(m_AccumulationData);
+	cudaMalloc((void**)&m_AccumulationData, sizeof(glm::vec4) * num_texels);
 }
 
 void Renderer::Render()
