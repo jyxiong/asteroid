@@ -1,8 +1,9 @@
+#pragma once
+
 #include <memory>
-#include "cuda_runtime.h"
 #include "glm/glm.hpp"
 #include "asteroid/base/layer.h"
-#include "asteroid/base/image.h"
+#include "asteroid/renderer/image.h"
 #include "asteroid/renderer/renderer.h"
 
 namespace Asteroid

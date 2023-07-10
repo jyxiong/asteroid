@@ -1,6 +1,5 @@
-#include <utility>
-
 #include "asteroid/base/layer.h"
+#include <utility>
 
 using namespace Asteroid;
 

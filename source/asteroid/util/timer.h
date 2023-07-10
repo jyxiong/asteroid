@@ -3,7 +3,6 @@
 #include <iostream>
 #include <string>
 #include <chrono>
-
 #include "asteroid/util/log.h"
 
 namespace Asteroid {

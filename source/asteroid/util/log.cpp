@@ -1,4 +1,4 @@
-#include "log.h"
+#include "asteroid/util/log.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 using namespace Asteroid;

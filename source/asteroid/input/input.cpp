@@ -1,4 +1,4 @@
-#include "input.h"
+#include "asteroid/input/input.h"
 
 #include "GLFW/glfw3.h"
 #include "asteroid/base/application.h"

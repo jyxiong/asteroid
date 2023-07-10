@@ -1,7 +1,5 @@
 #pragma once
 
-#include "cuda_runtime.h"
-
 #ifdef AST_ENABLE_ASSERTS
 
 #define AST_ASSERT(x, ...) { if(!(x)) { AST_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }

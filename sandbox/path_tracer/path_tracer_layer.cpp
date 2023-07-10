@@ -1,10 +1,6 @@
 #include "path_tracer_layer.h"
 
-#include "glad/gl.h"
-#include "cuda_gl_interop.h"
 #include "imgui.h"
-#include "glm/glm.hpp"
-
 #include "asteroid/base/application.h"
 #include "asteroid/util/timer.h"
 

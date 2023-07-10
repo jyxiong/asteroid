@@ -21,7 +21,6 @@ void Renderer::OnResize(unsigned int width, unsigned int height)
 
 	int num_texels = width * height;
 
-
 	cudaFree(m_ImageData);
 	cudaMalloc((void**)&m_ImageData, sizeof(glm::u8vec4) * num_texels);
 

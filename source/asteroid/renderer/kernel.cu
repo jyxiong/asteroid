@@ -1,7 +1,5 @@
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
 #include "glm/glm.hpp"
-#include "lib.h"
+#include "asteroid/renderer/lib.h"
 
 __global__ void cudaProcess(glm::u8vec4* g_odata, int width, int height) {
     auto x = blockIdx.x * blockDim.x + threadIdx.x;

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "asteroid/event/event.h"
-
 #include <sstream>
+#include "asteroid/event/event.h"
 
 namespace Asteroid
 {

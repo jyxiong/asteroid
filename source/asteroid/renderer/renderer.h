@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "glm/glm.hpp"
-#include "asteroid/base/image.h"
+#include "asteroid/renderer/image.h"
 
 namespace Asteroid
 {
@@ -13,7 +13,6 @@ namespace Asteroid
         void Render();
         
 		std::shared_ptr<Image> GetFinalImage() const { return m_FinalImage; }
-
 
 	private:
 		// 存储计算过程中颜色值[0, 1]

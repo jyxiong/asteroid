@@ -1,4 +1,4 @@
-#include "asteroid/base/image.h"
+#include "asteroid/renderer/image.h"
 
 using namespace Asteroid;
 
@@ -15,15 +15,14 @@ Image::~Image()
 
 void Image::SetData(const void* data)
 {
-    cudaGraphicsMapResources(1, &m_resource, 0);
+    cudaGraphicsMapResources(1, &m_resource, nullptr);
 
     cudaArray* texture_ptr;
     cudaGraphicsSubResourceGetMappedArray(&texture_ptr, m_resource, 0, 0);
 
-    size_t size = m_Width * m_Height * sizeof(uchar4);
-    cudaMemcpyToArray(texture_ptr, 0, 0, data, size, cudaMemcpyDeviceToDevice);
+    cudaMemcpy2DToArray(texture_ptr, 0, 0, data, m_Width * sizeof(uchar4), m_Width * sizeof(uchar4), m_Height, cudaMemcpyDeviceToDevice);
     
-    cudaGraphicsUnmapResources(1, &m_resource, 0);
+    cudaGraphicsUnmapResources(1, &m_resource, nullptr);
 }
 
 void Image::Resize(unsigned int width, unsigned int height)
