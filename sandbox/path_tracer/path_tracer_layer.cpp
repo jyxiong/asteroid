@@ -7,6 +7,7 @@
 
 #include "asteroid/base/application.h"
 #include "asteroid/util/helper_cuda.h"
+#include "asteroid/util/timer.h"
 
 using namespace Asteroid;
 
@@ -29,6 +30,14 @@ void ExampleLayer::OnUpdate()
 
 void ExampleLayer::OnImGuiRender()
 {
+    ImGui::Begin("Settings");
+    ImGui::Text("Last render: %.3fms", m_LastRenderTime);
+    if (ImGui::Button("Render"))
+    {
+        Render();
+    }
+    ImGui::End();
+
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Viewport");
 
@@ -52,6 +61,10 @@ void ExampleLayer::OnEvent(Event &event)
 
 void ExampleLayer::Render()
 {
+    Timer timer;
+    
     m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
     m_Renderer.Render();
+
+    m_LastRenderTime = timer.ElapsedMillis();
 }
