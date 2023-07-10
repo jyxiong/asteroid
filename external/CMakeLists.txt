@@ -34,7 +34,7 @@ endif ()
 
 if (NOT TARGET spdlog)
     add_subdirectory(spdlog)
-    set_target_properties(spdlog_headers_for_ide PROPERTIES FOLDER ${EXTERNAL_DIR}/spdlog)
+    set_target_properties(spdlog PROPERTIES FOLDER ${EXTERNAL_DIR}/spdlog)
 endif ()
 
 if (NOT TARGET stb)
