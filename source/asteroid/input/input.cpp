@@ -5,39 +5,31 @@
 
 using namespace Asteroid;
 
-Input* Input::s_Instance = new Input();
-
-bool Input::IsKeyPressedImpl(int keycode)
+bool Input::IsKeyDown(KeyCode keycode)
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-    auto state = glfwGetKey(window, keycode);
+    auto state = glfwGetKey(window, (int)keycode);
     return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-bool Input::IsMouseButtonPressedImpl(int button)
+bool Input::IsMouseButtonDown(MouseButton button)
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-    auto state = glfwGetMouseButton(window, button);
+    auto state = glfwGetMouseButton(window, (int)button);
     return state == GLFW_PRESS;
 }
 
-std::pair<float, float> Input::GetMousePositionImpl()
+glm::vec2 Input::GetMousePosition()
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
 
-    return { (float)xpos, (float)ypos };
+    return { (float)x, (float)y };
 }
 
-float Input::GetMouseXImpl()
+void Input::SetCursorMode(CursorMode mode)
 {
-    auto[x, y] = GetMousePositionImpl();
-    return x;
-}
-
-float Input::GetMouseYImpl()
-{
-    auto[x, y] = GetMousePositionImpl();
-    return y;
+    auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
 }
