@@ -7,23 +7,26 @@
 #include "asteroid/base/layer_stack.h"
 #include "asteroid/imgui/imgui_layer.h"
 
-namespace Asteroid {
+namespace Asteroid
+{
 
 class Application
 {
 public:
     Application();
+
     virtual ~Application();
 
-    inline Window& GetWindow() { return *m_Window; }
+    inline Window &GetWindow() { return *m_Window; }
 
-    void PushLayer(Layer* layer);
-    void PushOverlay(Layer* layer);
+    void PushLayer(Layer *layer);
+
+    void PushOverlay(Layer *layer);
 
     void Run();
 
 public:
-    inline static Application& Get() { return *s_Instance; }
+    inline static Application &Get() { return *s_Instance; }
 
 private:
 
@@ -31,23 +34,27 @@ private:
 
     void InitLayer();
 
-    void OnEvent(Event& e);
+    void OnEvent(Event &e);
 
-    bool OnWindowClose(WindowCloseEvent& e);
+    bool OnWindowClose(WindowCloseEvent &e);
 
-    bool OnWindowResize(WindowResizeEvent& e);
+    bool OnWindowResize(WindowResizeEvent &e);
 
     std::unique_ptr<Window> m_Window;
-    ImGuiLayer* m_ImGuiLayer;
+    ImGuiLayer *m_ImGuiLayer;
     bool m_Running = true;
     bool m_Minimized = false;
     LayerStack m_LayerStack;
 
+    float m_TimeStep = 0.0f;
+    float m_FrameTime = 0.0f;
+    float m_LastFrameTime = 0.0f;
+
 private:
-    static Application* s_Instance;
+    static Application *s_Instance;
 };
 
 // 该函数由派生的应用定义
-Application* CreateApplication();
+Application *CreateApplication();
 
 }

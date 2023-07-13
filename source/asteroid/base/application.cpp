@@ -1,6 +1,7 @@
 #include "asteroid/base/application.h"
 
 #include <memory>
+#include "glm/glm.hpp"
 #include "asteroid/event/application_event.h"
 #include "asteroid/util/log.h"
 #include "asteroid/util/macro.h"
@@ -37,10 +38,15 @@ void Application::Run()
 {
     while (m_Running)
     {
+        auto time = (float)glfwGetTime();
+        m_FrameTime = time - m_LastFrameTime;
+        m_TimeStep = std::min(m_FrameTime, 0.0333f);
+        m_LastFrameTime = time;
+
         if (!m_Minimized)
         {
             for (Layer* layer : m_LayerStack)
-                layer->OnUpdate();
+                layer->OnUpdate(m_TimeStep);
         }
 
         m_ImGuiLayer->Begin();

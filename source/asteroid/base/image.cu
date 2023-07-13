@@ -1,4 +1,4 @@
-#include "asteroid/renderer/image.h"
+#include "asteroid/base/image.h"
 
 using namespace Asteroid;
 

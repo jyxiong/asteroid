@@ -1,4 +1,4 @@
-file(GLOB BASE_SOURCES asteroid/base/*.h asteroid/base/*.cpp)
+file(GLOB BASE_SOURCES asteroid/base/*.h asteroid/base/*.cpp asteroid/base/*.cu)
 file(GLOB EVENT_SOURCES asteroid/event/*.h asteroid/event/*.cpp)
 file(GLOB IMGUI_SOURCES asteroid/imgui/*.h asteroid/imgui/*.cpp)
 file(GLOB INPUT_SOURCES asteroid/input/*.h asteroid/input/*.cpp)

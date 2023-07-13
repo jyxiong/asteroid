@@ -7,17 +7,15 @@
 using namespace Asteroid;
 
 ExampleLayer::ExampleLayer()
-    : Layer("Example")
+    : m_Camera(45.0f, 0.1f, 100.0f), Layer("Example")
 {
 }
 
-ExampleLayer::~ExampleLayer()
-{
-}
+ExampleLayer::~ExampleLayer() = default;
 
-void ExampleLayer::OnUpdate()
+void ExampleLayer::OnUpdate(float ts)
 {
-    
+    m_Camera.OnUpdate(ts);
 }
 
 void ExampleLayer::OnImGuiRender()
@@ -33,8 +31,8 @@ void ExampleLayer::OnImGuiRender()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Viewport");
 
-    m_ViewportWidth = ImGui::GetContentRegionAvail().x;
-    m_ViewportHeight = ImGui::GetContentRegionAvail().y;
+    m_ViewportWidth = (unsigned int)ImGui::GetContentRegionAvail().x;
+    m_ViewportHeight = (unsigned int)ImGui::GetContentRegionAvail().y;
 
     auto image = m_Renderer.GetFinalImage();
     if (image)
@@ -56,7 +54,8 @@ void ExampleLayer::Render()
     Timer timer;
     
     m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
-    m_Renderer.Render();
+    m_Camera.OnResize(m_ViewportWidth, m_ViewportHeight);
+    m_Renderer.Render(m_Camera);
 
     m_LastRenderTime = timer.ElapsedMillis();
 }

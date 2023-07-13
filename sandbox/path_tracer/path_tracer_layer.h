@@ -3,8 +3,9 @@
 #include <memory>
 #include "glm/glm.hpp"
 #include "asteroid/base/layer.h"
-#include "asteroid/renderer/image.h"
+#include "asteroid/base/image.h"
 #include "asteroid/renderer/renderer.h"
+#include "asteroid/renderer/camera.h"
 
 namespace Asteroid
 {
@@ -15,7 +16,7 @@ public:
 
     ~ExampleLayer();
 
-    void OnUpdate() override;
+    void OnUpdate(float ts) override;
 
     void OnImGuiRender() override;
 
@@ -26,6 +27,8 @@ private:
 
 private:
     Renderer m_Renderer;
+
+    Camera m_Camera;
 
     unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
 

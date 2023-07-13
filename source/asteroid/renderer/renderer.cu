@@ -1,6 +1,5 @@
 #include "asteroid/renderer/renderer.h"
-
-#include "asteroid/renderer/kernel.h"
+#include "asteroid/renderer/path_tracer.h"
 
 using namespace Asteroid;
 
@@ -19,24 +18,26 @@ void Renderer::OnResize(unsigned int width, unsigned int height)
 		m_FinalImage = std::make_shared<Image>(width, height);
 	}
 
-	int num_texels = width * height;
+	auto pixel_num = width * height;
 
 	cudaFree(m_ImageData);
-	cudaMalloc((void**)&m_ImageData, sizeof(glm::u8vec4) * num_texels);
+    cudaMalloc((void**)&m_ImageData, sizeof(glm::u8vec4) * pixel_num);
 
-	cudaFree(m_AccumulationData);
-	cudaMalloc((void**)&m_AccumulationData, sizeof(glm::vec4) * num_texels);
+    cudaFree(m_AccumulationData);
+    cudaMalloc((void**)&m_AccumulationData, sizeof(glm::vec4) * pixel_num);
+
+    cudaFree(m_Ray);
+    cudaMalloc((void**)&m_Ray, sizeof(Ray) * pixel_num);
 }
 
-void Renderer::Render()
+void Renderer::Render(const Camera& camera)
 {
 	auto width = m_FinalImage->GetWidth();
 	auto height = m_FinalImage->GetHeight();
 
 	// Execute the kernel
-	dim3 block(16, 16, 1);
-	dim3 grid(width / block.x, height / block.y, 1);
-	launch_cudaProcess(grid, block, m_ImageData, width, height);
+
+	launch_cudaProcess(camera, m_ImageData, width, height);
 
 	m_FinalImage->SetData(m_ImageData);
 }

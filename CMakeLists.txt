@@ -4,8 +4,9 @@ project(asteroid LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17)
 
-if (WIN32)
+if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler=/wd4819")
 endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

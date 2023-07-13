@@ -17,7 +17,7 @@ public:
 
     virtual void OnDetach() {}
 
-    virtual void OnUpdate() {}
+    virtual void OnUpdate(float ts) {}
 
     virtual void OnImGuiRender() {}
 
