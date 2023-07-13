@@ -10,20 +10,20 @@ __device__ glm::u8vec4 ConvertToRGBA(const glm::vec4& color)
 }
 
 
-__device__ glm::u8vec4 PerPixel(glm::vec2 coord)
+__device__ glm::vec4 PerPixel(const glm::vec2& coord)
 {
     glm::vec3 rayOrigin(0.0f, 0.0f, 1.0f);
 	glm::vec3 rayDirection(coord.x, coord.y, -1.0f);
 
 	float radius = 0.5f;
 
-	float a = glm::dot(rayDirection, rayDirection);
-	float b = 2.0f * glm::dot(rayOrigin, rayDirection);
-	float c = glm::dot(rayOrigin, rayOrigin) - radius * radius;
-
+	auto oc = rayOrigin - glm::vec3(0);
+	auto a = glm::dot(rayDirection, rayDirection);
+	auto b = 2.0 * glm::dot(oc, rayDirection);
+	auto c = dot(oc, oc) - radius * radius;
 	float discriminant = b * b - 4.0f * a * c;
 	if (discriminant < 0.0f)
-		return glm::vec4(0, 0, 0, 1);
+		return glm::vec4(0, 0, 1, 1);
 
 	// Quadratic formula:
 	// (-b +- sqrt(discriminant)) / 2a
@@ -38,6 +38,6 @@ __device__ glm::u8vec4 PerPixel(glm::vec2 coord)
 	float lightIntensity = glm::max(glm::dot(normal, -lightDir), 0.0f); // == cos(angle)
 
 	glm::vec3 sphereColor(1, 0, 1);
-	//sphereColor *= lightIntensity;
+	sphereColor *= lightIntensity;
 	return glm::vec4(sphereColor, 1.f);
 }
