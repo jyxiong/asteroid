@@ -50,16 +50,12 @@ void Renderer::Render(const Camera& camera)
 
     dim3 block(8, 8, 1);
     dim3 grid(width / block.x, height / block.y, 1);
-    CUDA_SYNC_CHECK()
 
     GeneratePrimaryRay<<<grid, block>>>(camera, m_Rays);
     CUDA_SYNC_CHECK()
 
     GetColor<<<grid, block>>>(m_Rays, m_ImageData, width, height);
     CUDA_SYNC_CHECK()
-
-//    test<<<grid, block>>>(m_ImageData, width, height);
-//    CUDA_SYNC_CHECK()
 
 	m_FinalImage->SetData(m_ImageData);
 }

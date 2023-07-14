@@ -1,7 +1,6 @@
 #pragma once
 
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
+#include <cuda_runtime.h>
 #include "glm/glm.hpp"
 
 #include "asteroid/renderer/ray.h"
@@ -9,14 +8,6 @@
 
 namespace Asteroid
 {
-
-__device__ void GeneratePrimaryRayKernel(const Camera& camera, const glm::vec2 &uv, Ray &ray)
-{
-    auto x = float(uv.x) * camera.m_tanHalfFov * camera.m_Aspect * camera.m_Right;
-    auto y = float(uv.y) * camera.m_tanHalfFov * camera.m_Up;
-    ray.Direction = glm::normalize(camera.m_Direction + x + y);
-    ray.Origin = camera.m_Position;
-}
 
 __device__ glm::vec4 TraceRay(const Ray &ray)
 {

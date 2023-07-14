@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <cuda_runtime.h>
 #include "glad/gl.h"
-#include "cuda_gl_interop.h"
 
 namespace Asteroid
 {

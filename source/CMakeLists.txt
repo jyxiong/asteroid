@@ -15,6 +15,9 @@ add_library(asteroid STATIC
     ${RENDERER_SOURCES}
     ${UTIL_SOURCES}
     )
+
+target_include_directories(asteroid SYSTEM PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+
 target_include_directories(asteroid PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(asteroid PUBLIC glad glfw glm imgui spdlog stb)
@@ -26,3 +29,7 @@ target_compile_definitions(asteroid PUBLIC
     STB_IMAGE_IMPLEMENTATION
     AST_PLATFORM_WINDOWS
     AST_ENABLE_ASSERTS)
+
+set_target_properties(asteroid PROPERTIES 
+    CUDA_SEPARABLE_COMPILATION ON
+    CUDA_RESOLVE_DEVICE_SYMBOLS ON)

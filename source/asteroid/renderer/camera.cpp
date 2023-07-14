@@ -15,7 +15,7 @@ Camera::Camera(float verticalFOV, float nearClip, float farClip)
     m_Up = glm::vec3(0, 1, 0);
     m_Right = glm::cross(m_Direction, m_Up);
     m_focal = glm::vec3(0);
-    m_Aspect = (float)m_ViewportWidth / (float)m_ViewportHeight;
+    m_Aspect = (float)m_Viewport.x / (float)m_Viewport.y;
     m_tanHalfFov = tanf(m_VerticalFOV * 0.5f / 180.f * 3.1415926f);
 }
 
@@ -90,10 +90,9 @@ void Camera::OnUpdate(float ts)
 
 void Camera::OnResize(uint32_t width, uint32_t height)
 {
-    if (width == m_ViewportWidth && height == m_ViewportHeight)
+    if (width == m_Viewport.x && height == m_Viewport.y)
         return;
 
-    m_ViewportWidth = width;
-    m_ViewportHeight = height;
-    m_Aspect = (float)m_ViewportWidth / (float)m_ViewportHeight;
+    m_Viewport = {width, height};
+    m_Aspect = (float)m_Viewport.x / (float)m_Viewport.y;
 }
