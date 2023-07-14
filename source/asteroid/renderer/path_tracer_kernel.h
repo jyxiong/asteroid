@@ -10,12 +10,12 @@
 namespace Asteroid
 {
 
-__device__ void GeneratePrimaryRay(const Camera& camera, const glm::uvec2 &uv, Ray &ray)
+__device__ void GeneratePrimaryRayKernel(const Camera& camera, const glm::vec2 &uv, Ray &ray)
 {
-    glm::vec4 target = camera.GetInverseProjection() * glm::vec4(uv.x, uv.y, 1, 1);
-    ray.Direction = glm::vec3(
-            camera.GetInverseView() * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0));
-    ray.Origin = camera.GetPosition();
+    auto x = float(uv.x) * camera.m_tanHalfFov * camera.m_Aspect * camera.m_Right;
+    auto y = float(uv.y) * camera.m_tanHalfFov * camera.m_Up;
+    ray.Direction = glm::normalize(camera.m_Direction + x + y);
+    ray.Origin = camera.m_Position;
 }
 
 __device__ glm::vec4 TraceRay(const Ray &ray)

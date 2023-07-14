@@ -23,7 +23,7 @@ private:
     // 存储最终颜色值[0, 255]
     glm::u8vec4* m_ImageData = nullptr;
 
-    Ray* m_Ray = nullptr;
+    Ray* m_Rays = nullptr;
 
     // 存储用于展示的纹理图像
     std::shared_ptr<Image> m_FinalImage;
