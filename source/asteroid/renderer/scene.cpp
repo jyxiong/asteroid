@@ -2,9 +2,10 @@
 
 using namespace Asteroid;
 
-SceneView Scene::View() const
-{
-    return SceneView(this);
-}
+SceneView::SceneView(const Scene& scene)
+    : spheres(scene.m_DeviceSpheres){}
 
-SceneView::SceneView(const Scene *scene) {}
+void Scene::CreateDeviceData()
+{
+    m_DeviceSpheres = Buffer<Sphere>(m_Spheres.data(), m_Spheres.size());
+}

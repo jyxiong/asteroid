@@ -29,6 +29,7 @@ public:
 private:
 
     glm::uvec2 m_Viewport{};
+
     glm::vec3 m_Position{};
     glm::vec3 m_Direction{};
     glm::vec3 m_Up{};
@@ -38,12 +39,6 @@ private:
     float m_VerticalFOV;
     float m_tanHalfFov;
     float m_Aspect;
-
-    float m_NearClip = 0.1f;
-    float m_FarClip = 100.0f;
-
-    // Cached ray directions
-    std::vector<glm::vec3> m_RayDirections;
 
     glm::vec2 m_LastMousePosition{ 0.0f, 0.0f };
 };

@@ -1,13 +1,22 @@
 #pragma once
 
-#include "asteroid/renderer/ray.h"
+#include <vector>
+#include "glm/glm.hpp"
 
 namespace Asteroid
 {
 
-struct PathSegment
+struct Sphere
 {
-    Ray ray;
+	glm::vec3 Position{0.0f};
+	float Radius = 0.5f;
+
+	glm::vec3 Albedo{1.0f};
+};
+
+struct Scene
+{
+	std::vector<Sphere> Spheres;
 };
 
 }

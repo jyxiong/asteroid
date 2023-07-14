@@ -8,8 +8,7 @@
 using namespace Asteroid;
 
 Camera::Camera(float verticalFOV, float nearClip, float farClip)
-    : m_VerticalFOV(verticalFOV), m_NearClip(nearClip), m_FarClip(farClip)
-{
+    : m_VerticalFOV(verticalFOV) {
     m_Position = glm::vec3(0, 0, 1);
     m_Direction = glm::vec3(0, 0, -1);
     m_Up = glm::vec3(0, 1, 0);
