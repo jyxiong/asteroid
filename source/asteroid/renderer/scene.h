@@ -15,7 +15,7 @@ struct Sphere
 	glm::vec3 Albedo{1.0f};
 };
 
-class Scene;
+struct Scene;
 struct SceneView
 {
     SceneView(const Scene& scene);
@@ -23,21 +23,14 @@ struct SceneView
     BufferView<Sphere> spheres;
 };
 
-class Scene
+struct Scene
 {
-public:
     void CreateDeviceData();
 
     SceneView View() const { return SceneView(*this); }
 
-private:
-
-    std::vector<Sphere> m_Spheres;
-    Buffer<Sphere> m_DeviceSpheres;
-
-    friend SceneView;
+    std::vector<Sphere> spheres;
+    Buffer<Sphere> deviceSpheres;
 };
-
-
 
 }

@@ -9,6 +9,6 @@
 [CIS565-Fall-2022/Project3-CUDA-Path-Tracer](https://github.com/CIS565-Fall-2022/Project3-CUDA-Path-Tracer)
 
 ## TODO
-- cuda buffer
-- camera.generate_ray
 - render_state
+- cmake warning msvcrt libmt
+- camera conmtroller

@@ -30,7 +30,7 @@ __device__ glm::vec4 TraceRay(const Ray &ray)
     glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
     float lightIntensity = glm::max(glm::dot(normal, -lightDir), 0.0f);
 
-    glm::vec3 sphereColor(1, 0, 1);
+    glm::vec3 sphereColor(1, 0, 0);
     sphereColor *= lightIntensity;
     return { sphereColor, 1.f };
 }

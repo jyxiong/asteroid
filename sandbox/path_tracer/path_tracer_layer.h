@@ -6,6 +6,7 @@
 #include "asteroid/base/image.h"
 #include "asteroid/renderer/renderer.h"
 #include "asteroid/renderer/camera.h"
+#include "asteroid/renderer/scene.h"
 
 namespace Asteroid
 {
@@ -15,6 +16,8 @@ public:
     ExampleLayer();
 
     ~ExampleLayer();
+
+    void OnAttach() override;
 
     void OnUpdate(float ts) override;
 
@@ -29,6 +32,8 @@ private:
     Renderer m_Renderer;
 
     Camera m_Camera;
+
+    Scene m_Scene;
 
     unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
 

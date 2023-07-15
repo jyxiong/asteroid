@@ -22,7 +22,7 @@ class Buffer
 {
 public:
 
-	explicit Buffer(size_t size)
+	explicit Buffer(size_t size = 0)
         : m_Size(size)
 	{
 		cudaMalloc(&m_Data, sizeof(T) * m_Size);
