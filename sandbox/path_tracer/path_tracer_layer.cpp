@@ -33,7 +33,6 @@ ExampleLayer::~ExampleLayer() = default;
 
 void ExampleLayer::OnAttach()
 {
-    m_Scene.CreateDeviceData();
 }
 
 void ExampleLayer::OnUpdate(float ts)
@@ -91,10 +90,13 @@ void ExampleLayer::OnEvent(Event &event)
 void ExampleLayer::Render()
 {
     Timer timer;
-    
-    m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+
+    m_Scene.UpdateDevice();
+
     m_Camera.OnResize(m_ViewportWidth, m_ViewportHeight);
-    m_Renderer.Render(m_Camera);
+    m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+
+    m_Renderer.Render(m_Scene, m_Camera);
 
     m_LastRenderTime = timer.ElapsedMillis();
 }

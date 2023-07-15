@@ -1,11 +1,15 @@
+#include <asteroid/util/macro.h>
 #include "asteroid/renderer/scene.h"
+
 
 using namespace Asteroid;
 
 SceneView::SceneView(const Scene& scene)
-    : spheres(scene.deviceSpheres) {}
+    : deviceSpheres(scene.deviceSpheres) {}
 
-void Scene::CreateDeviceData()
+void Scene::UpdateDevice()
 {
-    deviceSpheres = Buffer<Sphere>(spheres.data(), spheres.size());
+    deviceSpheres = DeviceBuffer<Sphere>(spheres.data(), spheres.size(), spheres);
+
+    deviceSpheres.CopyTo(spheres);
 }

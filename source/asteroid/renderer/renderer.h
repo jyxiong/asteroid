@@ -5,6 +5,7 @@
 #include "asteroid/base/image.h"
 #include "asteroid/renderer/camera.h"
 #include "asteroid/renderer/ray.h"
+#include "asteroid/renderer/scene.h"
 
 namespace Asteroid
 {
@@ -12,7 +13,7 @@ class Renderer
 {
 public:
     void OnResize(unsigned int width, unsigned int height);
-    void Render(const Camera& camera);
+    void Render(const Scene& scene, const Camera& camera);
 
     std::shared_ptr<Image> GetFinalImage() const { return m_FinalImage; }
 

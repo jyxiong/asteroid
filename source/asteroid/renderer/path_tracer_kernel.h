@@ -5,39 +5,57 @@
 
 #include "asteroid/renderer/ray.h"
 #include "asteroid/renderer/camera.h"
+#include "asteroid/renderer/scene.h"
 
-namespace Asteroid
-{
+namespace Asteroid {
 
-__device__ glm::vec4 TraceRay(const Ray &ray)
-{
-    float radius = 0.5f;
+    __device__ glm::vec4 TraceRay(const SceneView &scene, const Ray &ray) {
 
-    float a = glm::dot(ray.Direction, ray.Direction);
-    float b = 2.0f * glm::dot(ray.Origin, ray.Direction);
-    float c = glm::dot(ray.Origin, ray.Origin) - radius * radius;
+        if (scene.deviceSpheres.size() == 0)
+            return {1, 1, 1, 1};
 
-    float discriminant = b * b - 4.0f * a * c;
-    if (discriminant < 0.0f)
-        return { 0, 0, 0, 1 };
+        const Sphere *closestSphere = nullptr;
+        float hitDistance = std::numeric_limits<float>::max();
 
-    float closestT = (-b - glm::sqrt(discriminant)) / (2.0f * a);
-    float t0 = (-b + glm::sqrt(discriminant)) / (2.0f * a); // Second hit distance (currently unused)
+        for (size_t i = 0; i < scene.deviceSpheres.size(); ++i) {
+            auto sphere = scene.deviceSpheres[i];
 
-    glm::vec3 hitPoint = ray.Origin + ray.Direction * closestT;
-    glm::vec3 normal = glm::normalize(hitPoint);
+            return {sphere.Radius, sphere.Radius,sphere.Radius,1};
 
-    glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
-    float lightIntensity = glm::max(glm::dot(normal, -lightDir), 0.0f);
+            glm::vec3 origin = ray.Origin - sphere.Position;
 
-    glm::vec3 sphereColor(1, 0, 0);
-    sphereColor *= lightIntensity;
-    return { sphereColor, 1.f };
-}
+            float a = glm::dot(ray.Direction, ray.Direction);
+            float b = 2.0f * glm::dot(origin, ray.Direction);
+            float c = glm::dot(origin, origin) - sphere.Radius * sphere.Radius;
 
-__device__ glm::u8vec4 ConvertToRGBA(const glm::vec4 &color)
-{
-    return static_cast<glm::u8vec4>(color * 255.f);
-}
+            float discriminant = b * b - 4.0f * a * c;
+            if (discriminant < 0.0f)
+                continue;
+
+            float closestT = (-b - glm::sqrt(discriminant)) / (2.0f * a);
+            if (closestT < hitDistance) {
+                hitDistance = closestT;
+                closestSphere = &sphere;
+            }
+        }
+
+        if (closestSphere == nullptr)
+            return {1.0f, 0.0f, 0.0f, 1.0f};
+
+        glm::vec3 origin = ray.Origin - closestSphere->Position;
+        glm::vec3 hitPoint = ray(hitDistance);
+        glm::vec3 normal = glm::normalize(hitPoint);
+
+        glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
+        float lightIntensity = glm::max(glm::dot(normal, -lightDir), 0.0f); // == cos(angle)
+
+        glm::vec3 sphereColor = closestSphere->Albedo;
+        sphereColor *= lightIntensity;
+        return {sphereColor, 1.0f};
+    }
+
+    __device__ glm::u8vec4 ConvertToRGBA(const glm::vec4 &color) {
+        return static_cast<glm::u8vec4>(color * 255.f);
+    }
 
 }

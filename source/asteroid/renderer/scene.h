@@ -4,33 +4,35 @@
 #include "glm/glm.hpp"
 #include "asteroid/util/buffer.h"
 
-namespace Asteroid
-{
+namespace Asteroid {
 
-struct Sphere
-{
-	glm::vec3 Position{0.0f};
-	float Radius = 0.5f;
+    struct Sphere {
+        float Radius = 0.5f;
 
-	glm::vec3 Albedo{1.0f};
-};
+        glm::vec3 Position{0.0f};
 
-struct Scene;
-struct SceneView
-{
-    SceneView(const Scene& scene);
+        glm::vec3 Albedo{1.0f};
 
-    BufferView<Sphere> spheres;
-};
+    };
 
-struct Scene
-{
-    void CreateDeviceData();
+    struct Scene;
 
-    SceneView View() const { return SceneView(*this); }
+    struct SceneView {
 
-    std::vector<Sphere> spheres;
-    Buffer<Sphere> deviceSpheres;
-};
+        DeviceBufferView<Sphere> deviceSpheres;
+
+        explicit SceneView(const Scene &scene);
+
+    };
+
+    struct Scene {
+
+        std::vector<Sphere> spheres;
+
+        DeviceBuffer<Sphere> deviceSpheres;
+
+        void UpdateDevice();
+
+    };
 
 }
