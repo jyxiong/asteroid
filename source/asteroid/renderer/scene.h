@@ -29,7 +29,7 @@ namespace Asteroid {
 
         std::vector<Sphere> spheres;
 
-        DeviceBuffer<Sphere> deviceSpheres;
+        std::shared_ptr<DeviceBuffer<Sphere>> deviceSpheres;
 
         void UpdateDevice();
 

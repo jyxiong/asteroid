@@ -32,7 +32,7 @@ namespace Asteroid
         if (x >= width && y >= height)
             return;
 
-        glm::vec4 color = {scene.deviceSpheres[0].Radius, scene.deviceSpheres[0].Radius, 0, 1};
+        glm::vec4 color =TraceRay(scene, rays[y * width + x]);
         g_odata[y * width + x] = glm::u8vec4(ConvertToRGBA(color));
     }
 }
