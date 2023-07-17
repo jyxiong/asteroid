@@ -29,6 +29,9 @@ void Renderer::OnResize(unsigned int width, unsigned int height)
 
     cudaFree(m_Rays);
     cudaMalloc((void**)&m_Rays, sizeof(Ray) * pixel_num);
+
+    cudaFree(m_Intersections);
+    cudaMalloc((void**)&m_Intersections, sizeof(Intersection) * pixel_num);
 }
 
 void Renderer::Render(const Scene& scene, const Camera& camera)
@@ -45,7 +48,10 @@ void Renderer::Render(const Scene& scene, const Camera& camera)
     GeneratePrimaryRay<<<grid, block>>>(camera, m_Rays);
     CUDA_SYNC_CHECK()
 
-    GetColor<<<grid, block>>>(sceneView, m_Rays, m_ImageData, width, height);
+    ComputeIntersection<<<grid, block>>>(sceneView, m_Rays, width, height,m_Intersections);
+    CUDA_SYNC_CHECK()
+
+    PerPixel<<<grid, block>>>(sceneView, m_Rays, m_ImageData, width, height);
     CUDA_SYNC_CHECK()
 
 	m_FinalImage->SetData(m_ImageData);

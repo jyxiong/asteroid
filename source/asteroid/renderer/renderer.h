@@ -5,6 +5,7 @@
 #include "asteroid/base/image.h"
 #include "asteroid/renderer/camera.h"
 #include "asteroid/renderer/ray.h"
+#include "asteroid/renderer/intersection.h"
 #include "asteroid/renderer/scene.h"
 
 namespace Asteroid
@@ -18,6 +19,12 @@ public:
     std::shared_ptr<Image> GetFinalImage() const { return m_FinalImage; }
 
 private:
+    // 存储用于展示的纹理图像
+    std::shared_ptr<Image> m_FinalImage;
+
+    const Scene* m_ActiveScene = nullptr;
+    const Camera* m_ActiveCamera = nullptr;
+
     // 存储计算过程中颜色值[0, 1]
     glm::vec4* m_AccumulationData = nullptr;
 
@@ -25,8 +32,6 @@ private:
     glm::u8vec4* m_ImageData = nullptr;
 
     Ray* m_Rays = nullptr;
-
-    // 存储用于展示的纹理图像
-    std::shared_ptr<Image> m_FinalImage;
+    Intersection* m_Intersections = nullptr;
 };
 }

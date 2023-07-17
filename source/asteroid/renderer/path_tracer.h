@@ -7,10 +7,8 @@
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/path_tracer_kernel.h"
 
-namespace Asteroid
-{
-    __global__ void GeneratePrimaryRay(const Camera camera, Ray* rays)
-    {
+namespace Asteroid {
+    __global__ void GeneratePrimaryRay(const Camera camera, Ray *rays) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -24,15 +22,39 @@ namespace Asteroid
         camera.GeneratePrimaryRay(uv, rays[y * viewport.x + x]);
     }
 
-    __global__ void GetColor(const SceneView scene, const Ray* rays, glm::u8vec4 *g_odata, int width, int height)
-    {
+    __global__ void ComputeIntersection(const SceneView scene, const Ray *rays, int width, int height, Intersection *intersections) {
+        auto x = blockIdx.x * blockDim.x + threadIdx.x;
+        auto y = blockIdx.y * blockDim.y + threadIdx.y;
+
+        int closestSphere = -1;
+        float hitDistance = std::numeric_limits<float>::max();
+        for (size_t i = 0; i < scene.deviceSpheres.size(); ++i) {
+            float t = HitSphere(scene.deviceSpheres[i], rays[y * width + x]);
+            if (t < 0.f) continue;
+
+            if (t < hitDistance) {
+                hitDistance = t;
+                closestSphere = i;
+            }
+        }
+
+        if (closestSphere < 0)
+            intersections[y * width + x].t = -1;
+        else
+        {
+            intersections[y * width + x].t = hitDistance;
+//            intersections[y * width + x].sphereIndex = closestSphere;
+        }
+    }
+
+    __global__ void PerPixel(const SceneView scene, const Ray *rays, glm::u8vec4 *g_odata, int width, int height) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
         if (x >= width && y >= height)
             return;
 
-        glm::vec4 color =TraceRay(scene, rays[y * width + x]);
+        glm::vec4 color = TraceRay(scene, rays[y * width + x]);
         g_odata[y * width + x] = glm::u8vec4(ConvertToRGBA(color));
     }
 }
