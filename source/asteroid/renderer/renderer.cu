@@ -28,7 +28,7 @@ void Renderer::OnResize(unsigned int width, unsigned int height)
     cudaMalloc((void**)&m_AccumulationData, sizeof(glm::vec4) * pixel_num);
 
     cudaFree(m_Rays);
-    CUDA_CHECK(cudaMalloc((void**)&m_Rays, sizeof(Ray) * pixel_num))
+    cudaMalloc((void**)&m_Rays, sizeof(Ray) * pixel_num);
 }
 
 void Renderer::Render(const Scene& scene, const Camera& camera)
@@ -37,9 +37,6 @@ void Renderer::Render(const Scene& scene, const Camera& camera)
 	auto height = m_FinalImage->GetHeight();
 
 	auto sceneView = SceneView(scene);
-
-//    Sphere sphere;
-//    cudaMemcpy(&sphere, &sceneView.deviceSpheres.data()[0], sizeof(Sphere), cudaMemcpyDeviceToHost);
 
 	// Execute the kernel
     dim3 block(8, 8, 1);

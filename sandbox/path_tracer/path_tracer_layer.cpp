@@ -13,7 +13,7 @@ ExampleLayer::ExampleLayer()
     
     {
         Sphere sphere;
-        sphere.Position = { 0.0f, 0.0f, 0.0f };
+        sphere.Position = { 0.0f, 0.0f, -1.f };
         sphere.Radius = 0.5f;
         sphere.Albedo = { 1.0f, 0.0f, 1.0f };
         m_Scene.spheres.push_back(sphere);

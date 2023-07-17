@@ -9,38 +9,42 @@
 
 namespace Asteroid {
 
+    __device__ float HitSphere(const glm::vec3 &center, float radius, const Ray &r) {
+        glm::vec3 oc = r.Origin - center;
+        auto a = glm::dot(r.Direction, r.Direction);
+        auto b = 2.f * glm::dot(oc, r.Direction);
+        auto c = dot(oc, oc) - radius * radius;
+        auto discriminant = b * b - 4.f * a * c;
+        if (discriminant < 0.f) {
+            return -1.f;
+        } else {
+            return (-b - sqrtf(discriminant)) / (2.f * a);
+        }
+    }
+
     __device__ glm::vec4 TraceRay(const SceneView &scene, const Ray &ray) {
 
         if (scene.deviceSpheres.size() == 0)
-            return {1, 1, 1, 1};
+            return glm::vec4(0);
 
         int closestSphere = -1;
         float hitDistance = std::numeric_limits<float>::max();
 
         for (size_t i = 0; i < scene.deviceSpheres.size(); ++i) {
-            glm::vec3 origin = ray.Origin - scene.deviceSpheres[i].Position;
+            float t = HitSphere(scene.deviceSpheres[i].Position, scene.deviceSpheres[i].Radius, ray);
+            if (t < 0.f) continue;
 
-            float a = glm::dot(ray.Direction, ray.Direction);
-            float b = 2.0f * glm::dot(origin, ray.Direction);
-            float c = glm::dot(origin, origin) - scene.deviceSpheres[i].Radius * scene.deviceSpheres[i].Radius;
-
-            float discriminant = b * b - 4.0f * a * c;
-            if (discriminant < 0.0f)
-                continue;
-
-            float closestT = (-b - glm::sqrt(discriminant)) / (2.0f * a);
-            if (closestT < hitDistance) {
-                hitDistance = closestT;
+            if (t < hitDistance) {
+                hitDistance = t;
                 closestSphere = i;
             }
         }
 
         if (closestSphere == -1)
-            return {1.0f, 0.0f, 0.0f, 1.0f};
+            return glm::vec4(0);
 
-        glm::vec3 origin = ray.Origin - scene.deviceSpheres[closestSphere].Position;
         glm::vec3 hitPoint = ray(hitDistance);
-        glm::vec3 normal = glm::normalize(hitPoint);
+        glm::vec3 normal = glm::normalize(hitPoint - scene.deviceSpheres[closestSphere].Position);
 
         glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
         float lightIntensity = glm::max(glm::dot(normal, -lightDir), 0.0f);
