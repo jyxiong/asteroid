@@ -46,16 +46,44 @@ namespace Asteroid {
         }
     }
 
-    __global__ void
-    PerPixel(const SceneView scene, const Ray *rays, const Intersection *its, glm::u8vec4 *g_odata, int width,
-             int height) {
+    __global__ void Shading(const Ray *rays, const Intersection *its, glm::vec4 *g_odata, int width, int height) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
         if (x >= width && y >= height)
             return;
 
-        glm::vec4 color = TraceRay(scene, rays[y * width + x], its[y * width + x]);
-        g_odata[y * width + x] = glm::u8vec4(ConvertToRGBA(color));
+        float multiplier = 1.0f;
+
+        auto it = its[y * width + x];
+        auto ray = rays[y * width + x];
+        if (it.t < 0)
+        {
+            return;
+        }
+
+        glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
+        float lightIntensity = glm::max(glm::dot(it.normal, -lightDir), 0.0f);
+
+        auto color = it.albedo * lightIntensity;
+        g_odata[y * width + x] +=  glm::vec4(color, 1.0f) * multiplier;
+
+        multiplier *= 0.7f;
+
+        ray.Origin = its->position + its->normal * 0.0001f;
+        ray.Direction = glm::reflect(ray.Direction, its->normal);
     }
+
+    __global__ void ConvertToRGBA(const glm::vec4* data, int width, int height, glm::u8vec4* image)
+    {
+        auto x = blockIdx.x * blockDim.x + threadIdx.x;
+        auto y = blockIdx.y * blockDim.y + threadIdx.y;
+
+        if (x >= width && y >= height)
+            return;
+
+        auto color = glm::clamp(data[y * width + x], 0.f, 1.f);
+        image[y * width + x] = glm::u8vec4(color * 255.f);
+    }
+
 }

@@ -42,20 +42,4 @@ namespace Asteroid {
 
         return true;
     }
-
-    __device__ glm::vec4 TraceRay(const SceneView &scene, const Ray &ray, const Intersection &its) {
-        if (its.t < 0)
-            return glm::vec4(1);
-
-        glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
-        float lightIntensity = glm::max(glm::dot(its.normal, -lightDir), 0.0f);
-
-        auto color = its.albedo * lightIntensity;
-        return {color, 1.0f};
-    }
-
-    __device__ glm::u8vec4 ConvertToRGBA(const glm::vec4 &color) {
-        return static_cast<glm::u8vec4>(color * 255.f);
-    }
-
 }
