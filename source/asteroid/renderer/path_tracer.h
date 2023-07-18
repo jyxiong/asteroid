@@ -22,39 +22,40 @@ namespace Asteroid {
         camera.GeneratePrimaryRay(uv, rays[y * viewport.x + x]);
     }
 
-    __global__ void ComputeIntersection(const SceneView scene, const Ray *rays, int width, int height, Intersection *intersections) {
+    __global__ void
+    ComputeIntersection(const SceneView scene, const Ray *rays, int width, int height, Intersection *intersections) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
         int closestSphere = -1;
+        Intersection its;
         float hitDistance = std::numeric_limits<float>::max();
         for (size_t i = 0; i < scene.deviceSpheres.size(); ++i) {
-            float t = HitSphere(scene.deviceSpheres[i], rays[y * width + x]);
-            if (t < 0.f) continue;
+            if (!HitSphere(scene.deviceSpheres[i], rays[y * width + x], its)) continue;
 
-            if (t < hitDistance) {
-                hitDistance = t;
+            if (its.t < hitDistance && its.t > 0) {
+                hitDistance = its.t;
                 closestSphere = i;
             }
         }
 
         if (closestSphere < 0)
             intersections[y * width + x].t = -1;
-        else
-        {
-            intersections[y * width + x].t = hitDistance;
-//            intersections[y * width + x].sphereIndex = closestSphere;
+        else {
+            intersections[y * width + x] = its;
         }
     }
 
-    __global__ void PerPixel(const SceneView scene, const Ray *rays, glm::u8vec4 *g_odata, int width, int height) {
+    __global__ void
+    PerPixel(const SceneView scene, const Ray *rays, const Intersection *its, glm::u8vec4 *g_odata, int width,
+             int height) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
         if (x >= width && y >= height)
             return;
 
-        glm::vec4 color = TraceRay(scene, rays[y * width + x]);
+        glm::vec4 color = TraceRay(scene, rays[y * width + x], its[y * width + x]);
         g_odata[y * width + x] = glm::u8vec4(ConvertToRGBA(color));
     }
 }
