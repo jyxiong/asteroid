@@ -1,25 +1,10 @@
-#include "asteroid/renderer/camera.h"
-
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/quaternion.hpp"
-#include "glm/gtx/quaternion.hpp"
-#include "asteroid/input/input.h"
+#include "asteroid/renderer/camera_controller.h"
 
 using namespace Asteroid;
 
-Camera::Camera(float verticalFOV, float nearClip, float farClip)
-    : m_VerticalFOV(verticalFOV) {
-    m_Position = glm::vec3(0, 0, 6);
-    m_Direction = glm::vec3(0, 0, -1);
-    m_Up = glm::vec3(0, 1, 0);
-    m_Right = glm::cross(m_Direction, m_Up);
-    m_focal = glm::vec3(0);
-    m_Aspect = (float)m_Viewport.x / (float)m_Viewport.y;
-    m_tanHalfFov = tanf(m_VerticalFOV * 0.5f / 180.f * 3.1415926f);
-}
+CameraController::CameraController() = default;
 
-void Camera::OnUpdate(float ts)
-{
+CameraController::OnUpdate(float ts) {
     glm::vec2 mousePos = Input::GetMousePosition();
     glm::vec2 delta = (mousePos - m_LastMousePosition) * 0.002f;
     m_LastMousePosition = mousePos;
@@ -85,18 +70,4 @@ void Camera::OnUpdate(float ts)
 
         moved = true;
     }
-
-    if (moved)
-    {
-
-    }
-}
-
-void Camera::OnResize(unsigned int width, unsigned int height)
-{
-    if (width == m_Viewport.x && height == m_Viewport.y)
-        return;
-
-    m_Viewport = {width, height};
-    m_Aspect = (float)m_Viewport.x / (float)m_Viewport.y;
 }

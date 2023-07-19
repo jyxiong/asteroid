@@ -8,7 +8,7 @@
 #include "asteroid/renderer/path_tracer_kernel.h"
 
 namespace Asteroid {
-    __global__ void GeneratePrimaryRay(const Camera camera, Ray *rays) {
+    __global__ void GeneratePrimaryRay(const Camera camera, DeviceBufferView<PathSegment> paths) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -17,21 +17,31 @@ namespace Asteroid {
         if (x >= viewport.x && y >= viewport.y)
             return;
 
+        auto& path = paths[y * viewport.x + x];
+        path.color = glm::vec3(0);
+        path.throughput = glm::vec3(1);
+
         auto uv = glm::vec2(x, y) / glm::vec2(viewport) * 2.f - 1.f;
 
-        camera.GeneratePrimaryRay(uv, rays[y * viewport.x + x]);
+        camera.GeneratePrimaryRay(uv, path.ray);
     }
 
     __global__ void
-    ComputeIntersection(const SceneView scene, const Ray *rays, int width, int height, Intersection *intersections) {
+    ComputeIntersection(const SceneView scene, const DeviceBufferView<PathSegment> paths, int width, int height,
+                        Intersection *intersections) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
+
+        if (x >= width && y >= height)
+            return;
+
+        const auto& path = paths[y * width + x];
 
         int closestSphere = -1;
         Intersection its;
         float hitDistance = std::numeric_limits<float>::max();
         for (size_t i = 0; i < scene.deviceSpheres.size(); ++i) {
-            if (!HitSphere(scene.deviceSpheres[i], rays[y * width + x], its)) continue;
+            if (!HitSphere(scene.deviceSpheres[i], path.ray, its)) continue;
 
             if (its.t < hitDistance && its.t > 0) {
                 hitDistance = its.t;
@@ -46,50 +56,37 @@ namespace Asteroid {
         }
     }
 
-    __global__ void Shading(const SceneView scene, const Ray *rays, const Intersection *its, glm::vec4 *g_odata, int width, int height) {
+    __global__ void
+    Shading(const SceneView scene, DeviceBufferView<PathSegment> paths, const Intersection *its,
+            int width, int height) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
         if (x >= width && y >= height)
             return;
 
-        float multiplier = 1.0f;
+        auto& path = paths[y * width + x];
 
         auto it = its[y * width + x];
-        auto ray = rays[y * width + x];
-        if (it.t < 0)
-        {
-            glm::vec3 skyColor = glm::vec3(0.6f, 0.7f, 0.9f);
-            g_odata[y * width + x] +=  glm::vec4(skyColor, 1.0f) * multiplier;
+
+        if (it.t < 0) {
+            path.remainingBounces = 0;
 
             return;
         }
 
-        glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
-        float lightIntensity = glm::max(glm::dot(it.normal, -lightDir), 0.0f);
-
-        auto color = scene.deviceMaterials[it.materialId].Albedo * lightIntensity;
-        g_odata[y * width + x] +=  glm::vec4(color, 1.0f) * multiplier;
-
-        multiplier *= 0.5f;
-
-        ray.Origin = its->position + its->normal * 0.0001f;
-        ray.Direction = glm::reflect(ray.Direction, its->normal);
-
-        ray.Direction = glm::reflect(ray.Direction,
-                                     its->normal + scene.deviceMaterials[it.materialId].Roughness);
+        scatterRay(path, its[y * width + x], scene.deviceMaterials[it.materialId]);
     }
 
-    __global__ void ConvertToRGBA(const glm::vec4* data, int width, int height, glm::u8vec4* image)
-    {
+    __global__ void ConvertToRGBA(const DeviceBufferView<PathSegment> paths, int width, int height, glm::u8vec4 *image) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
         if (x >= width && y >= height)
             return;
 
-        auto color = glm::clamp(data[y * width + x], 0.f, 1.f);
-        image[y * width + x] = glm::u8vec4(color * 255.f);
+        auto color = glm::clamp(paths[y * width + x].color, 0.f, 1.f);
+        image[y * width + x] = glm::u8vec4(color * 255.f, 255);
     }
 
 }

@@ -38,8 +38,13 @@ namespace Asteroid {
     class DeviceBuffer {
     public:
 
+        explicit DeviceBuffer(size_t size)
+                : m_Data(nullptr), m_Size(size) {
+            cudaMalloc(&m_Data, sizeof(T) * m_Size);
+        }
+
         explicit DeviceBuffer(const std::vector<T>& buffer)
-                : m_Data(0), m_Size(buffer.size()) {
+                : m_Data(nullptr), m_Size(buffer.size()) {
             cudaMalloc(&m_Data, sizeof(T) * m_Size);
             cudaMemcpy(m_Data, buffer.data(), sizeof(T) * buffer.size(), cudaMemcpyHostToDevice);
         }

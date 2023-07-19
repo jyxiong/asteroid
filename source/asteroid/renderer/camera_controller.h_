@@ -1,0 +1,24 @@
+#pragma once
+
+#include "asteroid/renderer/camera.h"
+
+namespace Asteroid {
+
+class CameraController {
+
+public:
+    CameraController();
+
+    void OnUpdate(float ts);
+
+    void OnResize(unsigned int width, unsigned int height);
+
+    Camera& GetCamera() { return m_camera; }
+
+    const Camera& GetCamera() const { return m_camera; }
+
+private:
+    Camera m_camera;
+};
+
+}

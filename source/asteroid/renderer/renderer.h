@@ -7,6 +7,7 @@
 #include "asteroid/renderer/ray.h"
 #include "asteroid/renderer/intersection.h"
 #include "asteroid/renderer/scene.h"
+#include "asteroid/renderer/scene_struct.h"
 
 namespace Asteroid
 {
@@ -25,13 +26,11 @@ private:
     const Scene* m_ActiveScene = nullptr;
     const Camera* m_ActiveCamera = nullptr;
 
-    // 存储计算过程中颜色值[0, 1]
-    glm::vec4* m_AccumulationData = nullptr;
-
     // 存储最终颜色值[0, 255]
     glm::u8vec4* m_ImageData = nullptr;
 
-    Ray* m_Rays = nullptr;
+    std::shared_ptr<DeviceBuffer<PathSegment>> m_devicePaths = nullptr;
+
     Intersection* m_Intersections = nullptr;
 };
 }

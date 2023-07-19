@@ -42,4 +42,22 @@ namespace Asteroid {
 
         return true;
     }
+
+    __device__
+    void scatterRay(PathSegment & pathSegment, const Intersection& its, const Material &mat) {
+
+        glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
+        float lightIntensity = glm::max(glm::dot(its.normal, -lightDir), 0.0f);
+
+        auto color = mat.Albedo * lightIntensity;
+        pathSegment.color += color * pathSegment.throughput;
+
+        pathSegment.throughput *= 0.5f;
+
+        pathSegment.ray.Origin = its.position + its.normal * 0.0001f;
+        pathSegment.ray.Direction = glm::reflect(pathSegment.ray.Direction, its.normal + mat.Roughness);
+
+        pathSegment.remainingBounces--;
+    }
+
 }

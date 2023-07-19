@@ -17,15 +17,10 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
 
     auto pixel_num = width * height;
 
-    cudaFree(m_Rays);
-    cudaMalloc((void **) &m_Rays, sizeof(Ray) * pixel_num);
+    m_devicePaths = std::make_shared<DeviceBuffer<PathSegment>>(pixel_num);
 
     cudaFree(m_Intersections);
     cudaMalloc((void **) &m_Intersections, sizeof(Intersection) * pixel_num);
-
-    cudaFree(m_AccumulationData);
-    cudaMalloc((void **) &m_AccumulationData, sizeof(glm::vec4) * pixel_num);
-    cudaMemset(m_AccumulationData, 0, sizeof(glm::vec4) * pixel_num);
 
     cudaFree(m_ImageData);
     cudaMalloc((void **) &m_ImageData, sizeof(glm::u8vec4) * pixel_num);
@@ -36,26 +31,25 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
     auto height = m_FinalImage->GetHeight();
 
     auto sceneView = SceneView(scene);
+    auto paths = DeviceBufferView<PathSegment>(*m_devicePaths);
 
     // Execute the kernel
     dim3 block(8, 8, 1);
     dim3 grid(width / block.x, height / block.y, 1);
 
-    GeneratePrimaryRay<<<grid, block>>>(camera, m_Rays);
+    GeneratePrimaryRay<<<grid, block>>>(camera, paths);
     CUDA_SYNC_CHECK()
 
-    cudaMemset(m_AccumulationData, 0, sizeof(glm::vec4) * width * height);
-
-    int bounces = 5;
+    int bounces = 1;
     for (int i = 0; i < bounces; i++) {
-        ComputeIntersection<<<grid, block>>>(sceneView, m_Rays, width, height, m_Intersections);
+        ComputeIntersection<<<grid, block>>>(sceneView, paths, width, height, m_Intersections);
         CUDA_SYNC_CHECK()
 
-        Shading<<<grid, block>>>(sceneView, m_Rays, m_Intersections, m_AccumulationData, width, height);
+        Shading<<<grid, block>>>(sceneView, paths, m_Intersections, width, height);
         CUDA_SYNC_CHECK()
     }
 
-    ConvertToRGBA<<<grid, block>>>(m_AccumulationData, width, height, m_ImageData);
+    ConvertToRGBA<<<grid, block>>>(paths, width, height, m_ImageData);
 
     m_FinalImage->SetData(m_ImageData);
 }
