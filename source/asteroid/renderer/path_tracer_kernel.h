@@ -32,12 +32,12 @@ namespace Asteroid {
             its.t = glm::min(t1, t2);
             its.position = r(its.t);
             its.normal = (its.position - sphere.Position) / sphere.Radius;
-            its.albedo = sphere.Albedo;
+            its.materialId = sphere.MaterialId;
         } else {
             its.t = glm::max(t1, t2);
             its.position = r(its.t);
             its.normal = (sphere.Position - its.position) / sphere.Radius;
-            its.albedo = sphere.Albedo;
+            its.materialId = sphere.MaterialId;
         }
 
         return true;

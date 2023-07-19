@@ -9,7 +9,7 @@ using namespace Asteroid;
 
 Camera::Camera(float verticalFOV, float nearClip, float farClip)
     : m_VerticalFOV(verticalFOV) {
-    m_Position = glm::vec3(0, 0, 1);
+    m_Position = glm::vec3(0, 0, 6);
     m_Direction = glm::vec3(0, 0, -1);
     m_Up = glm::vec3(0, 1, 0);
     m_Right = glm::cross(m_Direction, m_Up);

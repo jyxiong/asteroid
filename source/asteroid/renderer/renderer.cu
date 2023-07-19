@@ -46,12 +46,12 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
 
     cudaMemset(m_AccumulationData, 0, sizeof(glm::vec4) * width * height);
 
-    int bounces = 2;
+    int bounces = 5;
     for (int i = 0; i < bounces; i++) {
         ComputeIntersection<<<grid, block>>>(sceneView, m_Rays, width, height, m_Intersections);
         CUDA_SYNC_CHECK()
 
-        Shading<<<grid, block>>>(m_Rays, m_Intersections, m_AccumulationData, width, height);
+        Shading<<<grid, block>>>(sceneView, m_Rays, m_Intersections, m_AccumulationData, width, height);
         CUDA_SYNC_CHECK()
     }
 

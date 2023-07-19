@@ -46,7 +46,7 @@ namespace Asteroid {
         }
     }
 
-    __global__ void Shading(const Ray *rays, const Intersection *its, glm::vec4 *g_odata, int width, int height) {
+    __global__ void Shading(const SceneView scene, const Ray *rays, const Intersection *its, glm::vec4 *g_odata, int width, int height) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -59,19 +59,25 @@ namespace Asteroid {
         auto ray = rays[y * width + x];
         if (it.t < 0)
         {
+            glm::vec3 skyColor = glm::vec3(0.6f, 0.7f, 0.9f);
+            g_odata[y * width + x] +=  glm::vec4(skyColor, 1.0f) * multiplier;
+
             return;
         }
 
         glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
         float lightIntensity = glm::max(glm::dot(it.normal, -lightDir), 0.0f);
 
-        auto color = it.albedo * lightIntensity;
+        auto color = scene.deviceMaterials[it.materialId].Albedo * lightIntensity;
         g_odata[y * width + x] +=  glm::vec4(color, 1.0f) * multiplier;
 
-        multiplier *= 0.7f;
+        multiplier *= 0.5f;
 
         ray.Origin = its->position + its->normal * 0.0001f;
         ray.Direction = glm::reflect(ray.Direction, its->normal);
+
+        ray.Direction = glm::reflect(ray.Direction,
+                                     its->normal + scene.deviceMaterials[it.materialId].Roughness);
     }
 
     __global__ void ConvertToRGBA(const glm::vec4* data, int width, int height, glm::u8vec4* image)
