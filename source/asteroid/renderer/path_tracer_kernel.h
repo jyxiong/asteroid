@@ -17,7 +17,11 @@ namespace Asteroid {
         auto c = dot(oc, oc) - sphere.Radius * sphere.Radius;
 
         auto discriminant = half_b * half_b - a * c;
-        if (discriminant < 0) return false;
+        if (discriminant < 0)
+        {
+            its.t = -1;
+            return false;
+        }
         auto sqrtd = sqrt(discriminant);
 
         auto t1 = (-half_b - sqrtd) / a;
@@ -34,10 +38,12 @@ namespace Asteroid {
             its.normal = (its.position - sphere.Position) / sphere.Radius;
             its.materialId = sphere.MaterialId;
         } else {
-            its.t = glm::max(t1, t2);
-            its.position = r(its.t);
-            its.normal = (sphere.Position - its.position) / sphere.Radius;
-            its.materialId = sphere.MaterialId;
+//            its.t = glm::max(t1, t2);
+//            its.position = r(its.t);
+//            its.normal = (sphere.Position - its.position) / sphere.Radius;
+//            its.materialId = sphere.MaterialId;
+            its.t = -1;
+            return false;
         }
 
         return true;

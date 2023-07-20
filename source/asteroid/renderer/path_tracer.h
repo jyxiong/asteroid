@@ -12,7 +12,7 @@ namespace Asteroid {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
-        auto viewport = camera.GetViewport();
+        auto viewport = camera.viewport;
 
         if (x >= viewport.x && y >= viewport.y)
             return;
@@ -23,12 +23,16 @@ namespace Asteroid {
 
         auto uv = glm::vec2(x, y) / glm::vec2(viewport) * 2.f - 1.f;
 
-        camera.GeneratePrimaryRay(uv, path.ray);
+        auto offsetx = float(uv.x) * camera.tanHalfFov * camera.aspectRatio * camera.right;
+        auto offsety = float(uv.y) * camera.tanHalfFov * camera.up;
+
+        path.ray.Direction = glm::normalize(camera.direction + offsetx + offsety);
+        path.ray.Origin = camera.position;
     }
 
     __global__ void
     ComputeIntersection(const SceneView scene, const DeviceBufferView<PathSegment> paths, int width, int height,
-                        Intersection *intersections) {
+                        DeviceBufferView<Intersection> intersections) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -57,7 +61,7 @@ namespace Asteroid {
     }
 
     __global__ void
-    Shading(const SceneView scene, DeviceBufferView<PathSegment> paths, const Intersection *its,
+    Shading(const SceneView scene, DeviceBufferView<PathSegment> paths, const DeviceBufferView<Intersection> its,
             int width, int height) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -78,7 +82,7 @@ namespace Asteroid {
         scatterRay(path, its[y * width + x], scene.deviceMaterials[it.materialId]);
     }
 
-    __global__ void ConvertToRGBA(const DeviceBufferView<PathSegment> paths, int width, int height, glm::u8vec4 *image) {
+    __global__ void ConvertToRGBA(const DeviceBufferView<PathSegment> paths, int width, int height, DeviceBufferView<glm::u8vec4> image) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 

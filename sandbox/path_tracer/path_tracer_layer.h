@@ -5,8 +5,8 @@
 #include "asteroid/base/layer.h"
 #include "asteroid/base/image.h"
 #include "asteroid/renderer/renderer.h"
-#include "asteroid/renderer/camera.h"
 #include "asteroid/renderer/scene.h"
+#include "asteroid/renderer/camera_controller.h"
 
 namespace Asteroid
 {
@@ -31,7 +31,7 @@ private:
 private:
     Renderer m_Renderer;
 
-    Camera m_Camera;
+    CameraController m_CameraController;
 
     Scene m_Scene;
 

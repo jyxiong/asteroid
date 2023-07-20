@@ -27,10 +27,10 @@ private:
     const Camera* m_ActiveCamera = nullptr;
 
     // 存储最终颜色值[0, 255]
-    glm::u8vec4* m_ImageData = nullptr;
+    std::shared_ptr<DeviceBuffer<glm::u8vec4>> m_ImageData = nullptr;
 
     std::shared_ptr<DeviceBuffer<PathSegment>> m_devicePaths = nullptr;
 
-    Intersection* m_Intersections = nullptr;
+    std::shared_ptr<DeviceBuffer<Intersection>> m_Intersections = nullptr;
 };
 }

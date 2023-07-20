@@ -8,7 +8,8 @@
 using namespace Asteroid;
 
 ExampleLayer::ExampleLayer()
-        : m_Camera(45.0f, 0.1f, 100.0f), Layer("Example") {
+    : Layer("Example") {
+
     Material &pinkSphere = m_Scene.materials.emplace_back();
     pinkSphere.Albedo = {1.0f, 0.0f, 1.0f};
     pinkSphere.Roughness = 0.0f;
@@ -40,7 +41,7 @@ void ExampleLayer::OnAttach() {
 }
 
 void ExampleLayer::OnUpdate(float ts) {
-    m_Camera.OnUpdate(ts);
+    m_CameraController.OnUpdate(ts);
 }
 
 void ExampleLayer::OnImGuiRender() {
@@ -107,10 +108,10 @@ void ExampleLayer::Render() {
 
     m_Scene.UpdateDevice();
 
-    m_Camera.OnResize(m_ViewportWidth, m_ViewportHeight);
+    m_CameraController.OnResize(m_ViewportWidth, m_ViewportHeight);
     m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
 
-    m_Renderer.Render(m_Scene, m_Camera);
+    m_Renderer.Render(m_Scene, m_CameraController.GetCamera());
 
     m_LastRenderTime = timer.ElapsedMillis();
 }
