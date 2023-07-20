@@ -11,7 +11,7 @@
 [pbrt](https://www.pbrt.org/)
 
 ## TODO
-- camera controller
+- 球与射线相交的bug
 - material
-- path segment
+- path segment：bounce
 - unique ptr
