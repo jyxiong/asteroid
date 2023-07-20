@@ -11,7 +11,5 @@
 [pbrt](https://www.pbrt.org/)
 
 ## TODO
-- 球与射线相交的bug
-- material
 - path segment：bounce
-- unique ptr
+- material

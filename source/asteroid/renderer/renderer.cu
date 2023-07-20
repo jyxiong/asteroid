@@ -17,11 +17,11 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
 
     auto pixel_num = width * height;
 
-    m_devicePaths = std::make_shared<DeviceBuffer<PathSegment>>(pixel_num);
+    m_devicePaths = std::make_unique<Buffer<PathSegment>>(pixel_num);
 
-    m_Intersections = std::make_shared<DeviceBuffer<Intersection>>(pixel_num);
+    m_Intersections = std::make_unique<Buffer<Intersection>>(pixel_num);
 
-    m_ImageData = std::make_shared<DeviceBuffer<glm::u8vec4>>(pixel_num);
+    m_ImageData = std::make_unique<Buffer<glm::u8vec4>>(pixel_num);
 
 }
 
@@ -30,9 +30,9 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
     auto height = m_FinalImage->GetHeight();
 
     auto sceneView = SceneView(scene);
-    auto paths = DeviceBufferView<PathSegment>(*m_devicePaths);
-    auto its = DeviceBufferView<Intersection>(*m_Intersections);
-    auto imageData = DeviceBufferView<glm::u8vec4>(*m_ImageData);
+    auto paths = BufferView<PathSegment>(m_devicePaths->data(), m_devicePaths->size());
+    auto its = BufferView<Intersection>(m_Intersections->data(), m_Intersections->size());
+    auto imageData = BufferView<glm::u8vec4>(m_ImageData->data(), m_ImageData->size());
 
     // Execute the kernel
     dim3 block(8, 8, 1);
@@ -40,7 +40,7 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
 
     GeneratePrimaryRay<<<grid, block>>>(camera, paths);
 
-    int bounces = 1;
+    int bounces = 5;
     for (int i = 0; i < bounces; i++) {
         ComputeIntersection<<<grid, block>>>(sceneView, paths, width, height, its);
 

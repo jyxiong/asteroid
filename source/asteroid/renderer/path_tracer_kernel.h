@@ -19,7 +19,6 @@ namespace Asteroid {
         auto discriminant = half_b * half_b - a * c;
         if (discriminant < 0)
         {
-            its.t = -1;
             return false;
         }
         auto sqrtd = sqrt(discriminant);
@@ -28,8 +27,7 @@ namespace Asteroid {
         auto t2 = (-half_b + sqrtd) / a;
 
         if (t1 < 0 && t2 < 0) {
-            its.t = -1;
-            return false;
+             return false;
         }
 
         if (t1 > 0 && t2 > 0) {
@@ -38,12 +36,10 @@ namespace Asteroid {
             its.normal = (its.position - sphere.Position) / sphere.Radius;
             its.materialId = sphere.MaterialId;
         } else {
-//            its.t = glm::max(t1, t2);
-//            its.position = r(its.t);
-//            its.normal = (sphere.Position - its.position) / sphere.Radius;
-//            its.materialId = sphere.MaterialId;
-            its.t = -1;
-            return false;
+            its.t = glm::max(t1, t2);
+            its.position = r(its.t);
+            its.normal = (sphere.Position - its.position) / sphere.Radius;
+            its.materialId = sphere.MaterialId;
         }
 
         return true;
@@ -52,8 +48,8 @@ namespace Asteroid {
     __device__
     void scatterRay(PathSegment & pathSegment, const Intersection& its, const Material &mat) {
 
-        glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
-        float lightIntensity = glm::max(glm::dot(its.normal, -lightDir), 0.0f);
+        auto lightDir = glm::normalize(glm::vec3(-1, -1, -1));
+        auto lightIntensity = glm::max(glm::dot(its.normal, -lightDir), 0.0f);
 
         auto color = mat.Albedo * lightIntensity;
         pathSegment.color += color * pathSegment.throughput;

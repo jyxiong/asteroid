@@ -4,12 +4,12 @@
 using namespace Asteroid;
 
 SceneView::SceneView(const Scene& scene)
-    : deviceSpheres(*scene.deviceSpheres),
-      deviceMaterials(*scene.deviceMaterials){}
+    : deviceSpheres(scene.deviceSpheres->data(), scene.deviceSpheres->size()),
+      deviceMaterials(scene.deviceMaterials->data(), scene.deviceMaterials->size()){}
 
 void Scene::UpdateDevice()
 {
-    deviceSpheres = std::make_shared<DeviceBuffer<Sphere>>(spheres);
+    deviceSpheres = std::make_unique<Buffer<Sphere>>(spheres);
 
-    deviceMaterials = std::make_shared<DeviceBuffer<Material>>(materials);
+    deviceMaterials = std::make_unique<Buffer<Material>>(materials);
 }

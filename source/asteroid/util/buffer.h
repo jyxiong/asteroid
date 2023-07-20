@@ -1,18 +1,21 @@
 #pragma once
 
 #include <cuda_runtime.h>
-#include <asteroid/util/macro.h>
+#include "asteroid/util/macro.h"
 
 namespace Asteroid {
 
     template<typename T>
-    class DeviceBuffer;
+    class Buffer;
 
     template<typename T>
-    class DeviceBufferView {
+    class BufferView {
     public:
-        explicit DeviceBufferView(const DeviceBuffer<T> &buffer)
+        explicit BufferView(const Buffer<T> &buffer)
                 : m_data(buffer.m_Data), m_size(buffer.m_Size) {}
+
+        BufferView(T *data, size_t size)
+                : m_data(data), m_size(size) {}
 
         __device__ size_t size() const { return m_size; }
 
@@ -35,23 +38,23 @@ namespace Asteroid {
 
     // https://github.com/NVIDIAGameWorks/Falcor/blob/master/Source/Falcor/Utils/CudaUtils.cpp#L72
     template<typename T>
-    class DeviceBuffer {
+    class Buffer {
     public:
 
-        explicit DeviceBuffer(size_t size)
+        explicit Buffer(size_t size)
                 : m_Data(nullptr), m_Size(size) {
             cudaMalloc(&m_Data, sizeof(T) * m_Size);
         }
 
-        explicit DeviceBuffer(const std::vector<T>& buffer)
+        explicit Buffer(const std::vector<T> &buffer)
                 : m_Data(nullptr), m_Size(buffer.size()) {
             cudaMalloc(&m_Data, sizeof(T) * m_Size);
             cudaMemcpy(m_Data, buffer.data(), sizeof(T) * buffer.size(), cudaMemcpyHostToDevice);
         }
 
-        DeviceBuffer<T> &operator=(const DeviceBuffer<T> &buffer) = delete;
+        Buffer<T> &operator=(const Buffer<T> &buffer) = delete;
 
-        ~DeviceBuffer() {
+        ~Buffer() {
             cudaFree(m_Data);
         }
 
@@ -63,7 +66,6 @@ namespace Asteroid {
         T *m_Data;
         size_t m_Size;
 
-        friend DeviceBufferView<T>;
+        friend BufferView<T>;
     };
-
 } // namespace name

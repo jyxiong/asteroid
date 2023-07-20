@@ -25,9 +25,9 @@ namespace Asteroid {
 
     struct SceneView {
 
-        DeviceBufferView<Sphere> deviceSpheres;
+        BufferView<Sphere> deviceSpheres;
 
-        DeviceBufferView<Material> deviceMaterials;
+        BufferView<Material> deviceMaterials;
 
         explicit SceneView(const Scene &scene);
 
@@ -39,9 +39,9 @@ namespace Asteroid {
 
         std::vector<Material> materials;
 
-        std::shared_ptr<DeviceBuffer<Sphere>> deviceSpheres;
+        std::unique_ptr<Buffer<Sphere>> deviceSpheres;
 
-        std::shared_ptr<DeviceBuffer<Material>> deviceMaterials;
+        std::unique_ptr<Buffer<Material>> deviceMaterials;
 
         void UpdateDevice();
 

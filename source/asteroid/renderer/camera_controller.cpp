@@ -62,7 +62,10 @@ void CameraController::OnUpdate(float ts) {
 
         glm::quat q = glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, rightDirection),
                                                 glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
+
         m_camera.direction = glm::rotate(q, m_camera.direction);
+        m_camera.up = glm::rotate(q, m_camera.up);
+        m_camera.right = glm::cross(m_camera.direction, m_camera.up);
 
         moved = true;
     }

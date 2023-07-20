@@ -28,8 +28,8 @@ ExampleLayer::ExampleLayer()
 
     {
         Sphere sphere;
-        sphere.Position = {0.0f, -101.0f, 0.0f};
-        sphere.Radius = 100.0f;
+        sphere.Position = {2.0f, .0f, -2.0f};
+        sphere.Radius = 0.5f;
         sphere.MaterialId = 1;
         m_Scene.spheres.push_back(sphere);
     }

@@ -8,7 +8,7 @@
 #include "asteroid/renderer/path_tracer_kernel.h"
 
 namespace Asteroid {
-    __global__ void GeneratePrimaryRay(const Camera camera, DeviceBufferView<PathSegment> paths) {
+    __global__ void GeneratePrimaryRay(const Camera camera, BufferView<PathSegment> paths) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -17,7 +17,7 @@ namespace Asteroid {
         if (x >= viewport.x && y >= viewport.y)
             return;
 
-        auto& path = paths[y * viewport.x + x];
+        auto &path = paths[y * viewport.x + x];
         path.color = glm::vec3(0);
         path.throughput = glm::vec3(1);
 
@@ -31,15 +31,15 @@ namespace Asteroid {
     }
 
     __global__ void
-    ComputeIntersection(const SceneView scene, const DeviceBufferView<PathSegment> paths, int width, int height,
-                        DeviceBufferView<Intersection> intersections) {
+    ComputeIntersection(const SceneView scene, const BufferView<PathSegment> paths, int width, int height,
+                        BufferView<Intersection> intersections) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
         if (x >= width && y >= height)
             return;
 
-        const auto& path = paths[y * width + x];
+        const auto &path = paths[y * width + x];
 
         int closestSphere = -1;
         Intersection its;
@@ -61,7 +61,7 @@ namespace Asteroid {
     }
 
     __global__ void
-    Shading(const SceneView scene, DeviceBufferView<PathSegment> paths, const DeviceBufferView<Intersection> its,
+    Shading(const SceneView scene, BufferView<PathSegment> paths, const BufferView<Intersection> its,
             int width, int height) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -69,7 +69,7 @@ namespace Asteroid {
         if (x >= width && y >= height)
             return;
 
-        auto& path = paths[y * width + x];
+        auto &path = paths[y * width + x];
 
         auto it = its[y * width + x];
 
@@ -79,10 +79,11 @@ namespace Asteroid {
             return;
         }
 
-        scatterRay(path, its[y * width + x], scene.deviceMaterials[it.materialId]);
+        scatterRay(path, it, scene.deviceMaterials[it.materialId]);
     }
 
-    __global__ void ConvertToRGBA(const DeviceBufferView<PathSegment> paths, int width, int height, DeviceBufferView<glm::u8vec4> image) {
+    __global__ void
+    ConvertToRGBA(const BufferView<PathSegment> paths, int width, int height, BufferView<glm::u8vec4> image) {
         auto x = blockIdx.x * blockDim.x + threadIdx.x;
         auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
