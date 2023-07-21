@@ -11,14 +11,14 @@ CameraController::CameraController() {
     m_camera.tanHalfFov = glm::tan(glm::radians(m_camera.verticalFov * 0.5f));
 }
 
-void CameraController::OnUpdate(float ts) {
+bool CameraController::OnUpdate(float ts) {
     glm::vec2 mousePos = Input::GetMousePosition();
     glm::vec2 delta = (mousePos - m_camera.lastMousePosition) * 0.002f;
     m_camera.lastMousePosition = mousePos;
 
     if (!Input::IsMouseButtonDown(MouseButton::Right)) {
         Input::SetCursorMode(CursorMode::Normal);
-        return;
+        return false;
     }
 
     Input::SetCursorMode(CursorMode::Locked);
@@ -69,6 +69,8 @@ void CameraController::OnUpdate(float ts) {
 
         moved = true;
     }
+
+    return moved;
 }
 
 void CameraController::OnResize(unsigned int width, unsigned int height) {

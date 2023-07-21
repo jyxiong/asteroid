@@ -11,5 +11,5 @@
 [pbrt](https://www.pbrt.org/)
 
 ## TODO
-- material
+- material: emitter
 - transform

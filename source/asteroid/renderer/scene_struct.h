@@ -8,10 +8,9 @@ namespace Asteroid
 {
 
 struct RenderState {
-    unsigned int iterations;
-    unsigned int traceDepth;
-    std::vector<glm::vec3> image;
-    std::string imageName;
+    unsigned int iterations{1000};
+    unsigned int currentIteration{0};
+    unsigned int traceDepth{5};
 };
 
 struct Camera {

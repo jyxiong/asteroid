@@ -14,7 +14,7 @@ public:
 
     const Camera& GetCamera() const { return m_camera; }
 
-    void OnUpdate(float ts);
+    bool OnUpdate(float ts);
 
     void OnResize(unsigned int width, unsigned int height);
 

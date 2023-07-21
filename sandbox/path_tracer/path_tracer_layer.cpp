@@ -41,7 +41,9 @@ void ExampleLayer::OnAttach() {
 }
 
 void ExampleLayer::OnUpdate(float ts) {
-    m_CameraController.OnUpdate(ts);
+    if (m_CameraController.OnUpdate(ts)) {
+        m_Renderer.ResetFrameIndex();
+    }
 }
 
 void ExampleLayer::OnImGuiRender() {
@@ -50,6 +52,14 @@ void ExampleLayer::OnImGuiRender() {
     if (ImGui::Button("Render")) {
         Render();
     }
+
+    ImGui::DragInt("Iteration", reinterpret_cast<int *>(&m_Renderer.GetRenderState().iterations), 100, 0, 10000);
+    ImGui::Text("Current iteration: %d", m_Renderer.GetRenderState().currentIteration);
+    ImGui::DragInt("Trace depth: %d", reinterpret_cast<int *>(&m_Renderer.GetRenderState().traceDepth), 1, 0, 100);
+
+    if (ImGui::Button("Reset"))
+        m_Renderer.ResetFrameIndex();
+
     ImGui::End();
 
     ImGui::Begin("Scene");
@@ -60,7 +70,7 @@ void ExampleLayer::OnImGuiRender() {
         ImGui::DragFloat3("Position", glm::value_ptr(sphere.Position), 0.1f);
         ImGui::DragFloat("Radius", &sphere.Radius, 0.1f);
 
-        ImGui::DragInt("Material", &sphere.MaterialId, 1.0f, 0, (int) m_Scene.materials.size() - 1);
+        ImGui::DragInt("Material", &sphere.MaterialId, 1, 0, (int) m_Scene.materials.size() - 1);
 
         ImGui::Separator();
 
