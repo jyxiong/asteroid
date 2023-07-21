@@ -11,5 +11,8 @@
 [pbrt](https://www.pbrt.org/)
 
 ## TODO
+- geometry
+- transform: camera and geometry
 - material: emitter
-- transform
+- workflow: [ref1](https://blog.csdn.net/qq_16013649/article/details/113905995), [ref2](https://github.com/ptheywood/cuda-cmake-github-actions/issues/5)
+- licence
