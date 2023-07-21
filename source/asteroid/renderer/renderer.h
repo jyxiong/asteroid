@@ -3,9 +3,6 @@
 #include <memory>
 #include "glm/glm.hpp"
 #include "asteroid/base/image.h"
-#include "asteroid/renderer/camera.h"
-#include "asteroid/renderer/ray.h"
-#include "asteroid/renderer/intersection.h"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
 

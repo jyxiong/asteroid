@@ -38,10 +38,10 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
     dim3 block(8, 8, 1);
     dim3 grid(width / block.x, height / block.y, 1);
 
-    GeneratePrimaryRay<<<grid, block>>>(camera, paths);
+    unsigned int bounces = 5;
+    GeneratePathSegment<<<grid, block>>>(camera, bounces, paths);
 
-    int bounces = 5;
-    for (int i = 0; i < bounces; i++) {
+    for (unsigned int i = 0; i < bounces; i++) {
         ComputeIntersection<<<grid, block>>>(sceneView, paths, width, height, its);
 
         Shading<<<grid, block>>>(sceneView, paths, its, width, height);

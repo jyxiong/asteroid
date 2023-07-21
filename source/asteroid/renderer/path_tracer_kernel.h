@@ -3,10 +3,8 @@
 #include <cuda_runtime.h>
 #include "glm/glm.hpp"
 
-#include "asteroid/renderer/ray.h"
-#include "asteroid/renderer/camera.h"
 #include "asteroid/renderer/scene.h"
-#include "asteroid/renderer/intersection.h"
+#include "asteroid/renderer/scene_struct.h"
 
 namespace Asteroid {
 
@@ -32,12 +30,12 @@ namespace Asteroid {
 
         if (t1 > 0 && t2 > 0) {
             its.t = glm::min(t1, t2);
-            its.position = r(its.t);
+            its.position = r.Origin + its.t * r.Direction;
             its.normal = (its.position - sphere.Position) / sphere.Radius;
             its.materialId = sphere.MaterialId;
         } else {
             its.t = glm::max(t1, t2);
-            its.position = r(its.t);
+            its.position = r.Origin + its.t * r.Direction;
             its.normal = (sphere.Position - its.position) / sphere.Radius;
             its.materialId = sphere.MaterialId;
         }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "asteroid/renderer/camera.h"
+#include "asteroid/renderer/scene_struct.h"
 
 namespace Asteroid {
 
