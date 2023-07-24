@@ -3,6 +3,10 @@
 #include <memory>
 #include <cuda_runtime.h>
 
+// https://onihusube.hatenablog.com/entry/2018/06/21/021550
+// https://github.com/NVIDIA/TensorRT/blob/main/plugin/common/bertCommon.h#L293
+// https://github.com/Kitware/kwiver/blob/master/arrows/cuda/cuda_memory.h#L20
+
 namespace Asteroid {
 
 template<typename T>

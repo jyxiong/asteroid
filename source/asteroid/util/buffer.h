@@ -3,6 +3,8 @@
 #include <cuda_runtime.h>
 #include "asteroid/util/macro.h"
 
+// https://github.com/NVIDIAGameWorks/Falcor/blob/master/Source/Falcor/Utils/CudaUtils.cpp#L72
+
 namespace Asteroid {
 
 template<typename T>
@@ -36,7 +38,6 @@ private:
     size_t m_size;
 };
 
-// https://github.com/NVIDIAGameWorks/Falcor/blob/master/Source/Falcor/Utils/CudaUtils.cpp#L72
 template<typename T>
 class Buffer {
 public:

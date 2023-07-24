@@ -24,11 +24,11 @@ GeneratePathSegment(const Camera camera, unsigned int traceDepth, BufferView<Pat
     path.remainingBounces = traceDepth;
 
     auto uv = glm::vec2(x, y) / glm::vec2(viewport) * 2.f - 1.f;
-    auto offsetx = float(uv.x) * camera.tanHalfFov * camera.aspectRatio * camera.right;
-    auto offsety = float(uv.y) * camera.tanHalfFov * camera.up;
+    auto offsetX = float(uv.x) * camera.tanHalfFov * camera.aspectRatio * camera.right;
+    auto offsetY = float(uv.y) * camera.tanHalfFov * camera.up;
 
-    path.ray.Direction = glm::normalize(camera.direction + offsetx + offsety);
-    path.ray.Origin = camera.position;
+    path.ray.direction = glm::normalize(camera.direction + offsetX + offsetY);
+    path.ray.origin = camera.position;
 }
 
 __global__ void
@@ -79,9 +79,17 @@ Shading(const SceneView scene, BufferView<PathSegment> pathSegments, const Buffe
         return;
     }
 
+    auto &it = its[y * width + x];
+    auto &material = scene.deviceMaterials[it.materialIndex];
     auto &path = pathSegments[y * width + x];
-    auto it = its[y * width + x];
-    scatterRay(path, it, scene.deviceMaterials[it.materialId]);
+
+    if (material.emittance > 0.0f) {
+        path.color += (material.albedo * material.emittance) * path.throughput;
+        path.remainingBounces = 0;
+    }else
+    {
+        scatterRay(path, it, material);
+    }
 }
 
 __global__ void finalGather(BufferView<glm::vec3> image, const BufferView<PathSegment> pathSegments, int width, int height) {
