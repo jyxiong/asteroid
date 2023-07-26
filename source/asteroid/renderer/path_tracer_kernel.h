@@ -19,10 +19,10 @@ namespace Asteroid {
         {
             return false;
         }
-        auto sqrtd = sqrt(discriminant);
+        auto sqrtDis = sqrt(discriminant);
 
-        auto t1 = (-half_b - sqrtd) / a;
-        auto t2 = (-half_b + sqrtd) / a;
+        auto t1 = (-half_b - sqrtDis) / a;
+        auto t2 = (-half_b + sqrtDis) / a;
 
         if (t1 < 0 && t2 < 0) {
              return false;

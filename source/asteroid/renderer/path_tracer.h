@@ -22,6 +22,7 @@ GeneratePathSegment(const Camera camera, unsigned int traceDepth, BufferView<Pat
     path.color = glm::vec3(0);
     path.throughput = glm::vec3(1);
     path.remainingBounces = traceDepth;
+    path.pixelIndex = y * viewport.x + x;
 
     auto uv = glm::vec2(x, y) / glm::vec2(viewport) * 2.f - 1.f;
     auto offsetX = float(uv.x) * camera.tanHalfFov * camera.aspectRatio * camera.right;
@@ -90,6 +91,9 @@ Shading(const SceneView scene, BufferView<PathSegment> pathSegments, const Buffe
     {
         scatterRay(path, it, material);
     }
+
+//    if (path.pixelIndex == 142821)
+//        printf("pixel index = %d, color = (%f, %f, %f); \n", path.pixelIndex, path.color.x, path.color.y, path.color.z);
 }
 
 __global__ void finalGather(BufferView<glm::vec3> image, const BufferView<PathSegment> pathSegments, int width, int height) {

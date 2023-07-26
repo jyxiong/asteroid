@@ -9,7 +9,6 @@ namespace Asteroid
 
 struct RenderState
 {
-    unsigned int iterations{ 1000 };
     unsigned int currentIteration{ 0 };
     unsigned int traceDepth{ 5 };
 };
@@ -47,8 +46,6 @@ struct Sphere
     glm::vec3 position{ 0.0f };
 
     int materialIndex = 0;
-};
-
 };
 
 struct Ray

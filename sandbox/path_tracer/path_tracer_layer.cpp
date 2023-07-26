@@ -57,27 +57,19 @@ void ExampleLayer::OnAttach()
 
 void ExampleLayer::OnUpdate(float ts)
 {
-    if (m_CameraController.OnUpdate(ts))
-    {
-        m_Renderer.ResetFrameIndex();
-    }
+    m_modified |= m_CameraController.OnUpdate(ts);
 }
 
 void ExampleLayer::OnImGuiRender()
 {
     ImGui::Begin("Settings");
     ImGui::Text("Last render: %.3fms", m_LastRenderTime);
-    if (ImGui::Button("Render"))
-    {
-        Render();
-    }
 
-    ImGui::DragInt("Iteration", reinterpret_cast<int *>(&m_Renderer.GetRenderState().iterations), 100, 0, 10000);
     ImGui::Text("Current iteration: %d", m_Renderer.GetRenderState().currentIteration);
-    ImGui::DragInt("Trace depth: %d", reinterpret_cast<int *>(&m_Renderer.GetRenderState().traceDepth), 1, 0, 100);
 
-    if (ImGui::Button("Reset"))
-        m_Renderer.ResetFrameIndex();
+    m_modified |= ImGui::DragInt("Trace depth: %d", reinterpret_cast<int *>(&m_Renderer.GetRenderState().traceDepth), 1, 1, 100);
+
+    m_modified |= ImGui::Button("Reset");
 
     ImGui::End();
 
@@ -87,25 +79,30 @@ void ExampleLayer::OnImGuiRender()
         ImGui::PushID(i);
 
         Sphere &sphere = m_Scene.spheres[i];
-        ImGui::DragFloat3("position", glm::value_ptr(sphere.position), 0.1f);
-        ImGui::DragFloat("radius", &sphere.radius, 0.1f);
 
-        ImGui::DragInt("Material", &sphere.materialIndex, 1, 0, (int) m_Scene.materials.size() - 1);
+        m_modified |= ImGui::DragFloat3("position", glm::value_ptr(sphere.position), 0.1f);
+        m_modified |= ImGui::DragFloat("radius", &sphere.radius, 0.1f);
+        m_modified |= ImGui::DragInt("material ID", &sphere.materialIndex, 1, 0, (int) m_Scene.materials.size() - 1);
 
         ImGui::Separator();
 
         ImGui::PopID();
     }
 
+    ImGui::End();
+
+    ImGui::Begin("Material");
+
     for (size_t i = 0; i < m_Scene.materials.size(); i++)
     {
         ImGui::PushID(i);
 
         Material &material = m_Scene.materials[i];
-        ImGui::ColorEdit3("albedo", glm::value_ptr(material.albedo));
-        ImGui::DragFloat("roughness", &material.roughness, 0.01f, 0.0f, 1.0f);
-        ImGui::DragFloat("metallic", &material.metallic, 0.01f, 0.0f, 1.0f);
-        ImGui::DragFloat("emittance", &material.emittance, 0.05f, 0.0f, FLT_MAX);
+
+        m_modified |= ImGui::ColorEdit3("albedo", glm::value_ptr(material.albedo));
+        m_modified |= ImGui::DragFloat("roughness", &material.roughness, 0.01f, 0.0f, 1.0f);
+        m_modified |= ImGui::DragFloat("metallic", &material.metallic, 0.01f, 0.0f, 1.0f);
+        m_modified |= ImGui::DragFloat("emittance", &material.emittance, 0.05f, 0.0f, FLT_MAX);
 
         ImGui::Separator();
 
@@ -139,6 +136,12 @@ void ExampleLayer::OnEvent(Event &event)
 void ExampleLayer::Render()
 {
     Timer timer;
+
+    if (m_modified)
+    {
+        m_Renderer.ResetFrameIndex();
+        m_modified = false;
+    }
 
     m_Scene.UpdateDevice();
 

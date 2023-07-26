@@ -37,6 +37,8 @@ private:
 
     unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
 
+    bool m_modified = false;
+
     float m_LastRenderTime = 0.0f;
 };
 
