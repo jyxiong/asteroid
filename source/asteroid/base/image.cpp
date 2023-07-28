@@ -16,14 +16,14 @@ Image::~Image()
 
 void Image::SetData(const void* data)
 {
-    cudaGraphicsMapResources(1, &m_resource, nullptr);
+    cudaGraphicsMapResources(1, &m_resource);
 
-    cudaArray* texture_ptr;
-    cudaGraphicsSubResourceGetMappedArray(&texture_ptr, m_resource, 0, 0);
+    cudaArray_t array;
+    cudaGraphicsSubResourceGetMappedArray(&array, m_resource, 0, 0);
 
-    cudaMemcpy2DToArray(texture_ptr, 0, 0, data, m_Width * sizeof(uchar4), m_Width * sizeof(uchar4), m_Height, cudaMemcpyDeviceToDevice);
+    cudaMemcpy2DToArray(array, 0, 0, data, m_Width * sizeof(uchar4), m_Width * sizeof(uchar4), m_Height, cudaMemcpyDeviceToDevice);
     
-    cudaGraphicsUnmapResources(1, &m_resource, nullptr);
+    cudaGraphicsUnmapResources(1, &m_resource);
 }
 
 void Image::Resize(unsigned int width, unsigned int height)

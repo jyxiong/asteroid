@@ -28,7 +28,7 @@ if (NOT TARGET glm)
 endif ()
 
 if (NOT TARGET imgui)
-    include(imgui)
+    include(imgui.cmake)
     set_target_properties(imgui PROPERTIES FOLDER ${EXTERNAL_DIR}/imgui)
 endif ()
 
@@ -38,6 +38,6 @@ if (NOT TARGET spdlog)
 endif ()
 
 if (NOT TARGET stb)
-    include(stb)
+    include(stb.cmake)
     set_target_properties(stb PROPERTIES FOLDER ${EXTERNAL_DIR}/stb)
 endif ()
