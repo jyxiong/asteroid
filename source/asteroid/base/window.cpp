@@ -40,7 +40,7 @@ void Window::Init(const WindowProps &props)
     {
         // TODO: glfwTerminate on system shutdown
         auto success = glfwInit();
-        AST_CORE_ASSERT(success, "Could not initialize GLFW!")
+        AST_ASSERT(success, "Could not initialize GLFW!")
 
         s_GLFWInitialized = true;
     }
@@ -49,7 +49,7 @@ void Window::Init(const WindowProps &props)
     glfwMakeContextCurrent(m_Window);
 
     auto status = gladLoadGL(glfwGetProcAddress);
-    AST_CORE_ASSERT(status, "Failed to initialize Glad!")
+    AST_ASSERT(status, "Failed to initialize Glad!")
 
     AST_CORE_INFO("OpenGL Info:");
     AST_CORE_INFO("  Vendor: {}", fmt::ptr(glGetString(GL_VENDOR)));

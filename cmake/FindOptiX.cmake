@@ -2,7 +2,7 @@ if (TARGET OptiX::OptiX)
     return()
 endif()
 
-file(GLOB OPTIX_SDK_DIR "$ENV{ProgramData}/NVIDIA Corporation/OptiX SDK 7.*.*")
+file(GLOB OPTIX_SDK_DIR "$ENV{ProgramData}/NVIDIA Corporation/OptiX SDK 7.7.*")
 find_path(OptiX_ROOT_DIR NAMES include/optix.h PATHS ${OptiX_INSTALL_DIR} ${OPTIX_SDK_DIR} REQUIRED)
 
 file(READ "${OptiX_ROOT_DIR}/include/optix.h" header)

@@ -10,12 +10,12 @@
 
 namespace Asteroid
 {
-class ExampleLayer : public Layer
+class OptixLayer : public Layer
 {
 public:
-    ExampleLayer();
+    OptixLayer();
 
-    ~ExampleLayer() override;
+    ~OptixLayer() override;
 
     void OnAttach() override;
 
@@ -31,15 +31,7 @@ private:
 private:
     Renderer m_Renderer;
 
-    CameraController m_CameraController;
-
-    Scene m_Scene;
-
-    unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
-
-    bool m_modified = false;
-
-    float m_LastRenderTime = 0.0f;
+   unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
 };
 
 }

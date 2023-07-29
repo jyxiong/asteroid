@@ -20,9 +20,17 @@ add_library(asteroid STATIC
 
 target_include_directories(asteroid SYSTEM PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
-target_include_directories(asteroid PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(asteroid PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(asteroid PUBLIC glad glfw glm imgui spdlog stb)
+target_link_libraries(asteroid PUBLIC
+    glad
+    glfw
+    glm
+    imgui
+    OptiX::OptiX
+    spdlog
+    stb)
 
 target_precompile_headers(asteroid PUBLIC astpch.h)
 

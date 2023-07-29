@@ -5,7 +5,7 @@
 #include "glm/glm.hpp"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
-#include "asteroid/renderer/path_tracer_kernel.h"
+#include "path_tracer_kernel.h"
 
 namespace Asteroid {
 __global__ void

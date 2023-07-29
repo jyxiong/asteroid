@@ -12,7 +12,7 @@ Application *Application::s_Instance = nullptr;
 
 Application::Application()
 {
-    AST_CORE_ASSERT(!s_Instance, "Application already exists!")
+    AST_ASSERT(!s_Instance, "Application already exists!")
     s_Instance = this;
 
     InitWindow();

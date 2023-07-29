@@ -13,7 +13,7 @@ public:
 
     void Render(const Scene &scene, const Camera &camera);
 
-    std::shared_ptr<Image> GetFinalImage() const { return m_FinalImage; }
+    std::shared_ptr<Image> GetFinalImage() const { return m_finalImage; }
 
     void ResetFrameIndex() { m_state.currentIteration = 0; }
 
@@ -23,7 +23,7 @@ private:
     RenderState m_state;
 
     // 存储用于展示的纹理图像
-    std::shared_ptr<Image> m_FinalImage;
+    std::shared_ptr<Image> m_finalImage;
 
     std::unique_ptr<Buffer<glm::vec3>> m_AccumulationData = nullptr;
 

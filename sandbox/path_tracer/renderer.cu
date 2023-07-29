@@ -1,18 +1,19 @@
-#include "asteroid/renderer/renderer.h"
-#include "asteroid/renderer/path_tracer.h"
+#include "renderer.h"
+
 #include "asteroid/util/macro.h"
+#include "path_tracer.h"
 
 using namespace Asteroid;
 
 void Renderer::OnResize(unsigned int width, unsigned int height) {
-    if (m_FinalImage) {
+    if (m_finalImage) {
         // No resize necessary
-        if (m_FinalImage->GetWidth() == width && m_FinalImage->GetHeight() == height)
+        if (m_finalImage->GetWidth() == width && m_finalImage->GetHeight() == height)
             return;
 
-        m_FinalImage->Resize(width, height);
+        m_finalImage->Resize(width, height);
     } else {
-        m_FinalImage = std::make_shared<Image>(width, height);
+        m_finalImage = std::make_shared<Image>(width, height);
     }
 
     auto pixel_num = width * height;
@@ -29,8 +30,8 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
 }
 
 void Renderer::Render(const Scene &scene, const Camera &camera) {
-    auto width = m_FinalImage->GetWidth();
-    auto height = m_FinalImage->GetHeight();
+    auto width = m_finalImage->GetWidth();
+    auto height = m_finalImage->GetHeight();
 
     if (m_state.currentIteration == 0)
     {
@@ -61,6 +62,6 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
 
     ConvertToRGBA<<<grid, block>>>(accumulations, m_state.currentIteration, width, height, imageData);
 
-    m_FinalImage->SetData(imageData.data());
+    m_finalImage->SetData(imageData.data());
 
 }
