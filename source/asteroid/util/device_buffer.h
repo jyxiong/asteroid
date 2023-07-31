@@ -8,9 +8,9 @@ namespace Asteroid
 
 struct DeviceBuffer
 {
-    inline CUdeviceptr devicePtr() const
+    inline void *devicePtr() const
     {
-        return (CUdeviceptr) m_devicePtr;
+        return m_devicePtr;
     }
 
     void resize(size_t size)

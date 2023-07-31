@@ -58,19 +58,19 @@ Renderer::Renderer()
     AST_CORE_INFO("create optix raygen program ...");
     createRaygenPG();
 
-//    AST_CORE_INFO("creating optix miss program ...");
-//    createMissPG();
-//
-//    AST_CORE_INFO("creating optix hit group program ...");
-//    createHitGroupPG();
-//
-//    AST_CORE_INFO("creating optix pipeline ...");
-//    createPipeline();
-//
-//    AST_CORE_INFO("creating optix shader binding table ...");
-//    createSBT();
-//
-//    m_launchParamsBuffer.alloc(sizeof(m_launchParams));
+    AST_CORE_INFO("creating optix miss program ...");
+    createMissPG();
+
+    AST_CORE_INFO("creating optix hit group program ...");
+    createHitGroupPG();
+
+    AST_CORE_INFO("creating optix pipeline ...");
+    createPipeline();
+
+    AST_CORE_INFO("creating optix shader binding table ...");
+    createSBT();
+
+    m_launchParamsBuffer.alloc(sizeof(m_launchParams));
 }
 
 void Renderer::OnResize(unsigned int width, unsigned int height)
@@ -104,7 +104,7 @@ void Renderer::Render()
     AST_OPTIX_CHECK(optixLaunch(/*! pipeline we're launching launch: */
         m_pipeline,m_stream,
         /*! parameters and SBT */
-        m_launchParamsBuffer.devicePtr(),
+        (CUdeviceptr)m_launchParamsBuffer.devicePtr(),
         m_launchParamsBuffer.m_sizeInBytes,
         &m_sbt,
         /*! dimensions of the launch: */
@@ -117,6 +117,8 @@ void Renderer::Render()
     // want to use streams and double-buffering, but for this simple
     // example, this will have to do)
     AST_CUDA_SYNC_CHECK();
+
+    m_finalImage->SetData(m_colorBuffer.devicePtr());
 }
 
 void Renderer::initOptix()
@@ -287,7 +289,7 @@ void Renderer::createSBT()
         raygenRecords.push_back(rec);
     }
     m_raygenRecords.allocAndUpload(raygenRecords);
-    m_sbt.raygenRecord = m_raygenRecords.devicePtr();
+    m_sbt.raygenRecord = (CUdeviceptr)m_raygenRecords.m_devicePtr;
 
     std::vector<MissRecord> missRecords;
     for (int i = 0; i < m_missPGs.size(); i++)
@@ -298,7 +300,7 @@ void Renderer::createSBT()
         missRecords.push_back(rec);
     }
     m_missRecords.allocAndUpload(missRecords);
-    m_sbt.missRecordBase = m_missRecords.devicePtr();
+    m_sbt.missRecordBase = (CUdeviceptr)m_missRecords.devicePtr();
     m_sbt.missRecordStrideInBytes = sizeof(MissRecord);
     m_sbt.missRecordCount = static_cast<int>(missRecords.size());
 
@@ -311,7 +313,7 @@ void Renderer::createSBT()
         hitgroupRecords.push_back(rec);
     }
     m_hitgroupRecords.allocAndUpload(hitgroupRecords);
-    m_sbt.hitgroupRecordBase = m_hitgroupRecords.devicePtr();
+    m_sbt.hitgroupRecordBase = (CUdeviceptr)m_hitgroupRecords.devicePtr();
     m_sbt.hitgroupRecordStrideInBytes = sizeof(HitgroupRecord);
     m_sbt.hitgroupRecordCount = static_cast<int>(hitgroupRecords.size());
 }
