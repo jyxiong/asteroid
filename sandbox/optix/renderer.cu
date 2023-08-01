@@ -89,17 +89,15 @@ void Renderer::OnResize(unsigned int width, unsigned int height)
 
     m_colorBuffer.resize(width * height * sizeof(unsigned int));
 
-    m_launchParams.width = width;
-    m_launchParams.height = height;
-    m_launchParams.colorBuffer = (unsigned int *) m_colorBuffer.devicePtr();
+    m_launchParams.frame.size = make_int2(width, height);
+    m_launchParams.frame.colorBuffer = (unsigned int *) m_colorBuffer.devicePtr();
 }
 
 void Renderer::Render()
 {
-    if (m_launchParams.width == 0) return;
+    if (m_launchParams.frame.size.x == 0) return;
 
     m_launchParamsBuffer.upload(&m_launchParams,1);
-    m_launchParams.frameID++;
 
     AST_OPTIX_CHECK(optixLaunch(/*! pipeline we're launching launch: */
         m_pipeline,m_stream,
@@ -108,8 +106,8 @@ void Renderer::Render()
         m_launchParamsBuffer.m_sizeInBytes,
         &m_sbt,
         /*! dimensions of the launch: */
-        m_launchParams.width,
-        m_launchParams.height,
+        m_launchParams.frame.size.x,
+        m_launchParams.frame.size.y,
         1
     ));
     // sync - make sure the frame is rendered before we download and

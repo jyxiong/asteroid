@@ -6,7 +6,8 @@ embed_ptx(
     OUTPUT_TARGET otkHelloKernel
     FOLDER sandbox/optix
     PTX_LINK_LIBRARIES
-        OptiX::OptiX
+        optix
+        asteroid
     SOURCES
         program.cu)
 

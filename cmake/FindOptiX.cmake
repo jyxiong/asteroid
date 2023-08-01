@@ -1,4 +1,4 @@
-if (TARGET OptiX::OptiX)
+if (TARGET optix)
     return()
 endif()
 
@@ -20,5 +20,5 @@ find_package_handle_standard_args(OptiX
 
 set(OptiX_INCLUDE_DIR ${OptiX_ROOT_DIR}/include)
 
-add_library(OptiX::OptiX INTERFACE IMPORTED)
-target_include_directories(OptiX::OptiX INTERFACE ${OptiX_INCLUDE_DIR})
+add_library(optix INTERFACE IMPORTED)
+target_include_directories(optix INTERFACE ${OptiX_INCLUDE_DIR})

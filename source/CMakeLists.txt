@@ -28,7 +28,7 @@ target_link_libraries(asteroid PUBLIC
     glfw
     glm
     imgui
-    OptiX::OptiX
+    optix
     spdlog
     stb)
 
