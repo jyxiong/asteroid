@@ -1026,6 +1026,14 @@ AST_INLINE AST_HOST_DEVICE int3 operator+(const int3& a, const int3& b)
 {
     return ::make_int3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
+AST_INLINE AST_HOST_DEVICE int3 operator+(const int3& a, const int b)
+{
+    return ::make_int3(a.x + b, a.y + b, a.z + b);
+}
+AST_INLINE AST_HOST_DEVICE int3 operator+(const int a, const int3& b)
+{
+    return ::make_int3(a + b.x, a + b.y, a + b.z);
+}
 AST_INLINE AST_HOST_DEVICE void operator+=(int3& a, const int3& b)
 {
     a.x += b.x; a.y += b.y; a.z += b.z;
