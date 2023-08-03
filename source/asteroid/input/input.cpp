@@ -19,7 +19,7 @@ bool Input::IsMouseButtonDown(MouseButton button)
     return state == GLFW_PRESS;
 }
 
-glm::vec2 Input::GetMousePosition()
+float2 Input::GetMousePosition()
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
     double x, y;

@@ -2570,6 +2570,20 @@ AST_INLINE AST_HOST_DEVICE void setByIndex(ulonglong4& v, int i, unsigned long l
     ((unsigned long long*)(&v))[i] = x;
 }
 
+/* uchar4 functions */
+/******************************************************************************/
+
+/** additional constructors
+* @{
+*/
+using ::make_uchar4;
+
+AST_INLINE AST_HOST_DEVICE uchar4 make_uchar4(const unsigned char s)
+{
+    return ::make_uchar4(s, s, s, s);
+}
+
+/** @} */
 
 /******************************************************************************/
 

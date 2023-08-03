@@ -18,16 +18,16 @@ GeneratePathSegment(const Camera camera, unsigned int traceDepth, BufferView<Pat
         return;
 
     auto &path = pathSegments[y * viewport.x + x];
-    path.color = float3(0);
-    path.throughput = float3(1);
+    path.color = make_float3(0);
+    path.throughput = make_float3(1);
     path.remainingBounces = traceDepth;
     path.pixelIndex = y * viewport.x + x;
 
-    auto uv = glm::vec2(x, y) / glm::vec2(viewport) * 2.f - 1.f;
+    auto uv = make_float2(x, y) / make_float2(viewport) * 2.f - 1.f;
     auto offsetX = float(uv.x) * camera.tanHalfFov * camera.aspectRatio * camera.right;
     auto offsetY = float(uv.y) * camera.tanHalfFov * camera.up;
 
-    path.ray.direction = glm::normalize(camera.direction + offsetX + offsetY);
+    path.ray.direction = normalize(camera.direction + offsetX + offsetY);
     path.ray.origin = camera.position;
 }
 
@@ -60,15 +60,15 @@ ComputeIntersection(const SceneView scene, BufferView<PathSegment> pathSegments,
 
     if (closestSphere < 0) {
         path.remainingBounces = 0;
-        intersections[y * width + x].t = -1;
+        intersections[path.pixelIndex].t = -1;
     } else {
-        intersections[y * width + x] = its;
+        intersections[path.pixelIndex] = its;
     }
 }
 
 __global__ void
 Shading(const SceneView scene, BufferView<PathSegment> pathSegments, const BufferView<Intersection> its,
-        int width, int height) {
+        int width, int height, BufferView<uchar4> image) {
     auto x = blockIdx.x * blockDim.x + threadIdx.x;
     auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -86,13 +86,14 @@ Shading(const SceneView scene, BufferView<PathSegment> pathSegments, const Buffe
     if (material.emittance > 0.0f) {
         path.color += (material.albedo * material.emittance) * path.throughput;
         path.remainingBounces = 0;
+
+        image[path.pixelIndex] = make_uchar4(path.color.x * 255.f, path.color.y * 255.f, path.color.z * 255.f, 255);
     }else
     {
-        scatterRay(path, it, material);
-    }
+//        scatterRay(path, it, material);
 
-//    if (path.pixelIndex == 142821)
-//        printf("pixel index = %d, color = (%f, %f, %f); \n", path.pixelIndex, path.color.x, path.color.y, path.color.z);
+        image[path.pixelIndex] = make_uchar4(0);
+    }
 }
 
 __global__ void finalGather(BufferView<float3> image, const BufferView<PathSegment> pathSegments, int width, int height) {
@@ -103,19 +104,19 @@ __global__ void finalGather(BufferView<float3> image, const BufferView<PathSegme
         return;
 
     auto& path = pathSegments[y * width + x];
-    image[y * width + x] += path.color;
+    image[path.pixelIndex] += path.color;
 }
 
 __global__ void
-ConvertToRGBA(const BufferView<float3> accumulations, unsigned int iter, int width, int height, BufferView<glm::u8vec4> image) {
+ConvertToRGBA(const BufferView<float3> accumulations, unsigned int iter, int width, int height, BufferView<uchar4> image) {
     auto x = blockIdx.x * blockDim.x + threadIdx.x;
     auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (x >= width && y >= height)
         return;
 
-    auto color = glm::clamp(accumulations[y * width + x] / float(iter), 0.f, 1.f);
-    image[y * width + x] = glm::u8vec4(color * 255.f, 255);
+    auto color = clamp(accumulations[y * width + x] / float(iter), 0.f, 1.f);
+    image[y * width + x] = make_uchar4((unsigned char)color.x * 255.f, (unsigned char)color.y * 255.f, (unsigned char)color.z * 255.f, 255);
 }
 
 }

@@ -79,7 +79,7 @@ void ExampleLayer::OnImGuiRender()
 
         Sphere &sphere = m_Scene.spheres[i];
 
-        m_modified |= ImGui::DragFloat3("position", glm::value_ptr(sphere.position), 0.1f);
+        m_modified |= ImGui::DragFloat3("position", &sphere.position.x, 0.1f);
         m_modified |= ImGui::DragFloat("radius", &sphere.radius, 0.1f);
         m_modified |= ImGui::DragInt("material ID", &sphere.materialIndex, 1, 0, (int) m_Scene.materials.size() - 1);
 
@@ -98,7 +98,7 @@ void ExampleLayer::OnImGuiRender()
 
         Material &material = m_Scene.materials[i];
 
-        m_modified |= ImGui::ColorEdit3("albedo", glm::value_ptr(material.albedo));
+        m_modified |= ImGui::ColorEdit3("albedo", &material.albedo.x);
         m_modified |= ImGui::DragFloat("roughness", &material.roughness, 0.01f, 0.0f, 1.0f);
         m_modified |= ImGui::DragFloat("metallic", &material.metallic, 0.01f, 0.0f, 1.0f);
         m_modified |= ImGui::DragFloat("emittance", &material.emittance, 0.05f, 0.0f, FLT_MAX);
