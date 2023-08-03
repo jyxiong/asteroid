@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include "glm/glm.hpp"
 #include "asteroid/base/layer.h"
 #include "asteroid/base/image.h"
 #include "asteroid/renderer/scene.h"

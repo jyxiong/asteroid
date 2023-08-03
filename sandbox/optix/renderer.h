@@ -6,7 +6,6 @@
 #include <optix.h>
 #include <optix_stubs.h>
 
-#include "glm/glm.hpp"
 #include "asteroid/base/image.h"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
@@ -37,6 +36,8 @@ public:
     void Render();
 
     std::shared_ptr<Image> GetFinalImage() const { return m_finalImage; }
+
+    void setCamera(const Camera &camera);
 
 private:
     void initOptix();

@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include "glm/glm.hpp"
 
 namespace Asteroid
 {
@@ -15,15 +14,15 @@ struct RenderState
 
 struct Camera
 {
-    glm::vec3 position{ 0, 0, 6 };
-    glm::vec3 direction{ 0, 0, -1 };
-    glm::vec3 up{ 0, 1, 0 };
+    float3 position{ 0, 0, 6 };
+    float3 direction{ 0, 0, -1 };
+    float3 up{ 0, 1, 0 };
 
     float verticalFov{ 45.f };
     float focalDistance{ 0.f };
     glm::uvec2 viewport{ 1, 1 };
 
-    glm::vec3 right;
+    float3 right;
     float tanHalfFov;
     float aspectRatio;
 
@@ -32,7 +31,7 @@ struct Camera
 
 struct Material
 {
-    glm::vec3 albedo{ 1.0f };
+    float3 albedo{ 1.0f };
     float roughness = 1.0f;
     float metallic = 0.0f;
     float emittance = 0.0f;
@@ -43,23 +42,23 @@ struct Sphere
 {
     float radius = 0.5f;
 
-    glm::vec3 position{ 0.0f };
+    float3 position{ 0.0f };
 
     int materialIndex = 0;
 };
 
 struct Ray
 {
-    glm::vec3 origin;
+    float3 origin;
 
-    glm::vec3 direction;
+    float3 direction;
 };
 
 struct PathSegment
 {
     Ray ray;
-    glm::vec3 color; // accumulated light
-    glm::vec3 throughput;
+    float3 color; // accumulated light
+    float3 throughput;
     int pixelIndex;
     unsigned int remainingBounces;
 };
@@ -67,8 +66,8 @@ struct PathSegment
 struct Intersection
 {
     float t;
-    glm::vec3 normal;
-    glm::vec3 position;
+    float3 normal;
+    float3 position;
     int materialIndex;
 };
 
