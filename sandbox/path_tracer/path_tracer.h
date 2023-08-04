@@ -2,6 +2,7 @@
 
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
+#include "glm/glm.hpp"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
 #include "path_tracer_kernel.h"
@@ -18,8 +19,8 @@ GeneratePathSegment(const Camera camera, unsigned int traceDepth, BufferView<Pat
         return;
 
     auto &path = pathSegments[y * viewport.x + x];
-    path.color = float3(0);
-    path.throughput = float3(1);
+    path.color = glm::vec3(0);
+    path.throughput = glm::vec3(1);
     path.remainingBounces = traceDepth;
     path.pixelIndex = y * viewport.x + x;
 
@@ -95,7 +96,7 @@ Shading(const SceneView scene, BufferView<PathSegment> pathSegments, const Buffe
 //        printf("pixel index = %d, color = (%f, %f, %f); \n", path.pixelIndex, path.color.x, path.color.y, path.color.z);
 }
 
-__global__ void finalGather(BufferView<float3> image, const BufferView<PathSegment> pathSegments, int width, int height) {
+__global__ void finalGather(BufferView<glm::vec3> image, const BufferView<PathSegment> pathSegments, int width, int height) {
     auto x = blockIdx.x * blockDim.x + threadIdx.x;
     auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -107,7 +108,7 @@ __global__ void finalGather(BufferView<float3> image, const BufferView<PathSegme
 }
 
 __global__ void
-ConvertToRGBA(const BufferView<float3> accumulations, unsigned int iter, int width, int height, BufferView<glm::u8vec4> image) {
+ConvertToRGBA(const BufferView<glm::vec3> accumulations, unsigned int iter, int width, int height, BufferView<glm::u8vec4> image) {
     auto x = blockIdx.x * blockDim.x + threadIdx.x;
     auto y = blockIdx.y * blockDim.y + threadIdx.y;
 

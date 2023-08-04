@@ -115,7 +115,7 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
 
     m_colorBuffer.resize(width * height * sizeof(unsigned int));
 
-    m_launchParams.frame.size = glm::ivec2(width, height);
+    m_launchParams.frame.size = make_int2(width, height);
     m_launchParams.frame.colorBuffer = (unsigned int *) m_colorBuffer.devicePtr();
 }
 
@@ -142,20 +142,6 @@ void Renderer::Render() {
     AST_CUDA_SYNC_CHECK();
 
     m_finalImage->SetData(m_colorBuffer.devicePtr());
-}
-
-void Renderer::setCamera(const Camera &camera)
-{
-    m_launchParams.camera.position  = make_float3(camera.position.x, camera.position.y, camera.position.z);
-    m_launchParams.camera.direction = normalize(camera.at - camera.from);
-//    const float cosFovy = 0.66f;
-//    const float aspect = m_launchParams.frame.size.x / float(m_launchParams.frame.size.y);
-//    m_launchParams.camera.horizontal
-//        = cosFovy * aspect * normalize(cross(m_launchParams.camera.direction,
-//                                             camera.up));
-//    m_launchParams.camera.vertical
-//        = cosFovy * normalize(cross(m_launchParams.camera.horizontal,
-//                                    m_launchParams.camera.direction));
 }
 
 void Renderer::initOptix() {

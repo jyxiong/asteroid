@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "glm/glm.hpp"
 #include "asteroid/util/buffer.h"
 #include "asteroid/renderer/scene_struct.h"
 

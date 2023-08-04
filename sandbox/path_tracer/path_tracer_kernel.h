@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cuda_runtime.h>
+#include "glm/glm.hpp"
 
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
@@ -8,7 +9,7 @@
 namespace Asteroid {
 
     __device__ bool HitSphere(const Sphere &sphere, const Ray &r, Intersection &its) {
-        float3 oc = r.origin - sphere.position;
+        glm::vec3 oc = r.origin - sphere.position;
         auto a = glm::dot(r.direction, r.direction);
         auto half_b = glm::dot(oc, r.direction);
         auto c = dot(oc, oc) - sphere.radius * sphere.radius;
@@ -45,7 +46,7 @@ namespace Asteroid {
     __device__
     void scatterRay(PathSegment & pathSegment, const Intersection& its, const Material &mat) {
 
-        auto lightDir = glm::normalize(float3(-1, -1, -1));
+        auto lightDir = glm::normalize(glm::vec3(-1, -1, -1));
         auto lightIntensity = glm::max(glm::dot(its.normal, -lightDir), 0.0f);
 
         auto color = mat.albedo * lightIntensity;

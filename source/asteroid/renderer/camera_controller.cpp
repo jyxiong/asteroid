@@ -1,5 +1,7 @@
 #include "asteroid/renderer/camera_controller.h"
 
+#include "glm/gtc/quaternion.hpp"
+#include "glm/gtx/quaternion.hpp"
 #include "asteroid/input/input.h"
 
 using namespace Asteroid;
@@ -23,8 +25,8 @@ bool CameraController::OnUpdate(float ts) {
 
     bool moved = false;
 
-    constexpr float3 upDirection(0.0f, 1.0f, 0.0f);
-    float3 rightDirection = glm::cross(m_camera.direction, upDirection);
+    constexpr glm::vec3 upDirection(0.0f, 1.0f, 0.0f);
+    glm::vec3 rightDirection = glm::cross(m_camera.direction, upDirection);
 
     // Movement
     float moveSpeed = 5.0f;
@@ -59,7 +61,7 @@ bool CameraController::OnUpdate(float ts) {
         float yawDelta = delta.x * rotateSpeed;
 
         glm::quat q = glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, rightDirection),
-                                                glm::angleAxis(-yawDelta, float3(0.f, 1.0f, 0.0f))));
+                                                glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
 
         m_camera.direction = glm::rotate(q, m_camera.direction);
         m_camera.up = glm::rotate(q, m_camera.up);

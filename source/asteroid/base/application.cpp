@@ -1,6 +1,7 @@
 #include "asteroid/base/application.h"
 
 #include <memory>
+#include "glm/glm.hpp"
 #include "asteroid/event/application_event.h"
 #include "asteroid/util/log.h"
 #include "asteroid/util/macro.h"
