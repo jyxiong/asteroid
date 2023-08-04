@@ -27,7 +27,7 @@ private:
     std::unique_ptr<Buffer<float3>> m_AccumulationData = nullptr;
 
     // 存储最终颜色值[0, 255]
-    std::unique_ptr<Buffer<uchar4>> m_ImageData = nullptr;
+    std::unique_ptr<Buffer<glm::u8vec4>> m_ImageData = nullptr;
 
     std::unique_ptr<Buffer<PathSegment>> m_devicePaths = nullptr;
 

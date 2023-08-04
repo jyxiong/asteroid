@@ -24,7 +24,7 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
 
     m_AccumulationData = std::make_unique<Buffer<float3>>(pixel_num);
 
-    m_ImageData = std::make_unique<Buffer<uchar4>>(pixel_num);
+    m_ImageData = std::make_unique<Buffer<glm::u8vec4>>(pixel_num);
 
     ResetFrameIndex();
 }
@@ -44,7 +44,7 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
     auto paths = BufferView<PathSegment>(m_devicePaths->data(), m_devicePaths->size());
     auto its = BufferView<Intersection>(m_Intersections->data(), m_Intersections->size());
     auto accumulations = BufferView<float3>(m_AccumulationData->data(), m_AccumulationData->size());
-    auto imageData = BufferView<uchar4>(m_ImageData->data(), m_ImageData->size());
+    auto imageData = BufferView<glm::u8vec4>(m_ImageData->data(), m_ImageData->size());
 
     // Execute the kernel
     dim3 block(8, 8, 1);
@@ -55,12 +55,12 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
     for (unsigned int i = 0; i < m_state.traceDepth; i++) {
         ComputeIntersection<<<grid, block>>>(sceneView, paths, width, height, its);
 
-        Shading<<<grid, block>>>(sceneView, paths, its, width, height, imageData);
+        Shading<<<grid, block>>>(sceneView, paths, its, width, height);
     }
-//
-//    finalGather<<<grid, block>>>(accumulations, paths, width, height);
-//
-//    ConvertToRGBA<<<grid, block>>>(accumulations, m_state.currentIteration, width, height, imageData);
+
+    finalGather<<<grid, block>>>(accumulations, paths, width, height);
+
+    ConvertToRGBA<<<grid, block>>>(accumulations, m_state.currentIteration, width, height, imageData);
 
     m_finalImage->SetData(imageData.data());
 

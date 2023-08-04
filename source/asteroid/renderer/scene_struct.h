@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include "asteroid/util/vec_math.h"
 
 namespace Asteroid
 {
@@ -10,7 +9,7 @@ namespace Asteroid
 struct RenderState
 {
     unsigned int currentIteration{ 0 };
-    unsigned int traceDepth{ 1 };
+    unsigned int traceDepth{ 5 };
 };
 
 struct Camera
@@ -21,13 +20,13 @@ struct Camera
 
     float verticalFov{ 45.f };
     float focalDistance{ 0.f };
-    uint2 viewport{ 1, 1 };
+    glm::uvec2 viewport{ 1, 1 };
 
-    float3 right{};
-    float tanHalfFov{};
-    float aspectRatio{};
+    float3 right;
+    float tanHalfFov;
+    float aspectRatio;
 
-    float2 lastMousePosition{ 0.0f, 0.0f };
+    glm::vec2 lastMousePosition{ 0.0f, 0.0f };
 };
 
 struct Material
