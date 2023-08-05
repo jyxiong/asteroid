@@ -8,10 +8,8 @@
 #include "asteroid/renderer/camera_controller.h"
 #include "renderer.h"
 
-namespace Asteroid
-{
-class OptixLayer : public Layer
-{
+namespace Asteroid {
+class OptixLayer : public Layer {
 public:
     OptixLayer();
 
@@ -29,9 +27,13 @@ private:
     void Render();
 
 private:
-    Renderer m_Renderer;
+    Renderer m_renderer;
 
-   unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
+    CameraController m_cameraController;
+
+    unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+    bool m_modified = false;
 
     float m_LastRenderTime = 0.0f;
 };

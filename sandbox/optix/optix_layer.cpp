@@ -8,21 +8,27 @@
 using namespace Asteroid;
 
 OptixLayer::OptixLayer()
-    : Layer("OptiX") {}
+    : Layer("OptiX") {
+
+    TriangleMesh model;
+    // 100x100 thin ground plane
+    model.addCube({0.f, -1.5f, 0.f}, {10.f, .1f, 10.f});
+    // a unit cube centered on top of that
+    model.addCube({0.f, 0.f, 0.f}, {2.f, 2.f, 2.f});
+
+    m_renderer.setModel(model);
+}
 
 OptixLayer::~OptixLayer() = default;
 
-void OptixLayer::OnAttach()
-{
+void OptixLayer::OnAttach() {
 }
 
-void OptixLayer::OnUpdate(float ts)
-{
-
+void OptixLayer::OnUpdate(float ts) {
+    m_modified |= m_cameraController.OnUpdate(ts);
 }
 
-void OptixLayer::OnImGuiRender()
-{
+void OptixLayer::OnImGuiRender() {
     ImGui::Begin("Settings");
 
     ImGui::Text("Last render: %.3fms", m_LastRenderTime);
@@ -35,10 +41,10 @@ void OptixLayer::OnImGuiRender()
     m_ViewportWidth = (unsigned int) ImGui::GetContentRegionAvail().x;
     m_ViewportHeight = (unsigned int) ImGui::GetContentRegionAvail().y;
 
-    auto image = m_Renderer.GetFinalImage();
+    auto image = m_renderer.GetFinalImage();
     if (image)
         ImGui::Image((void *) (intptr_t) image->GetRendererID(),
-                     { (float) image->GetWidth(), (float) image->GetHeight() },
+                     {(float) image->GetWidth(), (float) image->GetHeight()},
                      ImVec2(0, 1), ImVec2(1, 0));
 
     ImGui::End();
@@ -47,17 +53,18 @@ void OptixLayer::OnImGuiRender()
     Render();
 }
 
-void OptixLayer::OnEvent(Event &event)
-{
+void OptixLayer::OnEvent(Event &event) {
 }
 
-void OptixLayer::Render()
-{
+void OptixLayer::Render() {
     Timer timer;
 
-    m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+    m_cameraController.OnResize(m_ViewportWidth, m_ViewportHeight);
 
-    m_Renderer.Render();
+    m_renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+
+    m_renderer.setCamera(m_cameraController.GetCamera());
+    m_renderer.Render();
 
     m_LastRenderTime = timer.ElapsedMillis();
 }

@@ -2,7 +2,7 @@
 
 // this include may only appear in a single source file:
 #include <optix_function_table_definition.h>
-
+#include "glm/gtx/transform.hpp"
 #include "asteroid/util/log.h"
 #include "otkHelloKernelPTX.h"
 
@@ -10,24 +10,24 @@ using namespace Asteroid;
 
 //extern "C" char embedded_ptx_code[];
 
-void TriangleMesh::addCube(const float3 &center, const float3 &size) {
-    auto transform = Matrix4x4::translate(center - 0.5f * size) *
-                     Matrix4x4::scale(size);
+void TriangleMesh::addCube(const glm::vec3 &center, const glm::vec3 &size) {
+    auto transform = glm::translate(center - 0.5f * size) *
+                     glm::scale(size);
     addUnitCube(transform);
 }
 
 /*! add a unit cube (subject to given xfm matrix) to the current
     triangleMesh */
-void TriangleMesh::addUnitCube(const Matrix4x4 &transform) {
+void TriangleMesh::addUnitCube(const glm::mat4 &transform) {
     int firstVertexID = (int) vertex.size();
-    vertex.push_back(make_float3(transform * make_float4(0.f, 0.f, 0.f, 1.f)));
-    vertex.push_back(make_float3(transform * make_float4(1.f, 0.f, 0.f, 1.f)));
-    vertex.push_back(make_float3(transform * make_float4(0.f, 1.f, 0.f, 1.f)));
-    vertex.push_back(make_float3(transform * make_float4(1.f, 1.f, 0.f, 1.f)));
-    vertex.push_back(make_float3(transform * make_float4(0.f, 0.f, 1.f, 1.f)));
-    vertex.push_back(make_float3(transform * make_float4(1.f, 0.f, 1.f, 1.f)));
-    vertex.push_back(make_float3(transform * make_float4(0.f, 1.f, 1.f, 1.f)));
-    vertex.push_back(make_float3(transform * make_float4(1.f, 1.f, 1.f, 1.f)));
+    vertex.push_back({transform * glm::vec4(0.f, 0.f, 0.f, 1.f)});
+    vertex.push_back({transform * glm::vec4(1.f, 0.f, 0.f, 1.f)});
+    vertex.push_back({transform * glm::vec4(0.f, 1.f, 0.f, 1.f)});
+    vertex.push_back({transform * glm::vec4(1.f, 1.f, 0.f, 1.f)});
+    vertex.push_back({transform * glm::vec4(0.f, 0.f, 1.f, 1.f)});
+    vertex.push_back({transform * glm::vec4(1.f, 0.f, 1.f, 1.f)});
+    vertex.push_back({transform * glm::vec4(0.f, 1.f, 1.f, 1.f)});
+    vertex.push_back({transform * glm::vec4(1.f, 1.f, 1.f, 1.f)});
 
 
     int indices[] = {0, 1, 3, 2, 3, 0,
@@ -35,12 +35,11 @@ void TriangleMesh::addUnitCube(const Matrix4x4 &transform) {
                      0, 4, 5, 0, 5, 1,
                      2, 3, 7, 2, 7, 6,
                      1, 5, 7, 1, 7, 3,
-                     4, 0, 2, 4, 2, 6
-    };
+                     4, 0, 2, 4, 2, 6};
     for (int i = 0; i < 12; i++)
-        index.push_back(firstVertexID + make_int3(indices[3 * i + 0],
-                                                  indices[3 * i + 1],
-                                                  indices[3 * i + 2]));
+        index.push_back(firstVertexID + glm::ivec3(indices[3 * i + 0],
+                                                   indices[3 * i + 1],
+                                                   indices[3 * i + 2]));
 }
 
 
@@ -99,6 +98,9 @@ Renderer::Renderer() {
     AST_CORE_INFO("creating optix shader binding table ...");
     createSBT();
 
+    AST_CORE_INFO("creating optix  ...");
+    createAccel();
+
     m_launchParamsBuffer.alloc(sizeof(m_launchParams));
 }
 
@@ -115,7 +117,7 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
 
     m_colorBuffer.resize(width * height * sizeof(unsigned int));
 
-    m_launchParams.frame.size = make_int2(width, height);
+    m_launchParams.frame.size = glm::ivec2(width, height);
     m_launchParams.frame.colorBuffer = (unsigned int *) m_colorBuffer.devicePtr();
 }
 
@@ -142,6 +144,20 @@ void Renderer::Render() {
     AST_CUDA_SYNC_CHECK();
 
     m_finalImage->SetData(m_colorBuffer.devicePtr());
+}
+
+void Renderer::setModel(const TriangleMesh &model) {
+    m_model = model;
+}
+
+void Renderer::setCamera(const Camera &camera) {
+    m_camera = camera;
+    m_launchParams.camera.position = m_camera.position;
+    m_launchParams.camera.direction = m_camera.direction;
+    const float cosFovy = 0.66f;
+    const float aspect = m_camera.aspectRatio;
+    m_launchParams.camera.horizontal = cosFovy * aspect * m_camera.right;
+    m_launchParams.camera.vertical = cosFovy * m_camera.up;
 }
 
 void Renderer::initOptix() {
@@ -329,12 +345,10 @@ void Renderer::createSBT() {
     m_sbt.hitgroupRecordCount = static_cast<int>(hitgroupRecords.size());
 }
 
-OptixTraversableHandle Renderer::createAccel() {
+void Renderer::createAccel() {
     // upload the model to the device: the builder
     m_vertexBuffer.allocAndUpload(m_model.vertex);
     m_indexBuffer.allocAndUpload(m_model.index);
-
-    OptixTraversableHandle asHandle{0};
 
     // ==================================================================
     // triangle inputs
@@ -349,12 +363,12 @@ OptixTraversableHandle Renderer::createAccel() {
     auto d_indices = (CUdeviceptr) m_indexBuffer.devicePtr();
 
     triangleInput.triangleArray.vertexFormat = OPTIX_VERTEX_FORMAT_FLOAT3;
-    triangleInput.triangleArray.vertexStrideInBytes = sizeof(float3);
+    triangleInput.triangleArray.vertexStrideInBytes = sizeof(glm::vec3);
     triangleInput.triangleArray.numVertices = (int) m_model.vertex.size();
     triangleInput.triangleArray.vertexBuffers = &d_vertices;
 
     triangleInput.triangleArray.indexFormat = OPTIX_INDICES_FORMAT_UNSIGNED_INT3;
-    triangleInput.triangleArray.indexStrideInBytes = sizeof(int3);
+    triangleInput.triangleArray.indexStrideInBytes = sizeof(glm::ivec3);
     triangleInput.triangleArray.numIndexTriplets = (int) m_model.index.size();
     triangleInput.triangleArray.indexBuffer = d_indices;
 
@@ -380,12 +394,12 @@ OptixTraversableHandle Renderer::createAccel() {
 
     OptixAccelBufferSizes blasBufferSizes;
     AST_OPTIX_CHECK(optixAccelComputeMemoryUsage
-                    (m_optixContext,
-                     &accelOptions,
-                     &triangleInput,
-                     1,  // num_build_inputs
-                     &blasBufferSizes
-                    ));
+                        (m_optixContext,
+                         &accelOptions,
+                         &triangleInput,
+                         1,  // num_build_inputs
+                         &blasBufferSizes
+                        ));
 
     // ==================================================================
     // prepare compaction
@@ -396,7 +410,7 @@ OptixTraversableHandle Renderer::createAccel() {
 
     OptixAccelEmitDesc emitDesc;
     emitDesc.type = OPTIX_PROPERTY_TYPE_COMPACTED_SIZE;
-    emitDesc.result = (CUdeviceptr)compactedSizeBuffer.devicePtr();
+    emitDesc.result = (CUdeviceptr) compactedSizeBuffer.devicePtr();
 
     // ==================================================================
     // execute build (main stage)
@@ -410,18 +424,18 @@ OptixTraversableHandle Renderer::createAccel() {
 
     AST_OPTIX_CHECK(optixAccelBuild(m_optixContext,
         /* stream */0,
-                                &accelOptions,
-                                &triangleInput,
-                                1,
-                                (CUdeviceptr)tempBuffer.devicePtr(),
-                                tempBuffer.m_sizeInBytes,
+                                    &accelOptions,
+                                    &triangleInput,
+                                    1,
+                                    (CUdeviceptr) tempBuffer.devicePtr(),
+                                    tempBuffer.m_sizeInBytes,
 
-                                (CUdeviceptr)outputBuffer.devicePtr(),
-                                outputBuffer.m_sizeInBytes,
+                                    (CUdeviceptr) outputBuffer.devicePtr(),
+                                    outputBuffer.m_sizeInBytes,
 
-                                &asHandle,
+                                    &m_launchParams.traversable,
 
-                                &emitDesc, 1
+                                    &emitDesc, 1
     ));
     AST_CUDA_SYNC_CHECK();
 
@@ -434,10 +448,10 @@ OptixTraversableHandle Renderer::createAccel() {
     m_asBuffer.alloc(compactedSize);
     AST_OPTIX_CHECK(optixAccelCompact(m_optixContext,
         /*stream:*/0,
-                                  asHandle,
-                                  (CUdeviceptr)m_asBuffer.devicePtr(),
-                                  m_asBuffer.m_sizeInBytes,
-                                  &asHandle));
+                                      m_launchParams.traversable,
+                                      (CUdeviceptr) m_asBuffer.devicePtr(),
+                                      m_asBuffer.m_sizeInBytes,
+                                      &m_launchParams.traversable));
     AST_CUDA_SYNC_CHECK();
 
     // ==================================================================
@@ -446,6 +460,4 @@ OptixTraversableHandle Renderer::createAccel() {
     outputBuffer.free(); // << the UNcompacted, temporary output buffer
     tempBuffer.free();
     compactedSizeBuffer.free();
-
-    return asHandle;
 }

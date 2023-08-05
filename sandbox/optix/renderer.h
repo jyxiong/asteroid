@@ -19,13 +19,13 @@ namespace Asteroid {
 struct TriangleMesh {
     /*! add a unit cube (subject to given xfm matrix) to the current
         triangleMesh */
-    void addUnitCube(const Matrix4x4 &xfm);
+    void addUnitCube(const glm::mat4 &xfm);
 
     //! add aligned cube aith front-lower-left corner and size
-    void addCube(const float3 &center, const float3 &size);
+    void addCube(const glm::vec3 &center, const glm::vec3 &size);
 
-    std::vector<float3> vertex;
-    std::vector<int3> index;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::ivec3> index;
 };
 
 class Renderer {
@@ -37,6 +37,10 @@ public:
     void Render();
 
     std::shared_ptr<Image> GetFinalImage() const { return m_finalImage; }
+
+    void setModel(const TriangleMesh &model);
+
+    void setCamera(const Camera &camera);
 
 private:
     void initOptix();
@@ -55,14 +59,16 @@ private:
 
     void createSBT();
 
-    OptixTraversableHandle createAccel();
+    void createAccel();
 
 private:
     // 存储用于展示的纹理图像
     std::shared_ptr<Image> m_finalImage;
     DeviceBuffer m_colorBuffer;
 
-    const TriangleMesh m_model;
+    Camera m_camera;
+
+    TriangleMesh m_model;
     DeviceBuffer m_vertexBuffer;
     DeviceBuffer m_indexBuffer;
     DeviceBuffer m_asBuffer;
