@@ -63,7 +63,12 @@ static __forceinline__ __device__ T *getPRD() {
 // one group of them to set up the SBT)
 //------------------------------------------------------------------------------
 
-extern "C" __global__ void __closesthit__radiance() { /*! for this simple example, this will remain empty */ }
+extern "C" __global__ void __closesthit__radiance()
+{
+    const int primID = optixGetPrimitiveIndex();
+    auto &prd = *(glm::vec3*)getPRD<glm::vec3>();
+    prd = glm::vec3(1, 0, 0);
+}
 
 extern "C" __global__ void __anyhit__radiance() { /*! for this simple example, this will remain empty */ }
 
@@ -77,9 +82,12 @@ extern "C" __global__ void __anyhit__radiance() { /*! for this simple example, t
 // need to have _some_ dummy function to set up a valid SBT
 // ------------------------------------------------------------------------------
 
-extern "C" __global__ void __miss__radiance() { /*! for this simple example, this will remain empty */ }
-
-
+extern "C" __global__ void __miss__radiance()
+{
+    auto &prd = *(glm::vec3*)getPRD<glm::vec3>();
+    // set to constant white as background color
+    prd = glm::vec3(1.f);
+}
 
 //------------------------------------------------------------------------------
 // ray gen program - the actual rendering happens in here
@@ -121,18 +129,9 @@ extern "C" __global__ void __raygen__renderFrame() {
                SURFACE_RAY_TYPE,             // missSBTIndex 
                u0, u1);
 
-    const int r = int(255.99f * pixelColorPRD.x);
-    const int g = int(255.99f * pixelColorPRD.y);
-    const int b = int(255.99f * pixelColorPRD.z);
-
-    // convert to 32-bit rgba value (we explicitly set alpha to 0xff
-    // to make stb_image_write happy ...
-    const uint32_t rgba = 0xff000000
-                          | (r << 0) | (g << 8) | (b << 16);
-
     // and write to frame buffer ...
     const uint32_t fbIndex = ix + iy * optixLaunchParams.frame.size.x;
-    optixLaunchParams.frame.colorBuffer[fbIndex] = rgba;
+    optixLaunchParams.frame.colorBuffer[fbIndex] = glm::u8vec4(pixelColorPRD * 255.f, 255);
 }
 
 } // ::osc

@@ -11,8 +11,7 @@ using namespace Asteroid;
 //extern "C" char embedded_ptx_code[];
 
 void TriangleMesh::addCube(const glm::vec3 &center, const glm::vec3 &size) {
-    auto transform = glm::translate(center - 0.5f * size) *
-                     glm::scale(size);
+    auto transform = glm::translate(center) * glm::scale(size);
     addUnitCube(transform);
 }
 
@@ -20,14 +19,14 @@ void TriangleMesh::addCube(const glm::vec3 &center, const glm::vec3 &size) {
     triangleMesh */
 void TriangleMesh::addUnitCube(const glm::mat4 &transform) {
     int firstVertexID = (int) vertex.size();
-    vertex.push_back({transform * glm::vec4(0.f, 0.f, 0.f, 1.f)});
-    vertex.push_back({transform * glm::vec4(1.f, 0.f, 0.f, 1.f)});
-    vertex.push_back({transform * glm::vec4(0.f, 1.f, 0.f, 1.f)});
-    vertex.push_back({transform * glm::vec4(1.f, 1.f, 0.f, 1.f)});
-    vertex.push_back({transform * glm::vec4(0.f, 0.f, 1.f, 1.f)});
-    vertex.push_back({transform * glm::vec4(1.f, 0.f, 1.f, 1.f)});
-    vertex.push_back({transform * glm::vec4(0.f, 1.f, 1.f, 1.f)});
-    vertex.push_back({transform * glm::vec4(1.f, 1.f, 1.f, 1.f)});
+    vertex.emplace_back(transform * glm::vec4(0.f, 0.f, 0.f, 1.f));
+    vertex.emplace_back(transform * glm::vec4(1.f, 0.f, 0.f, 1.f));
+    vertex.emplace_back(transform * glm::vec4(0.f, 1.f, 0.f, 1.f));
+    vertex.emplace_back(transform * glm::vec4(1.f, 1.f, 0.f, 1.f));
+    vertex.emplace_back(transform * glm::vec4(0.f, 0.f, 1.f, 1.f));
+    vertex.emplace_back(transform * glm::vec4(1.f, 0.f, 1.f, 1.f));
+    vertex.emplace_back(transform * glm::vec4(0.f, 1.f, 1.f, 1.f));
+    vertex.emplace_back(transform * glm::vec4(1.f, 1.f, 1.f, 1.f));
 
 
     int indices[] = {0, 1, 3, 2, 3, 0,
@@ -98,9 +97,6 @@ Renderer::Renderer() {
     AST_CORE_INFO("creating optix shader binding table ...");
     createSBT();
 
-    AST_CORE_INFO("creating optix  ...");
-    createAccel();
-
     m_launchParamsBuffer.alloc(sizeof(m_launchParams));
 }
 
@@ -115,10 +111,10 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
         m_finalImage = std::make_shared<Image>(width, height);
     }
 
-    m_colorBuffer.resize(width * height * sizeof(unsigned int));
+    m_colorBuffer.resize(width * height * sizeof(glm::u8vec4));
 
     m_launchParams.frame.size = glm::ivec2(width, height);
-    m_launchParams.frame.colorBuffer = (unsigned int *) m_colorBuffer.devicePtr();
+    m_launchParams.frame.colorBuffer = (glm::u8vec4 *) m_colorBuffer.devicePtr();
 }
 
 void Renderer::Render() {
@@ -136,18 +132,20 @@ void Renderer::Render() {
         m_launchParams.frame.size.x,
         m_launchParams.frame.size.y,
         1
-    ));
+    ))
     // sync - make sure the frame is rendered before we download and
     // display (obviously, for a high-performance application you
     // want to use streams and double-buffering, but for this simple
     // example, this will have to do)
-    AST_CUDA_SYNC_CHECK();
+    AST_CUDA_SYNC_CHECK()
 
     m_finalImage->SetData(m_colorBuffer.devicePtr());
 }
 
 void Renderer::setModel(const TriangleMesh &model) {
     m_model = model;
+
+    createAccel();
 }
 
 void Renderer::setCamera(const Camera &camera) {
@@ -172,27 +170,27 @@ void Renderer::initOptix() {
 
     AST_CORE_INFO("found {0} CUDA capable devices", numDevices);
 
-    AST_OPTIX_CHECK(optixInit());
+    AST_OPTIX_CHECK(optixInit())
 
     AST_CORE_INFO("initialize optix successfully!");
 }
 
 void Renderer::createContext() {
     const int deviceID = 0;
-    AST_CUDA_CHECK(cudaSetDevice(deviceID));
-    AST_CUDA_CHECK(cudaStreamCreate(&m_stream));
+    AST_CUDA_CHECK(cudaSetDevice(deviceID))
+    AST_CUDA_CHECK(cudaStreamCreate(&m_stream))
 
     cudaGetDeviceProperties(&m_deviceProps, deviceID);
     AST_CORE_INFO("running on device: {0}", m_deviceProps.name);
 
-    m_cudaContext = 0;
+    m_cudaContext = nullptr;
 //    auto cuRes = cuCtxGetCurrent(&m_cudaContext);
 //    if (cuRes != CUDA_SUCCESS)
 //        fprintf(stderr, "Error querying current context: error code %d\n", cuRes);
 
-    AST_OPTIX_CHECK(optixDeviceContextCreate(m_cudaContext, 0, &m_optixContext));
+    AST_OPTIX_CHECK(optixDeviceContextCreate(m_cudaContext, nullptr, &m_optixContext))
     AST_OPTIX_CHECK(optixDeviceContextSetLogCallback
-                        (m_optixContext, context_log_cb, nullptr, 4));
+                        (m_optixContext, context_log_cb, nullptr, 4))
 }
 
 void Renderer::createModule() {

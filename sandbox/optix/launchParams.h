@@ -8,7 +8,7 @@ struct LaunchParams
 {
     struct
     {
-        unsigned int *colorBuffer;
+        glm::u8vec4 *colorBuffer;
         glm::ivec2 size;
     } frame;
 

@@ -76,17 +76,17 @@ private:
     LaunchParams m_launchParams;
     DeviceBuffer m_launchParamsBuffer;
 
-    CUcontext m_cudaContext;
-    CUstream m_stream;
-    cudaDeviceProp m_deviceProps;
+    CUcontext m_cudaContext{};
+    CUstream m_stream{};
+    cudaDeviceProp m_deviceProps{};
 
-    OptixDeviceContext m_optixContext;
+    OptixDeviceContext m_optixContext{};
 
-    OptixPipeline m_pipeline;
+    OptixPipeline m_pipeline{};
     OptixPipelineCompileOptions m_pipelineCompileOptions = {};
     OptixPipelineLinkOptions m_pipelineLinkOptions = {};
 
-    OptixModule m_module;
+    OptixModule m_module{};
     OptixModuleCompileOptions m_moduleCompileOptions = {};
 
     std::vector<OptixProgramGroup> m_raygenPGs;
