@@ -76,37 +76,7 @@ void Application::OnEvent(Event &e)
 {
     EventDispatcher dispatcher(e);
     dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent &e) -> bool {
-        return OnWindowClose(e);
+        m_Running = false;
+        return true;
     });
-
-    dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent &e) -> bool {
-        return OnWindowResize(e);
-    });
-
-    for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
-    {
-        (*--it)->OnEvent(e);
-        if (e.Handled)
-            break;
-    }
-}
-
-bool Application::OnWindowClose(WindowCloseEvent &e)
-{
-    m_Running = false;
-    return true;
-}
-
-bool Application::OnWindowResize(WindowResizeEvent& e)
-{
-    if (e.GetWidth() == 0 || e.GetHeight() == 0)
-    {
-        m_Minimized = true;
-        return false;
-    }
-
-    m_Minimized = false;
-    glViewport(0, 0, e.GetWidth(), e.GetHeight());
-
-    return false;
 }

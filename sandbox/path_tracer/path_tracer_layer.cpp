@@ -129,10 +129,6 @@ void ExampleLayer::OnImGuiRender()
     Render();
 }
 
-void ExampleLayer::OnEvent(Event &event)
-{
-}
-
 void ExampleLayer::Render()
 {
     Timer timer;

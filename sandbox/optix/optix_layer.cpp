@@ -10,11 +10,13 @@ using namespace Asteroid;
 OptixLayer::OptixLayer()
     : Layer("OptiX") {
 
-    TriangleMesh model;
-    // 100x100 thin ground plane
-    model.addCube({0.f, -1.5f, 0.f}, {10.f, .1f, 10.f});
+    std::vector<TriangleMesh> model(2);
+
+    model[0].color = glm::vec3(0.f, 1.f, 0.f);
+    model[0].addCube(glm::vec3(0.f,-1.5f, 0.f),glm::vec3(10.f,.1f,10.f));
     // a unit cube centered on top of that
-    model.addCube({0.f, 0.f, 0.f}, {2.f, 2.f, 2.f});
+    model[1].color = glm::vec3(0.f,1.f,1.f);
+    model[1].addCube(glm::vec3(0.f,0.f,0.f),glm::vec3(2.f,2.f,2.f));
 
     m_renderer.setModel(model);
 }
@@ -51,9 +53,6 @@ void OptixLayer::OnImGuiRender() {
     ImGui::PopStyleVar();
 
     Render();
-}
-
-void OptixLayer::OnEvent(Event &event) {
 }
 
 void OptixLayer::Render() {

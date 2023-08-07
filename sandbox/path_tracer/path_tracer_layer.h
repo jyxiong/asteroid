@@ -23,8 +23,6 @@ public:
 
     void OnImGuiRender() override;
 
-    void OnEvent(Event &event) override;
-
 private:
     void Render();
 

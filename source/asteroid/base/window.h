@@ -41,18 +41,9 @@ public:
     // Window attributes
     inline void SetEventCallback(const EventCallbackFn &callback) { m_Data.EventCallback = callback; }
 
-    void SetVSync(bool enabled);
-
-    bool IsVSync() const;
-
     inline void* GetNativeWindow() const { return m_Window; }
 
     static Window *Create(const WindowProps &props = WindowProps());
-
-private:
-    void Init(const WindowProps &props);
-
-    void Shutdown();
 
 private:
     GLFWwindow *m_Window{};
@@ -61,7 +52,6 @@ private:
     {
         std::string Title;
         unsigned int Width, Height;
-        bool VSync;
 
         EventCallbackFn EventCallback;
     };
