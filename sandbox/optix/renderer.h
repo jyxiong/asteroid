@@ -26,6 +26,8 @@ struct TriangleMesh {
 
     std::vector<glm::vec3> vertex;
     std::vector<glm::ivec3> index;
+    glm::vec3              color;
+
 };
 
 class Renderer {
@@ -38,7 +40,7 @@ public:
 
     std::shared_ptr<Image> GetFinalImage() const { return m_finalImage; }
 
-    void setModel(const TriangleMesh &model);
+    void setModel(const std::vector<TriangleMesh> &model);
 
     void setCamera(const Camera &camera);
 
@@ -68,9 +70,9 @@ private:
 
     Camera m_camera;
 
-    TriangleMesh m_model;
-    DeviceBuffer m_vertexBuffer;
-    DeviceBuffer m_indexBuffer;
+    std::vector<TriangleMesh> m_meshes;
+    std::vector<DeviceBuffer> m_vertexBuffer;
+    std::vector<DeviceBuffer> m_indexBuffer;
     DeviceBuffer m_asBuffer;
 
     LaunchParams m_launchParams;

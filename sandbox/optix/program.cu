@@ -15,12 +15,9 @@
 // ======================================================================== //
 
 #include <optix_device.h>
-#include "asteroid/util/vec_math.h"
 #include "launchParams.h"
 
 using namespace Asteroid;
-
-namespace osc {
 
 /*! launch parameters in constant memory, filled in by optix upon
     optixLaunch (this gets filled in from the buffer we pass to
@@ -28,26 +25,30 @@ namespace osc {
 extern "C" __constant__ LaunchParams optixLaunchParams;
 
 // for this simple example, we have a single ray type
-enum {
+enum
+{
     SURFACE_RAY_TYPE = 0, RAY_TYPE_COUNT
 };
 
 static __forceinline__ __device__
-void *unpackPointer(uint32_t i0, uint32_t i1) {
+void *unpackPointer(uint32_t i0, uint32_t i1)
+{
     const uint64_t uptr = static_cast<uint64_t>( i0 ) << 32 | i1;
     void *ptr = reinterpret_cast<void *>( uptr );
     return ptr;
 }
 
 static __forceinline__ __device__
-void packPointer(void *ptr, uint32_t &i0, uint32_t &i1) {
+void packPointer(void *ptr, uint32_t &i0, uint32_t &i1)
+{
     const uint64_t uptr = reinterpret_cast<uint64_t>( ptr );
     i0 = uptr >> 32;
     i1 = uptr & 0x00000000ffffffff;
 }
 
 template<typename T>
-static __forceinline__ __device__ T *getPRD() {
+static __forceinline__ __device__ T *getPRD()
+{
     const uint32_t u0 = optixGetPayload_0();
     const uint32_t u1 = optixGetPayload_1();
     return reinterpret_cast<T *>( unpackPointer(u0, u1));
@@ -65,9 +66,22 @@ static __forceinline__ __device__ T *getPRD() {
 
 extern "C" __global__ void __closesthit__radiance()
 {
-    const int primID = optixGetPrimitiveIndex();
-    auto &prd = *(glm::vec3*)getPRD<glm::vec3>();
-    prd = glm::vec3(1, 0, 0);
+    const TriangleMeshSBTData &sbtData
+        = *(const TriangleMeshSBTData *) optixGetSbtDataPointer();
+
+    // compute normal:
+    auto primID = optixGetPrimitiveIndex();
+    const glm::ivec3 index = sbtData.index[primID];
+    const glm::vec3 &A = sbtData.vertex[index.x];
+    const glm::vec3 &B = sbtData.vertex[index.y];
+    const glm::vec3 &C = sbtData.vertex[index.z];
+    const glm::vec3 Ng = glm::normalize(glm::cross(B - A, C - A));
+
+    auto dir = optixGetWorldRayDirection();
+    const glm::vec3 rayDir = { dir.x, dir.y, dir.z };
+    const float cosDN = 0.2f + .8f * fabsf(glm::dot(rayDir, Ng));
+    glm::vec3 &prd = *(glm::vec3 *) getPRD<glm::vec3>();
+    prd = cosDN * sbtData.color;
 }
 
 extern "C" __global__ void __anyhit__radiance() { /*! for this simple example, this will remain empty */ }
@@ -84,7 +98,7 @@ extern "C" __global__ void __anyhit__radiance() { /*! for this simple example, t
 
 extern "C" __global__ void __miss__radiance()
 {
-    auto &prd = *(glm::vec3*)getPRD<glm::vec3>();
+    auto &prd = *(glm::vec3 *) getPRD<glm::vec3>();
     // set to constant white as background color
     prd = glm::vec3(1.f);
 }
@@ -92,7 +106,8 @@ extern "C" __global__ void __miss__radiance()
 //------------------------------------------------------------------------------
 // ray gen program - the actual rendering happens in here
 //------------------------------------------------------------------------------
-extern "C" __global__ void __raygen__renderFrame() {
+extern "C" __global__ void __raygen__renderFrame()
+{
 // compute a test pattern based on pixel ID
     const int ix = optixGetLaunchIndex().x;
     const int iy = optixGetLaunchIndex().y;
@@ -113,12 +128,12 @@ extern "C" __global__ void __raygen__renderFrame() {
 
     // generate ray direction
     auto rayDir = glm::normalize(camera.direction
-                                 + uv.x * camera.horizontal
-                                 + uv.y * camera.vertical);
+                                     + uv.x * camera.horizontal
+                                     + uv.y * camera.vertical);
 
     optixTrace(optixLaunchParams.traversable,
-               {camera.position.x, camera.position.y, camera.position.z},
-               {rayDir.x, rayDir.y, rayDir.z},
+               { camera.position.x, camera.position.y, camera.position.z },
+               { rayDir.x, rayDir.y, rayDir.z },
                0.f,    // tmin
                1e20f,  // tmax
                0.0f,   // rayTime
@@ -133,5 +148,3 @@ extern "C" __global__ void __raygen__renderFrame() {
     const uint32_t fbIndex = ix + iy * optixLaunchParams.frame.size.x;
     optixLaunchParams.frame.colorBuffer[fbIndex] = glm::u8vec4(pixelColorPRD * 255.f, 255);
 }
-
-} // ::osc

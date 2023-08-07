@@ -10,14 +10,16 @@ using namespace Asteroid;
 
 //extern "C" char embedded_ptx_code[];
 
-void TriangleMesh::addCube(const glm::vec3 &center, const glm::vec3 &size) {
+void TriangleMesh::addCube(const glm::vec3 &center, const glm::vec3 &size)
+{
     auto transform = glm::translate(center) * glm::scale(size);
     addUnitCube(transform);
 }
 
 /*! add a unit cube (subject to given xfm matrix) to the current
     triangleMesh */
-void TriangleMesh::addUnitCube(const glm::mat4 &transform) {
+void TriangleMesh::addUnitCube(const glm::mat4 &transform)
+{
     int firstVertexID = (int) vertex.size();
     vertex.emplace_back(transform * glm::vec4(0.f, 0.f, 0.f, 1.f));
     vertex.emplace_back(transform * glm::vec4(1.f, 0.f, 0.f, 1.f));
@@ -28,29 +30,29 @@ void TriangleMesh::addUnitCube(const glm::mat4 &transform) {
     vertex.emplace_back(transform * glm::vec4(0.f, 1.f, 1.f, 1.f));
     vertex.emplace_back(transform * glm::vec4(1.f, 1.f, 1.f, 1.f));
 
-
-    int indices[] = {0, 1, 3, 2, 3, 0,
-                     5, 7, 6, 5, 6, 4,
-                     0, 4, 5, 0, 5, 1,
-                     2, 3, 7, 2, 7, 6,
-                     1, 5, 7, 1, 7, 3,
-                     4, 0, 2, 4, 2, 6};
+    int indices[] = { 0, 1, 3, 2, 3, 0,
+                      5, 7, 6, 5, 6, 4,
+                      0, 4, 5, 0, 5, 1,
+                      2, 3, 7, 2, 7, 6,
+                      1, 5, 7, 1, 7, 3,
+                      4, 0, 2, 4, 2, 6 };
     for (int i = 0; i < 12; i++)
         index.push_back(firstVertexID + glm::ivec3(indices[3 * i + 0],
                                                    indices[3 * i + 1],
                                                    indices[3 * i + 2]));
 }
 
-
 static void context_log_cb(unsigned int level,
                            const char *tag,
                            const char *message,
-                           void *) {
+                           void *)
+{
     fprintf(stderr, "[%2d][%12s]: %s\n", (int) level, tag, message);
 }
 
 /*! SBT record for a raygen program */
-struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) RaygenRecord {
+struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) RaygenRecord
+{
     __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
     // just a dummy value - later examples will use more interesting
     // data here
@@ -58,7 +60,8 @@ struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) RaygenRecord {
 };
 
 /*! SBT record for a miss program */
-struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) MissRecord {
+struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) MissRecord
+{
     __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
     // just a dummy value - later examples will use more interesting
     // data here
@@ -66,14 +69,14 @@ struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) MissRecord {
 };
 
 /*! SBT record for a hitgroup program */
-struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) HitgroupRecord {
+struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) HitgroupRecord
+{
     __align__(OPTIX_SBT_RECORD_ALIGNMENT) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
-    // just a dummy value - later examples will use more interesting
-    // data here
-    int objectID;
+    TriangleMeshSBTData data;
 };
 
-Renderer::Renderer() {
+Renderer::Renderer()
+{
     initOptix();
 
     AST_CORE_INFO("creating optix context ...");
@@ -94,20 +97,20 @@ Renderer::Renderer() {
     AST_CORE_INFO("creating optix pipeline ...");
     createPipeline();
 
-    AST_CORE_INFO("creating optix shader binding table ...");
-    createSBT();
-
     m_launchParamsBuffer.alloc(sizeof(m_launchParams));
 }
 
-void Renderer::OnResize(unsigned int width, unsigned int height) {
-    if (m_finalImage) {
+void Renderer::OnResize(unsigned int width, unsigned int height)
+{
+    if (m_finalImage)
+    {
         // No resize necessary
         if (m_finalImage->GetWidth() == width && m_finalImage->GetHeight() == height)
             return;
 
         m_finalImage->Resize(width, height);
-    } else {
+    } else
+    {
         m_finalImage = std::make_shared<Image>(width, height);
     }
 
@@ -117,7 +120,8 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
     m_launchParams.frame.colorBuffer = (glm::u8vec4 *) m_colorBuffer.devicePtr();
 }
 
-void Renderer::Render() {
+void Renderer::Render()
+{
     if (m_launchParams.frame.size.x == 0) return;
 
     m_launchParamsBuffer.upload(&m_launchParams, 1);
@@ -142,13 +146,18 @@ void Renderer::Render() {
     m_finalImage->SetData(m_colorBuffer.devicePtr());
 }
 
-void Renderer::setModel(const TriangleMesh &model) {
-    m_model = model;
+void Renderer::setModel(const std::vector<TriangleMesh> &model)
+{
+    m_meshes = model;
 
     createAccel();
+
+    AST_CORE_INFO("creating optix shader binding table ...");
+    createSBT();
 }
 
-void Renderer::setCamera(const Camera &camera) {
+void Renderer::setCamera(const Camera &camera)
+{
     m_camera = camera;
     m_launchParams.camera.position = m_camera.position;
     m_launchParams.camera.direction = m_camera.direction;
@@ -158,13 +167,15 @@ void Renderer::setCamera(const Camera &camera) {
     m_launchParams.camera.vertical = cosFovy * m_camera.up;
 }
 
-void Renderer::initOptix() {
+void Renderer::initOptix()
+{
     AST_CORE_INFO("init optix ...");
 
     cudaFree(nullptr);
     int numDevices;
     cudaGetDeviceCount(&numDevices);
-    if (numDevices == 0) {
+    if (numDevices == 0)
+    {
         AST_CORE_ERROR("no CUDA capable devices found!");
     }
 
@@ -175,7 +186,8 @@ void Renderer::initOptix() {
     AST_CORE_INFO("initialize optix successfully!");
 }
 
-void Renderer::createContext() {
+void Renderer::createContext()
+{
     const int deviceID = 0;
     AST_CUDA_CHECK(cudaSetDevice(deviceID))
     AST_CUDA_CHECK(cudaStreamCreate(&m_stream))
@@ -193,7 +205,8 @@ void Renderer::createContext() {
                         (m_optixContext, context_log_cb, nullptr, 4))
 }
 
-void Renderer::createModule() {
+void Renderer::createModule()
+{
     m_moduleCompileOptions.maxRegisterCount = OPTIX_COMPILE_DEFAULT_MAX_REGISTER_COUNT;
     m_moduleCompileOptions.optLevel = OPTIX_COMPILE_OPTIMIZATION_DEFAULT;
     m_moduleCompileOptions.debugLevel = OPTIX_COMPILE_DEBUG_LEVEL_NONE;
@@ -221,7 +234,8 @@ void Renderer::createModule() {
         fprintf(stderr, "Log:\n%s\n", log);
 }
 
-void Renderer::createRaygenPG() {
+void Renderer::createRaygenPG()
+{
     m_raygenPGs.resize(1);
 
     OptixProgramGroupOptions pgOptions = {};
@@ -243,7 +257,8 @@ void Renderer::createRaygenPG() {
         fprintf(stderr, "Log:\n%s\n", log);
 }
 
-void Renderer::createMissPG() {
+void Renderer::createMissPG()
+{
     m_missPGs.resize(1);
     OptixProgramGroupOptions pgOptions = {};
     OptixProgramGroupDesc pgDesc = {};
@@ -264,7 +279,8 @@ void Renderer::createMissPG() {
         fprintf(stderr, "Log:\n%s\n", log);
 }
 
-void Renderer::createHitGroupPG() {
+void Renderer::createHitGroupPG()
+{
     m_hitgroupPGs.resize(1);
     OptixProgramGroupOptions pgOptions = {};
     OptixProgramGroupDesc pgDesc = {};
@@ -287,7 +303,8 @@ void Renderer::createHitGroupPG() {
         fprintf(stderr, "Log:\n%s\n", log);
 }
 
-void Renderer::createPipeline() {
+void Renderer::createPipeline()
+{
     std::vector<OptixProgramGroup> programGroups;
     programGroups.insert(programGroups.end(), m_raygenPGs.begin(), m_raygenPGs.end());
     programGroups.insert(programGroups.end(), m_missPGs.begin(), m_missPGs.end());
@@ -307,9 +324,11 @@ void Renderer::createPipeline() {
         fprintf(stderr, "Log:\n%s\n", log);
 }
 
-void Renderer::createSBT() {
+void Renderer::createSBT()
+{
     std::vector<RaygenRecord> raygenRecords;
-    for (int i = 0; i < m_raygenPGs.size(); i++) {
+    for (int i = 0; i < m_raygenPGs.size(); i++)
+    {
         RaygenRecord rec{};
         AST_OPTIX_CHECK(optixSbtRecordPackHeader(m_raygenPGs[i], &rec));
         rec.data = nullptr; /* for now ... */
@@ -319,7 +338,8 @@ void Renderer::createSBT() {
     m_sbt.raygenRecord = (CUdeviceptr) m_raygenRecords.m_devicePtr;
 
     std::vector<MissRecord> missRecords;
-    for (int i = 0; i < m_missPGs.size(); i++) {
+    for (int i = 0; i < m_missPGs.size(); i++)
+    {
         MissRecord rec{};
         AST_OPTIX_CHECK(optixSbtRecordPackHeader(m_missPGs[i], &rec));
         rec.data = nullptr; /* for now ... */
@@ -330,55 +350,77 @@ void Renderer::createSBT() {
     m_sbt.missRecordStrideInBytes = sizeof(MissRecord);
     m_sbt.missRecordCount = static_cast<int>(missRecords.size());
 
+    int numObjects = m_meshes.size();
     std::vector<HitgroupRecord> hitgroupRecords;
-    for (int i = 0; i < m_hitgroupPGs.size(); i++) {
-        HitgroupRecord rec{};
-        AST_OPTIX_CHECK(optixSbtRecordPackHeader(m_hitgroupPGs[i], &rec));
-        rec.objectID = i; /* for now ... */
+    for (int i = 0; i < numObjects; i++)
+    {
+        // we only have a single object type so far
+        int objectType = 0;
+        HitgroupRecord rec;
+        AST_OPTIX_CHECK(optixSbtRecordPackHeader(m_hitgroupPGs[objectType], &rec));
+        rec.data.vertex = (glm::vec3 *) m_vertexBuffer[i].devicePtr();
+        rec.data.index = (glm::ivec3 *) m_indexBuffer[i].devicePtr();
+        rec.data.color = m_meshes[i].color;
         hitgroupRecords.push_back(rec);
     }
     m_hitgroupRecords.allocAndUpload(hitgroupRecords);
     m_sbt.hitgroupRecordBase = (CUdeviceptr) m_hitgroupRecords.devicePtr();
     m_sbt.hitgroupRecordStrideInBytes = sizeof(HitgroupRecord);
-    m_sbt.hitgroupRecordCount = static_cast<int>(hitgroupRecords.size());
+    m_sbt.hitgroupRecordCount = (int) hitgroupRecords.size();
 }
 
-void Renderer::createAccel() {
-    // upload the model to the device: the builder
-    m_vertexBuffer.allocAndUpload(m_model.vertex);
-    m_indexBuffer.allocAndUpload(m_model.index);
+void Renderer::createAccel()
+{
 
-    // ==================================================================
-    // triangle inputs
-    // ==================================================================
-    OptixBuildInput triangleInput = {};
-    triangleInput.type
-        = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
+    m_vertexBuffer.resize(m_meshes.size());
+    m_indexBuffer.resize(m_meshes.size());
 
-    // create local variables, because we need a *pointer* to the
-    // device pointers
-    auto d_vertices = (CUdeviceptr) m_vertexBuffer.devicePtr();
-    auto d_indices = (CUdeviceptr) m_indexBuffer.devicePtr();
+    std::vector<OptixBuildInput> triangleInput(m_meshes.size());
+    std::vector<CUdeviceptr> d_vertices(m_meshes.size());
+    std::vector<CUdeviceptr> d_indices(m_meshes.size());
+    std::vector<uint32_t> triangleInputFlags(m_meshes.size());
 
-    triangleInput.triangleArray.vertexFormat = OPTIX_VERTEX_FORMAT_FLOAT3;
-    triangleInput.triangleArray.vertexStrideInBytes = sizeof(glm::vec3);
-    triangleInput.triangleArray.numVertices = (int) m_model.vertex.size();
-    triangleInput.triangleArray.vertexBuffers = &d_vertices;
+    for (size_t meshId = 0; meshId < m_meshes.size(); ++meshId)
+    {
+        TriangleMesh &model = m_meshes[meshId];
 
-    triangleInput.triangleArray.indexFormat = OPTIX_INDICES_FORMAT_UNSIGNED_INT3;
-    triangleInput.triangleArray.indexStrideInBytes = sizeof(glm::ivec3);
-    triangleInput.triangleArray.numIndexTriplets = (int) m_model.index.size();
-    triangleInput.triangleArray.indexBuffer = d_indices;
+        // upload the model to the device: the builder
+        m_vertexBuffer[meshId].allocAndUpload(model.vertex);
+        m_indexBuffer[meshId].allocAndUpload(model.index);
 
-    uint32_t triangleInputFlags[1] = {0};
+        // ==================================================================
+        // triangle inputs
+        // ==================================================================
+        triangleInput[meshId] = {};
+        triangleInput[meshId].type
+            = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
 
-    // in this example we have one SBT entry, and no per-primitive
-    // materials:
-    triangleInput.triangleArray.flags = triangleInputFlags;
-    triangleInput.triangleArray.numSbtRecords = 1;
-    triangleInput.triangleArray.sbtIndexOffsetBuffer = 0;
-    triangleInput.triangleArray.sbtIndexOffsetSizeInBytes = 0;
-    triangleInput.triangleArray.sbtIndexOffsetStrideInBytes = 0;
+        // create local variables, because we need a *pointer* to the
+        // device pointers
+        d_vertices[meshId] = (CUdeviceptr) m_vertexBuffer[meshId].devicePtr();
+        d_indices[meshId] = (CUdeviceptr) m_indexBuffer[meshId].devicePtr();
+
+        triangleInput[meshId].triangleArray.vertexFormat = OPTIX_VERTEX_FORMAT_FLOAT3;
+        triangleInput[meshId].triangleArray.vertexStrideInBytes = sizeof(glm::vec3);
+        triangleInput[meshId].triangleArray.numVertices = (int) model.vertex.size();
+        triangleInput[meshId].triangleArray.vertexBuffers = &d_vertices[meshId];
+
+        triangleInput[meshId].triangleArray.indexFormat = OPTIX_INDICES_FORMAT_UNSIGNED_INT3;
+        triangleInput[meshId].triangleArray.indexStrideInBytes = sizeof(glm::ivec3);
+        triangleInput[meshId].triangleArray.numIndexTriplets = (int) model.index.size();
+        triangleInput[meshId].triangleArray.indexBuffer = d_indices[meshId];
+
+        triangleInputFlags[meshId] = { 0 };
+
+        // in this example we have one SBT entry, and no per-primitive
+        // materials:
+        triangleInput[meshId].triangleArray.flags = &triangleInputFlags[meshId];
+        triangleInput[meshId].triangleArray.numSbtRecords = 1;
+        triangleInput[meshId].triangleArray.sbtIndexOffsetBuffer = 0;
+        triangleInput[meshId].triangleArray.sbtIndexOffsetSizeInBytes = 0;
+        triangleInput[meshId].triangleArray.sbtIndexOffsetStrideInBytes = 0;
+
+    }
 
     // ==================================================================
     // BLAS setup
@@ -386,7 +428,7 @@ void Renderer::createAccel() {
 
     OptixAccelBuildOptions accelOptions = {};
     accelOptions.buildFlags = OPTIX_BUILD_FLAG_NONE
-                              | OPTIX_BUILD_FLAG_ALLOW_COMPACTION;
+        | OPTIX_BUILD_FLAG_ALLOW_COMPACTION;
     accelOptions.motionOptions.numKeys = 1;
     accelOptions.operation = OPTIX_BUILD_OPERATION_BUILD;
 
@@ -394,8 +436,8 @@ void Renderer::createAccel() {
     AST_OPTIX_CHECK(optixAccelComputeMemoryUsage
                         (m_optixContext,
                          &accelOptions,
-                         &triangleInput,
-                         1,  // num_build_inputs
+                         triangleInput.data(),
+                         triangleInput.size(),  // num_build_inputs
                          &blasBufferSizes
                         ));
 
@@ -423,8 +465,8 @@ void Renderer::createAccel() {
     AST_OPTIX_CHECK(optixAccelBuild(m_optixContext,
         /* stream */0,
                                     &accelOptions,
-                                    &triangleInput,
-                                    1,
+                                    triangleInput.data(),
+                                    triangleInput.size(),
                                     (CUdeviceptr) tempBuffer.devicePtr(),
                                     tempBuffer.m_sizeInBytes,
 
