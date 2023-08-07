@@ -1,4 +1,4 @@
-#include "asteroid/base/image.h"
+#include "asteroid/app/image.h"
 #include <cuda_gl_interop.h>
 
 using namespace Asteroid;

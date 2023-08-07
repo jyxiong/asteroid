@@ -1,6 +1,6 @@
 #pragma once
 
-#include "asteroid/base/application.h"
+#include "asteroid/app/application.h"
 #include "asteroid/util/log.h"
 
 extern Asteroid::Application *Asteroid::CreateApplication();

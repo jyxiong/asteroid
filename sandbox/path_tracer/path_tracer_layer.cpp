@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "asteroid/base/application.h"
+#include "asteroid/app/application.h"
 #include "asteroid/util/timer.h"
 
 using namespace Asteroid;

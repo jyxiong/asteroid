@@ -1,11 +1,8 @@
 #pragma once
 
-#include "asteroid/event/event.h"
-#include "asteroid/event/application_event.h"
-#include "asteroid/base/window.h"
-#include "asteroid/base/layer.h"
-#include "asteroid/base/layer_stack.h"
-#include "asteroid/imgui/imgui_layer.h"
+#include "asteroid/app/window.h"
+#include "asteroid/app/layer.h"
+#include "asteroid/app/imgui/imgui_layer.h"
 
 namespace Asteroid
 {
@@ -19,9 +16,7 @@ public:
 
     inline Window &GetWindow() { return *m_Window; }
 
-    void PushLayer(Layer *layer);
-
-    void PushOverlay(Layer *layer);
+    void PushLayer(const std::shared_ptr<Layer> &layer);
 
     void Run();
 
@@ -34,19 +29,18 @@ private:
 
     void InitLayer();
 
-    void OnEvent(Event &e);
+private:
 
     std::unique_ptr<Window> m_Window;
-    ImGuiLayer *m_ImGuiLayer;
-    bool m_Running = true;
-    bool m_Minimized = false;
-    LayerStack m_LayerStack;
+
+    std::shared_ptr<ImGuiLayer> m_ImGuiLayer;
+
+    std::vector<std::shared_ptr<Layer>> m_LayerStack;
 
     float m_TimeStep = 0.0f;
     float m_FrameTime = 0.0f;
     float m_LastFrameTime = 0.0f;
 
-private:
     static Application *s_Instance;
 };
 

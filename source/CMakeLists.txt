@@ -1,18 +1,12 @@
-file(GLOB BASE_SOURCES asteroid/base/*.h asteroid/base/*.cpp asteroid/base/*.cu)
+file(GLOB_RECURSE APP_SOURCES asteroid/app/*.h asteroid/app/*.cpp)
 file(GLOB BSDF_SOURCES asteroid/bsdf/*.h)
-file(GLOB EVENT_SOURCES asteroid/event/*.h asteroid/event/*.cpp)
-file(GLOB IMGUI_SOURCES asteroid/imgui/*.h asteroid/imgui/*.cpp)
-file(GLOB INPUT_SOURCES asteroid/input/*.h asteroid/input/*.cpp)
 file(GLOB OPENGL_SOURCES asteroid/opengl/*.h asteroid/opengl/*.cpp)
 file(GLOB RENDERER_SOURCES asteroid/renderer/*.h asteroid/renderer/*.cpp asteroid/renderer/*.cu)
 file(GLOB UTIL_SOURCES asteroid/util/*.h asteroid/util/*.cpp)
 
 add_library(asteroid STATIC
-    ${BASE_SOURCES}
+    ${APP_SOURCES}
     ${BSDF_SOURCES}
-    ${EVENT_SOURCES}
-    ${IMGUI_SOURCES}
-    ${INPUT_SOURCES}
     ${OPENGL_SOURCES}
     ${RENDERER_SOURCES}
     ${UTIL_SOURCES}

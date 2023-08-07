@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "asteroid/input/key_code.h"
+#include "key_code.h"
 
 namespace Asteroid
 {

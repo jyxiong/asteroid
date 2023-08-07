@@ -4,7 +4,6 @@
 #include <functional>
 #include "glad/gl.h"
 #include "GLFW/glfw3.h"
-#include "asteroid/event/event.h"
 
 namespace Asteroid
 {
@@ -26,8 +25,6 @@ struct WindowProps
 class Window
 {
 public:
-    using EventCallbackFn = std::function<void(Event &)>;
-
     explicit Window(const WindowProps &props);
 
     ~Window();
@@ -38,10 +35,9 @@ public:
 
     inline unsigned int GetHeight() const { return m_Data.Height; }
 
-    // Window attributes
-    inline void SetEventCallback(const EventCallbackFn &callback) { m_Data.EventCallback = callback; }
+    inline bool ShouldClose() const { return glfwWindowShouldClose(m_Window); }
 
-    inline void* GetNativeWindow() const { return m_Window; }
+    inline void *GetNativeWindow() const { return m_Window; }
 
     static Window *Create(const WindowProps &props = WindowProps());
 
@@ -52,8 +48,6 @@ private:
     {
         std::string Title;
         unsigned int Width, Height;
-
-        EventCallbackFn EventCallback;
     };
 
     WindowData m_Data;

@@ -1,7 +1,7 @@
-#include "asteroid/input/input.h"
+#include "input.h"
 
 #include "GLFW/glfw3.h"
-#include "asteroid/base/application.h"
+#include "asteroid/app/application.h"
 
 using namespace Asteroid;
 

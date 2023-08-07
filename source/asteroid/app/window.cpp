@@ -1,6 +1,6 @@
-#include "asteroid/base/window.h"
+#include "asteroid/app/window.h"
 #include "asteroid/util/log.h"
-#include "asteroid/event/application_event.h"
+#include "asteroid/util/macro.h"
 
 using namespace Asteroid;
 
@@ -47,12 +47,6 @@ Window::Window(const WindowProps &props)
     glfwSetWindowUserPointer(m_Window, &m_Data);
 
     glfwSwapInterval(1);
-
-    glfwSetWindowCloseCallback(m_Window, [](GLFWwindow *window) {
-        WindowData &data = *(WindowData *) glfwGetWindowUserPointer(window);
-        WindowCloseEvent event;
-        data.EventCallback(event);
-    });
 }
 
 Window::~Window()

@@ -1,5 +1,5 @@
-#include "asteroid/base/application.h"
-#include "asteroid/base/entry_point.h"
+#include "asteroid/app/application.h"
+#include "asteroid/app/entry_point.h"
 #include "path_tracer_layer.h"
 
 using namespace Asteroid;

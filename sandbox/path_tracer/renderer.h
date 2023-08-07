@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "glm/glm.hpp"
-#include "asteroid/base/image.h"
+#include "asteroid/app/image.h"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
 

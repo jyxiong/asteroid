@@ -2,8 +2,8 @@
 
 #include <memory>
 #include "glm/glm.hpp"
-#include "asteroid/base/layer.h"
-#include "asteroid/base/image.h"
+#include "asteroid/app/layer.h"
+#include "asteroid/app/image.h"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/camera_controller.h"
 #include "renderer.h"

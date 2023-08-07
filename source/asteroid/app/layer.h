@@ -1,7 +1,6 @@
 #pragma once
 
 #include "asteroid/util/macro.h"
-#include "asteroid/event//event.h"
 
 namespace Asteroid
 {

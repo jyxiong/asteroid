@@ -2,7 +2,7 @@
 
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"
-#include "asteroid/input/input.h"
+#include "asteroid/app/input/input.h"
 
 using namespace Asteroid;
 
