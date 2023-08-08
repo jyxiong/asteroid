@@ -42,14 +42,6 @@ void TriangleMesh::addUnitCube(const glm::mat4 &transform)
                                                    indices[3 * i + 2]));
 }
 
-static void context_log_cb(unsigned int level,
-                           const char *tag,
-                           const char *message,
-                           void *)
-{
-    fprintf(stderr, "[%2d][%12s]: %s\n", (int) level, tag, message);
-}
-
 /*! SBT record for a raygen program */
 struct __align__(OPTIX_SBT_RECORD_ALIGNMENT) RaygenRecord
 {
@@ -200,9 +192,11 @@ void Renderer::createContext()
 //    if (cuRes != CUDA_SUCCESS)
 //        fprintf(stderr, "Error querying current context: error code %d\n", cuRes);
 
-    AST_OPTIX_CHECK(optixDeviceContextCreate(m_cudaContext, nullptr, &m_optixContext))
-    AST_OPTIX_CHECK(optixDeviceContextSetLogCallback
-                        (m_optixContext, context_log_cb, nullptr, 4))
+    m_optixContext.create();
+
+//    AST_OPTIX_CHECK(optixDeviceContextCreate(m_cudaContext, nullptr, &m_optixContext))
+//    AST_OPTIX_CHECK(optixDeviceContextSetLogCallback
+//                        (m_optixContext, context_log_cb, nullptr, 4))
 }
 
 void Renderer::createModule()
@@ -218,11 +212,13 @@ void Renderer::createModule()
     m_pipelineCompileOptions.exceptionFlags = OPTIX_EXCEPTION_FLAG_NONE;
     m_pipelineCompileOptions.pipelineLaunchParamsVariableName = "optixLaunchParams";
 
+    m_pipelineLinkOptions.maxTraceDepth          = 2;
+
 //    const std::string ptxCode = embedded_ptx_code;
 
     char log[2048];
     auto sizeof_log = sizeof(log);
-    AST_OPTIX_CHECK(optixModuleCreate(m_optixContext,
+    AST_OPTIX_CHECK(optixModuleCreate((OptixDeviceContext)m_optixContext,
                                       &m_moduleCompileOptions,
                                       &m_pipelineCompileOptions,
                                       program_ptx_text(),
@@ -246,7 +242,7 @@ void Renderer::createRaygenPG()
 
     char log[2048];
     auto sizeof_log = sizeof(log);
-    AST_OPTIX_CHECK(optixProgramGroupCreate(m_optixContext,
+    AST_OPTIX_CHECK(optixProgramGroupCreate((OptixDeviceContext)m_optixContext,
                                             &pgDesc,
                                             1,
                                             &pgOptions,
@@ -268,7 +264,7 @@ void Renderer::createMissPG()
 
     char log[2048];
     auto sizeof_log = sizeof(log);
-    AST_OPTIX_CHECK(optixProgramGroupCreate(m_optixContext,
+    AST_OPTIX_CHECK(optixProgramGroupCreate((OptixDeviceContext)m_optixContext,
                                             &pgDesc,
                                             1,
                                             &pgOptions,
@@ -292,7 +288,7 @@ void Renderer::createHitGroupPG()
 
     char log[2048];
     auto sizeof_log = sizeof(log);
-    AST_OPTIX_CHECK(optixProgramGroupCreate(m_optixContext,
+    AST_OPTIX_CHECK(optixProgramGroupCreate((OptixDeviceContext)m_optixContext,
                                             &pgDesc,
                                             1,
                                             &pgOptions,
@@ -312,7 +308,7 @@ void Renderer::createPipeline()
 
     char log[2048];
     auto sizeof_log = sizeof(log);
-    AST_OPTIX_CHECK(optixPipelineCreate(m_optixContext,
+    AST_OPTIX_CHECK(optixPipelineCreate((OptixDeviceContext)m_optixContext,
                                         &m_pipelineCompileOptions,
                                         &m_pipelineLinkOptions,
                                         programGroups.data(),
@@ -434,7 +430,7 @@ void Renderer::createAccel()
 
     OptixAccelBufferSizes blasBufferSizes;
     AST_OPTIX_CHECK(optixAccelComputeMemoryUsage
-                        (m_optixContext,
+                        ((OptixDeviceContext)m_optixContext,
                          &accelOptions,
                          triangleInput.data(),
                          triangleInput.size(),  // num_build_inputs
@@ -462,7 +458,7 @@ void Renderer::createAccel()
     DeviceBuffer outputBuffer;
     outputBuffer.alloc(blasBufferSizes.outputSizeInBytes);
 
-    AST_OPTIX_CHECK(optixAccelBuild(m_optixContext,
+    AST_OPTIX_CHECK(optixAccelBuild((OptixDeviceContext)m_optixContext,
         /* stream */0,
                                     &accelOptions,
                                     triangleInput.data(),
@@ -486,7 +482,7 @@ void Renderer::createAccel()
     compactedSizeBuffer.download(&compactedSize, 1);
 
     m_asBuffer.alloc(compactedSize);
-    AST_OPTIX_CHECK(optixAccelCompact(m_optixContext,
+    AST_OPTIX_CHECK(optixAccelCompact((OptixDeviceContext)m_optixContext,
         /*stream:*/0,
                                       m_launchParams.traversable,
                                       (CUdeviceptr) m_asBuffer.devicePtr(),

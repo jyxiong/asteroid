@@ -12,6 +12,7 @@
 #include "asteroid/renderer/scene_struct.h"
 #include "asteroid/util/device_buffer.h"
 #include "asteroid/util/matrix.h"
+#include "asteroid/optix/context.h"
 #include "launchParams.h"
 
 namespace Asteroid {
@@ -82,7 +83,8 @@ private:
     CUstream m_stream{};
     cudaDeviceProp m_deviceProps{};
 
-    OptixDeviceContext m_optixContext{};
+//    OptixDeviceContext m_optixContext{};
+    Context m_optixContext{};
 
     OptixPipeline m_pipeline{};
     OptixPipelineCompileOptions m_pipelineCompileOptions = {};
