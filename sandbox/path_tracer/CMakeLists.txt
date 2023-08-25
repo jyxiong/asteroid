@@ -1,4 +1,4 @@
-file(GLOB SOURCES *.h *.cpp)
+file(GLOB SOURCES *.h *.cpp *.cu)
 
 add_executable(path_tracer ${SOURCES})
 

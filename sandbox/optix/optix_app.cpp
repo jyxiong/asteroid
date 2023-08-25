@@ -1,6 +1,6 @@
 #include "asteroid/app/application.h"
 #include "asteroid/app/entry_point.h"
-#include "path_tracer_layer.h"
+#include "optix_layer.h"
 
 using namespace Asteroid;
 
@@ -9,13 +9,10 @@ class Sandbox : public Application
 public:
     Sandbox()
     {
-        PushLayer(new ExampleLayer());
+        PushLayer(std::make_shared<OptixLayer>());
     }
 
-    ~Sandbox()
-    {
-
-    }
+    ~Sandbox() override = default;
 };
 
 Asteroid::Application *Asteroid::CreateApplication()

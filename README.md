@@ -11,9 +11,9 @@
 [pbrt](https://www.pbrt.org/)
 
 ## TODO
+- nvcc compile cuda to optixIR
 - material: glass, metal, diffuse
 - scene with multiple spheres
 - geometry
 - transform: camera and geometry
 - workflow: [ref1](https://blog.csdn.net/qq_16013649/article/details/113905995), [ref2](https://github.com/ptheywood/cuda-cmake-github-actions/issues/5)
-- licence

@@ -8,14 +8,12 @@
 #include "asteroid/renderer/camera_controller.h"
 #include "renderer.h"
 
-namespace Asteroid
-{
-class ExampleLayer : public Layer
-{
+namespace Asteroid {
+class OptixLayer : public Layer {
 public:
-    ExampleLayer();
+    OptixLayer();
 
-    ~ExampleLayer() override;
+    ~OptixLayer() override;
 
     void OnAttach() override;
 
@@ -27,11 +25,9 @@ private:
     void Render();
 
 private:
-    Renderer m_Renderer;
+    Renderer m_renderer;
 
-    CameraController m_CameraController;
-
-    Scene m_Scene;
+    CameraController m_cameraController;
 
     unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
 
