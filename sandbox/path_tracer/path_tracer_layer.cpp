@@ -7,7 +7,7 @@
 
 using namespace Asteroid;
 
-ExampleLayer::ExampleLayer()
+PathTracerLayer::PathTracerLayer()
     : Layer("Example")
 {
 
@@ -49,18 +49,18 @@ ExampleLayer::ExampleLayer()
     }
 }
 
-ExampleLayer::~ExampleLayer() = default;
+PathTracerLayer::~PathTracerLayer() = default;
 
-void ExampleLayer::OnAttach()
+void PathTracerLayer::OnAttach()
 {
 }
 
-void ExampleLayer::OnUpdate(float ts)
+void PathTracerLayer::OnUpdate(float ts)
 {
     m_modified |= m_CameraController.OnUpdate(ts);
 }
 
-void ExampleLayer::OnImGuiRender()
+void PathTracerLayer::OnImGuiRender()
 {
     ImGui::Begin("Settings");
     ImGui::Text("Last render: %.3fms", m_LastRenderTime);
@@ -129,7 +129,7 @@ void ExampleLayer::OnImGuiRender()
     Render();
 }
 
-void ExampleLayer::Render()
+void PathTracerLayer::Render()
 {
     Timer timer;
 

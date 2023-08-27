@@ -10,12 +10,12 @@
 
 namespace Asteroid
 {
-class ExampleLayer : public Layer
+class PathTracerLayer : public Layer
 {
 public:
-    ExampleLayer();
+    PathTracerLayer();
 
-    ~ExampleLayer() override;
+    ~PathTracerLayer() override;
 
     void OnAttach() override;
 

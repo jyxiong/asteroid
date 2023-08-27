@@ -1,2 +1,1 @@
-add_subdirectory(optix)
 add_subdirectory(path_tracer)
