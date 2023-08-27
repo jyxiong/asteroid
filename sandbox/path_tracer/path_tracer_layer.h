@@ -6,16 +6,16 @@
 #include "asteroid/app/image.h"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/camera_controller.h"
-#include "renderer.h"
+#include "asteroid/renderer/renderer.h"
 
 namespace Asteroid
 {
-class ExampleLayer : public Layer
+class PathTracerLayer : public Layer
 {
 public:
-    ExampleLayer();
+    PathTracerLayer();
 
-    ~ExampleLayer() override;
+    ~PathTracerLayer() override;
 
     void OnAttach() override;
 

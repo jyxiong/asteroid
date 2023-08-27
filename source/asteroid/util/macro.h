@@ -52,13 +52,3 @@
             return 0;                                                                                                    \
         }                                                                                                                \
     } while (0)
-
-#define AST_OPTIX_CHECK( call )                                             \
-  {                                                                     \
-    OptixResult res = call;                                             \
-    if( res != OPTIX_SUCCESS )                                          \
-      {                                                                 \
-        fprintf( stderr, "Optix call (%s) failed with code %d (line %d)\n", #call, res, __LINE__ ); \
-        exit( 2 );                                                      \
-      }                                                                 \
-  }

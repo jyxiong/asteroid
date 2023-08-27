@@ -9,7 +9,7 @@ class Sandbox : public Application
 public:
     Sandbox()
     {
-        PushLayer(new ExampleLayer());
+        PushLayer(std::make_shared<PathTracerLayer>());
     }
 
     ~Sandbox()
