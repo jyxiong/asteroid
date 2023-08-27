@@ -6,7 +6,7 @@
 #include "asteroid/app/image.h"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/camera_controller.h"
-#include "renderer.h"
+#include "asteroid/renderer/renderer.h"
 
 namespace Asteroid
 {

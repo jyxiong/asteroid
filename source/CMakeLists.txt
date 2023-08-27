@@ -18,7 +18,6 @@ target_link_libraries(asteroid PUBLIC
     glfw
     glm
     imgui
-    optix
     spdlog
     stb)
 
