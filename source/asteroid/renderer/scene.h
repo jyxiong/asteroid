@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "glm/glm.hpp"
-#include "asteroid/util/buffer.h"
+#include "asteroid/util/device_buffer.h"
 #include "asteroid/renderer/scene_struct.h"
 
 namespace Asteroid {
@@ -25,9 +25,9 @@ namespace Asteroid {
 
         std::vector<Material> materials;
 
-        std::unique_ptr<Buffer<Sphere>> deviceSpheres;
+        std::unique_ptr<DeviceBuffer<Sphere>> deviceSpheres;
 
-        std::unique_ptr<Buffer<Material>> deviceMaterials;
+        std::unique_ptr<DeviceBuffer<Material>> deviceMaterials;
 
         void UpdateDevice();
 

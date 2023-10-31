@@ -18,13 +18,13 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
 
     auto pixel_num = width * height;
 
-    m_devicePaths = std::make_unique<Buffer<PathSegment>>(pixel_num);
+    m_devicePaths = std::make_unique<DeviceBuffer<PathSegment>>(pixel_num);
 
-    m_Intersections = std::make_unique<Buffer<Intersection>>(pixel_num);
+    m_Intersections = std::make_unique<DeviceBuffer<Intersection>>(pixel_num);
 
-    m_AccumulationData = std::make_unique<Buffer<glm::vec3>>(pixel_num);
+    m_AccumulationData = std::make_unique<DeviceBuffer<glm::vec3>>(pixel_num);
 
-    m_ImageData = std::make_unique<Buffer<glm::u8vec4>>(pixel_num);
+    m_ImageData = std::make_unique<DeviceBuffer<glm::u8vec4>>(pixel_num);
 
     ResetFrameIndex();
 }
@@ -41,10 +41,10 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
     m_state.currentIteration++;
 
     auto sceneView = SceneView(scene);
-    auto paths = BufferView<PathSegment>(m_devicePaths->data(), m_devicePaths->size());
-    auto its = BufferView<Intersection>(m_Intersections->data(), m_Intersections->size());
-    auto accumulations = BufferView<glm::vec3>(m_AccumulationData->data(), m_AccumulationData->size());
-    auto imageData = BufferView<glm::u8vec4>(m_ImageData->data(), m_ImageData->size());
+    auto paths = m_devicePaths->view();
+    auto its = m_Intersections->view();
+    auto accumulations = m_AccumulationData->view();
+    auto imageData = m_ImageData->view();
 
     // Execute the kernel
     dim3 block(8, 8, 1);
@@ -62,6 +62,6 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
 
     ConvertToRGBA<<<grid, block>>>(accumulations, m_state.currentIteration, width, height, imageData);
 
-    m_finalImage->SetData(imageData.data());
+    m_finalImage->SetData(m_ImageData->data());
 
 }

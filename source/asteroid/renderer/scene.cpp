@@ -9,7 +9,7 @@ SceneView::SceneView(const Scene& scene)
 
 void Scene::UpdateDevice()
 {
-    deviceSpheres = std::make_unique<Buffer<Sphere>>(spheres);
+    deviceSpheres = std::make_unique<DeviceBuffer<Sphere>>(spheres);
 
-    deviceMaterials = std::make_unique<Buffer<Material>>(materials);
+    deviceMaterials = std::make_unique<DeviceBuffer<Material>>(materials);
 }
