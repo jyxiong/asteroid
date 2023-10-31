@@ -1,4 +1,19 @@
-# Ray Tracing
+# Asteroid
+Asteroid is a CUDA based Path Tracing Renderer.
+
+The repository is named after the [Asteroid Day](https://www.asteroidday.org/)
+
+## TODO
+- light
+- triangle
+- mesh
+- bvh
+- texture
+- material: glass, metal, diffuse
+- multiple importance sampling
+- volume
+- workflow: [ref1](https://blog.csdn.net/qq_16013649/article/details/113905995), [ref2](https://github.com/ptheywood/cuda-cmake-github-actions/issues/5)
+
 
 [CIS565-Fall-2022/Project3-CUDA-Path-Tracer](https://github.com/CIS565-Fall-2022/Project3-CUDA-Path-Tracer)
 
@@ -9,11 +24,3 @@
 [nori](https://wjakob.github.io/nori/)
 
 [pbrt](https://www.pbrt.org/)
-
-## TODO
-- nvcc compile cuda to optixIR
-- material: glass, metal, diffuse
-- scene with multiple spheres
-- geometry
-- transform: camera and geometry
-- workflow: [ref1](https://blog.csdn.net/qq_16013649/article/details/113905995), [ref2](https://github.com/ptheywood/cuda-cmake-github-actions/issues/5)
