@@ -5,32 +5,35 @@
 #include "asteroid/cuda/device_buffer.h"
 #include "asteroid/renderer/scene_struct.h"
 
-namespace Asteroid {
+namespace Asteroid
+{
 
-    struct Scene;
+struct Scene;
 
-    struct SceneView {
+struct SceneView
+{
 
-        BufferView<Geometry> deviceGeometries;
+    BufferView<Geometry> deviceGeometries;
 
-        BufferView<Material> deviceMaterials;
+    BufferView<Material> deviceMaterials;
 
-        explicit SceneView(const Scene &scene);
+    explicit SceneView(const Scene& scene);
 
-    };
+};
 
-    struct Scene {
+struct Scene
+{
 
-        std::vector<Geometry> geometries;
+    std::vector<Geometry> geometries;
 
-        std::vector<Material> materials;
+    std::vector<Material> materials;
 
-        DeviceBuffer<Geometry> deviceGeometries;
+    DeviceBuffer<Geometry> deviceGeometries;
 
-        DeviceBuffer<Material> deviceMaterials;
+    DeviceBuffer<Material> deviceMaterials;
 
-        void UpdateDevice();
+    void UpdateDevice();
 
-    };
+};
 
 }

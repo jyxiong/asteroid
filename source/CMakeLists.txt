@@ -8,7 +8,7 @@ add_library(asteroid STATIC
     ${APP_SOURCES}
     ${RENDERER_SOURCES}
     ${UTIL_SOURCES}
-    )
+)
 
 target_include_directories(asteroid SYSTEM PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 

@@ -5,11 +5,13 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace Asteroid {
+namespace Asteroid
+{
 
-struct RenderState {
-    unsigned int currentIteration{0};
-    unsigned int traceDepth{5};
+struct RenderState
+{
+    unsigned int currentIteration{ 0 };
+    unsigned int traceDepth{ 5 };
 };
 
 struct Camera
@@ -18,25 +20,27 @@ struct Camera
     glm::vec3 direction{ 0, 0, -1 };
     glm::vec3 up{ 0, 1, 0 };
 
-    float verticalFov{45.f};
-    float focalDistance{0.f};
-    glm::uvec2 viewport{1, 1};
+    float verticalFov{ 45.f };
+    float focalDistance{ 0.f };
+    glm::uvec2 viewport{ 1, 1 };
 
     glm::vec3 right;
     float tanHalfFov;
     float aspectRatio;
 
-    glm::vec2 lastMousePosition{0.0f, 0.0f};
+    glm::vec2 lastMousePosition{ 0.0f, 0.0f };
 };
 
-struct Material {
-    glm::vec3 albedo{1.0f};
+struct Material
+{
+    glm::vec3 albedo{ 1.0f };
     float roughness = 1.0f;
     float metallic = 0.0f;
     float emittance = 0.0f;
 };
 
-enum class GeometryType {
+enum class GeometryType
+{
     Sphere,
     Ellipsoid, // x^2/a^2 + y^2/b^2 + z^2/c^2 = 1
     Cube,
@@ -45,12 +49,13 @@ enum class GeometryType {
     Mesh
 };
 
-struct Geometry {
+struct Geometry
+{
     GeometryType type;
     int materialIndex;
-    glm::vec3 translation{0};
-    glm::vec3 rotation{0};
-    glm::vec3 scale{1};
+    glm::vec3 translation{ 0 };
+    glm::vec3 rotation{ 0 };
+    glm::vec3 scale{ 1 };
     glm::mat4 transform;
     glm::mat4 inverseTransform;
     glm::mat4 inverseTranspose;
@@ -68,13 +73,15 @@ struct Geometry {
     }
 };
 
-struct Ray {
+struct Ray
+{
     glm::vec3 origin;
 
     glm::vec3 direction;
 };
 
-struct PathSegment {
+struct PathSegment
+{
     Ray ray;
     glm::vec3 color; // accumulated light
     glm::vec3 throughput;
@@ -82,7 +89,8 @@ struct PathSegment {
     unsigned int remainingBounces;
 };
 
-struct Intersection {
+struct Intersection
+{
     float t;
     glm::vec3 normal;
     bool front_face;

@@ -3,7 +3,7 @@
 
 using namespace Asteroid;
 
-Image::Image(unsigned int width, unsigned int height)
+Image::Image(int width, int height)
     : m_Width(width), m_Height(height)
 {
     Allocate();
@@ -21,16 +21,23 @@ void Image::SetData(const void* data)
     cudaArray_t array;
     cudaGraphicsSubResourceGetMappedArray(&array, m_resource, 0, 0);
 
-    cudaMemcpy2DToArray(array, 0, 0, data, m_Width * sizeof(uchar4), m_Width * sizeof(uchar4), m_Height, cudaMemcpyDeviceToDevice);
-    
+    cudaMemcpy2DToArray(array,
+                        0,
+                        0,
+                        data,
+                        m_Width * sizeof(uchar4),
+                        m_Width * sizeof(uchar4),
+                        m_Height,
+                        cudaMemcpyDeviceToDevice);
+
     cudaGraphicsUnmapResources(1, &m_resource);
 }
 
-void Image::Resize(unsigned int width, unsigned int height)
+void Image::Resize(int width, int height)
 {
     if (m_Width == width && m_Height == height)
     {
-		return;
+        return;
     }
 
     Release();
@@ -52,7 +59,7 @@ void Image::Allocate()
     glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	cudaGraphicsGLRegisterImage(&m_resource, m_RendererID, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsWriteDiscard);
+    cudaGraphicsGLRegisterImage(&m_resource, m_RendererID, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsWriteDiscard);
 }
 
 void Image::Release()

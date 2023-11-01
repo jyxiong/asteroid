@@ -25,7 +25,7 @@ struct WindowProps
 class Window
 {
 public:
-    explicit Window(const WindowProps &props);
+    explicit Window(const WindowProps& props);
 
     ~Window();
 
@@ -37,12 +37,12 @@ public:
 
     inline bool ShouldClose() const { return glfwWindowShouldClose(m_Window); }
 
-    inline void *GetNativeWindow() const { return m_Window; }
+    inline void* GetNativeWindow() const { return m_Window; }
 
-    static Window *Create(const WindowProps &props = WindowProps());
+    static Window* Create(const WindowProps& props = WindowProps());
 
 private:
-    GLFWwindow *m_Window{};
+    GLFWwindow* m_Window{};
 
     struct WindowData
     {

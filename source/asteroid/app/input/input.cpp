@@ -8,14 +8,14 @@ using namespace Asteroid;
 bool Input::IsKeyDown(KeyCode keycode)
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-    auto state = glfwGetKey(window, (int)keycode);
+    auto state = glfwGetKey(window, (int) keycode);
     return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
 bool Input::IsMouseButtonDown(MouseButton button)
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-    auto state = glfwGetMouseButton(window, (int)button);
+    auto state = glfwGetMouseButton(window, (int) button);
     return state == GLFW_PRESS;
 }
 
@@ -25,11 +25,11 @@ glm::vec2 Input::GetMousePosition()
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
-    return { (float)x, (float)y };
+    return { (float) x, (float) y };
 }
 
 void Input::SetCursorMode(CursorMode mode)
 {
     auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int) mode);
 }

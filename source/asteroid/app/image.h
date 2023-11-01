@@ -6,35 +6,35 @@
 
 namespace Asteroid
 {
-	class Image
-	{
-	public:
-		Image(unsigned int width, unsigned int height);
+class Image
+{
+public:
+    Image(int width, int height);
 
-		~Image();
+    ~Image();
 
-		void SetData(const void* data);
+    void SetData(const void* data);
 
-		void Resize(unsigned int width, unsigned int);
+    void Resize(int width, int height);
 
-		int GetWidth() const { return m_Width; }
+    int GetWidth() const { return m_Width; }
 
-		int GetHeight() const { return m_Height; }
+    int GetHeight() const { return m_Height; }
 
-		unsigned int GetRendererID() const { return m_RendererID; }
+    unsigned int GetRendererID() const { return m_RendererID; }
 
-	private:
-		void Allocate();
+private:
+    void Allocate();
 
-		void Release();
+    void Release();
 
-	private:
-		unsigned int m_Width;
+private:
+    int m_Width;
 
-		unsigned int m_Height;
+    int m_Height;
 
-		unsigned int m_RendererID{};
+    unsigned int m_RendererID{};
 
-		cudaGraphicsResource_t m_resource;
-	};
+    cudaGraphicsResource_t m_resource;
+};
 }

@@ -22,7 +22,8 @@ void ImGuiLayer::OnAttach()
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO();
+    (void) io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 //    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
@@ -69,12 +70,12 @@ void ImGuiLayer::Begin()
 }
 
 void ImGuiLayer::End()
-{   
+{
     ShowDockSpaceEnd();
 
     ImGuiIO& io = ImGui::GetIO();
     Application& app = Application::Get();
-    io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
+    io.DisplaySize = ImVec2((float) app.GetWindow().GetWidth(), (float) app.GetWindow().GetHeight());
 
     // Rendering
     ImGui::Render();
@@ -98,7 +99,7 @@ void ImGuiLayer::End()
 }
 
 void ImGuiLayer::OnImGuiRender()
-{ 
+{
 }
 
 void ImGuiLayer::ShowDockSpaceBegin()
@@ -118,10 +119,10 @@ void ImGuiLayer::ShowDockSpaceBegin()
         ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_NoMove;
         window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-    }
-    else
+    } else
     {
         dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
     }

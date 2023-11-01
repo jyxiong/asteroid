@@ -33,7 +33,7 @@ private:
 
     Scene m_Scene;
 
-    unsigned int m_ViewportWidth = 0, m_ViewportHeight = 0;
+    int m_ViewportWidth = 0, m_ViewportHeight = 0;
 
     bool m_modified = false;
 

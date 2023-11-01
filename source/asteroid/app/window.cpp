@@ -6,17 +6,17 @@ using namespace Asteroid;
 
 static bool s_GLFWInitialized = false;
 
-static void GLFWErrorCallback(int error, const char *description)
+static void GLFWErrorCallback(int error, const char* description)
 {
     AST_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 }
 
-Window *Window::Create(const WindowProps &props)
+Window* Window::Create(const WindowProps& props)
 {
     return new Window(props);
 }
 
-Window::Window(const WindowProps &props)
+Window::Window(const WindowProps& props)
 {
     m_Data.Title = props.Title;
     m_Data.Width = props.Width;

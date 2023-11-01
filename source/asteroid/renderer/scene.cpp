@@ -2,7 +2,7 @@
 
 using namespace Asteroid;
 
-SceneView::SceneView(const Scene &scene)
+SceneView::SceneView(const Scene& scene)
     : deviceGeometries(scene.deviceGeometries.data(), scene.deviceGeometries.size()),
       deviceMaterials(scene.deviceMaterials.data(), scene.deviceMaterials.size())
 {

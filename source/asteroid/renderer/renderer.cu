@@ -5,14 +5,17 @@
 
 using namespace Asteroid;
 
-void Renderer::OnResize(unsigned int width, unsigned int height) {
-    if (m_finalImage) {
+void Renderer::OnResize(int width, int height)
+{
+    if (m_finalImage)
+    {
         // No resize necessary
         if (m_finalImage->GetWidth() == width && m_finalImage->GetHeight() == height)
             return;
 
         m_finalImage->Resize(width, height);
-    } else {
+    } else
+    {
         m_finalImage = std::make_shared<Image>(width, height);
     }
 
@@ -29,7 +32,8 @@ void Renderer::OnResize(unsigned int width, unsigned int height) {
     ResetFrameIndex();
 }
 
-void Renderer::Render(const Scene &scene, const Camera &camera) {
+void Renderer::Render(const Scene& scene, const Camera& camera)
+{
     auto width = m_finalImage->GetWidth();
     auto height = m_finalImage->GetHeight();
 
@@ -52,7 +56,8 @@ void Renderer::Render(const Scene &scene, const Camera &camera) {
 
     GeneratePathSegment<<<grid, block>>>(camera, m_state.traceDepth, paths);
 
-    for (unsigned int i = 0; i < m_state.traceDepth; i++) {
+    for (unsigned int i = 0; i < m_state.traceDepth; i++)
+    {
         ComputeIntersection<<<grid, block>>>(sceneView, paths, width, height, its);
 
         Shading<<<grid, block>>>(sceneView, paths, its, width, height);

@@ -3,9 +3,11 @@
 #include <memory>
 #include "asteroid/renderer/scene_struct.h"
 
-namespace Asteroid {
+namespace Asteroid
+{
 
-class CameraController {
+class CameraController
+{
 
 public:
     CameraController();
@@ -16,7 +18,7 @@ public:
 
     bool OnUpdate(float ts);
 
-    void OnResize(unsigned int width, unsigned int height);
+    void OnResize(int width, int height);
 
 private:
     Camera m_camera;

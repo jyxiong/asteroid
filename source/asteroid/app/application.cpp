@@ -6,7 +6,7 @@
 
 using namespace Asteroid;
 
-Application *Application::s_Instance = nullptr;
+Application* Application::s_Instance = nullptr;
 
 Application::Application()
 {
@@ -20,7 +20,7 @@ Application::Application()
 
 Application::~Application() = default;
 
-void Application::PushLayer(const std::shared_ptr<Layer> &layer)
+void Application::PushLayer(const std::shared_ptr<Layer>& layer)
 {
     m_LayerStack.emplace_back(layer);
     layer->OnAttach();
@@ -36,13 +36,13 @@ void Application::Run()
         m_LastFrameTime = time;
 
         // update
-        for (auto layer : m_LayerStack)
+        for (auto& layer : m_LayerStack)
             layer->OnUpdate(m_TimeStep);
 
         // imgui
         m_ImGuiLayer->Begin();
 
-        for (auto layer : m_LayerStack)
+        for (auto& layer : m_LayerStack)
             layer->OnImGuiRender();
 
         m_ImGuiLayer->End();

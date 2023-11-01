@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <iostream>
 
-namespace Asteroid {
+namespace Asteroid
+{
 
 enum class KeyCode : unsigned short
 {
@@ -167,7 +168,6 @@ enum class MouseButton : unsigned short
     Right = Button1,
     Middle = Button2
 };
-
 
 inline std::ostream& operator<<(std::ostream& os, KeyCode keyCode)
 {

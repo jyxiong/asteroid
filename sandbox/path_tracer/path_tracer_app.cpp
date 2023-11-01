@@ -12,13 +12,13 @@ public:
         PushLayer(std::make_shared<PathTracerLayer>());
     }
 
-    ~Sandbox()
+    ~Sandbox() override
     {
 
     }
 };
 
-Asteroid::Application *Asteroid::CreateApplication()
+Asteroid::Application* Asteroid::CreateApplication()
 {
     return new Sandbox();
 }

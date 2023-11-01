@@ -14,14 +14,14 @@ public:
 
     virtual ~Application();
 
-    inline Window &GetWindow() { return *m_Window; }
+    inline Window& GetWindow() { return *m_Window; }
 
-    void PushLayer(const std::shared_ptr<Layer> &layer);
+    void PushLayer(const std::shared_ptr<Layer>& layer);
 
     void Run();
 
 public:
-    inline static Application &Get() { return *s_Instance; }
+    inline static Application& Get() { return *s_Instance; }
 
 private:
 
@@ -41,10 +41,10 @@ private:
     float m_FrameTime = 0.0f;
     float m_LastFrameTime = 0.0f;
 
-    static Application *s_Instance;
+    static Application* s_Instance;
 };
 
 // 该函数由派生的应用定义
-Application *CreateApplication();
+Application* CreateApplication();
 
 }
