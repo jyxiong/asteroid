@@ -11,8 +11,8 @@ namespace Asteroid {
         auto center = glm::vec3(0);
         auto radius = 1.0f;
 
-        auto origin = glm::vec3(geometry.transform * glm::vec4(r.origin, 1.0f));
-        auto direction = glm::vec3(geometry.transform * glm::vec4(r.direction, 0.0f));
+        auto origin = glm::vec3(geometry.inverseTransform * glm::vec4(r.origin, 1.0f));
+        auto direction = glm::vec3(geometry.inverseTransform * glm::vec4(r.direction, 0.0f));
 
         auto oc = origin - center;
         auto a = glm::dot(direction, direction);

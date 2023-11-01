@@ -35,7 +35,7 @@ PathTracerLayer::PathTracerLayer()
     {
         Geometry geometry;
         geometry.type = GeometryType::Sphere;
-        geometry.translation = { -2.0f, 0.0f, 0.0f };
+        geometry.translation = { 2.0f, 0.0f, 0.0f };
         geometry.updateTransform();
         geometry.materialIndex = 2;
         m_Scene.geometries.push_back(geometry);
@@ -44,7 +44,7 @@ PathTracerLayer::PathTracerLayer()
     {
         Geometry geometry;
         geometry.type = GeometryType::Sphere;
-        geometry.translation = { 0.0f, 101.0f, 0.0f };
+        geometry.translation = { 0.0f, -101.0f, 0.0f };
         geometry.scale = { 100.0f, 100.0f, 100.0f };
         geometry.updateTransform();
         geometry.materialIndex = 1;
