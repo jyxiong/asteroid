@@ -1,4 +1,4 @@
-#include "asteroid/renderer/camera_controller.h"
+#include "asteroid/app/camera_controller.h"
 
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/quaternion.hpp"

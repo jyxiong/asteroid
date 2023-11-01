@@ -4,8 +4,8 @@
 #include "glm/glm.hpp"
 #include "asteroid/app/layer.h"
 #include "asteroid/app/image.h"
+#include "asteroid/app/camera_controller.h"
 #include "asteroid/renderer/scene.h"
-#include "asteroid/renderer/camera_controller.h"
 #include "asteroid/renderer/renderer.h"
 
 namespace Asteroid
