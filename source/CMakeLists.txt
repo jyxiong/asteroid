@@ -1,4 +1,5 @@
 file(GLOB_RECURSE APP_SOURCES asteroid/app/*.h asteroid/app/*.cpp)
+file(GLOB_RECURSE CUDA_SOURCES asteroid/cuda/*.h asteroid/cuda/*.cpp asteroid/cuda/*.inl)
 file(GLOB RENDERER_SOURCES asteroid/renderer/*.h asteroid/renderer/*.cpp asteroid/renderer/*.cu)
 file(GLOB UTIL_SOURCES asteroid/util/*.h asteroid/util/*.cpp)
 
