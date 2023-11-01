@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 namespace Asteroid {
 
@@ -33,15 +34,38 @@ struct Material {
     float roughness = 1.0f;
     float metallic = 0.0f;
     float emittance = 0.0f;
-
 };
 
-struct Sphere {
-    float radius = 0.5f;
+enum class GeometryType {
+    Sphere,
+    Ellipsoid, // x^2/a^2 + y^2/b^2 + z^2/c^2 = 1
+    Cube,
+    Cuboid,
+    AABB,
+    Mesh
+};
 
-    glm::vec3 position{0.0f};
+struct Geometry {
+    GeometryType type;
+    int materialIndex;
+    glm::vec3 translation{0};
+    glm::vec3 rotation{0};
+    glm::vec3 scale{1};
+    glm::mat4 transform;
+    glm::mat4 inverseTransform;
+    glm::mat4 inverseTranspose;
 
-    int materialIndex = 0;
+    void updateTransform()
+    {
+        transform = glm::translate(glm::mat4(1.0f), translation)
+            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), glm::vec3(1, 0, 0))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0, 1, 0))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0, 0, 1))
+            * glm::scale(glm::mat4(1.0f), scale);
+
+        inverseTransform = glm::inverse(transform);
+        inverseTranspose = glm::transpose(glm::inverse(transform));
+    }
 };
 
 struct Ray {
@@ -61,6 +85,7 @@ struct PathSegment {
 struct Intersection {
     float t;
     glm::vec3 normal;
+    bool front_face;
     glm::vec3 position;
     int materialIndex;
 };

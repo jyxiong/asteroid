@@ -11,41 +11,44 @@ PathTracerLayer::PathTracerLayer()
     : Layer("Example")
 {
 
-    Material &pinkSphere = m_Scene.materials.emplace_back();
-    pinkSphere.albedo = { 1.0f, 0.0f, 1.0f };
-    pinkSphere.roughness = 0.0f;
+    Material &pinkGeometry = m_Scene.materials.emplace_back();
+    pinkGeometry.albedo = { 1.0f, 0.0f, 1.0f };
+    pinkGeometry.roughness = 0.0f;
 
-    Material &blueSphere = m_Scene.materials.emplace_back();
-    blueSphere.albedo = { 0.2f, 0.3f, 1.0f };
-    blueSphere.roughness = 0.1f;
+    Material &blueGeometry = m_Scene.materials.emplace_back();
+    blueGeometry.albedo = { 0.2f, 0.3f, 1.0f };
+    blueGeometry.roughness = 0.1f;
 
-    Material& orangeSphere = m_Scene.materials.emplace_back();
-    orangeSphere.albedo = { 0.8f, 0.5f, 0.2f };
-    orangeSphere.roughness = 0.1f;
-    orangeSphere.emittance = 2.0f;
+    Material& orangeGeometry = m_Scene.materials.emplace_back();
+    orangeGeometry.albedo = { 0.8f, 0.5f, 0.2f };
+    orangeGeometry.roughness = 0.1f;
+    orangeGeometry.emittance = 2.0f;
 
     {
-        Sphere sphere;
-        sphere.position = { 0.0f, 0.0f, 0.0f };
-        sphere.radius = 1.0f;
-        sphere.materialIndex = 0;
-        m_Scene.spheres.push_back(sphere);
+        Geometry geometry;
+        geometry.type = GeometryType::Sphere;
+        geometry.materialIndex = 0;
+        geometry.updateTransform();
+        m_Scene.geometries.push_back(geometry);
     }
 
     {
-        Sphere sphere;
-        sphere.position = { 2.0f, 0.0f, 0.0f };
-        sphere.radius = 1.0f;
-        sphere.materialIndex = 2;
-        m_Scene.spheres.push_back(sphere);
+        Geometry geometry;
+        geometry.type = GeometryType::Sphere;
+        geometry.translation = { -2.0f, 0.0f, 0.0f };
+        geometry.updateTransform();
+        geometry.materialIndex = 2;
+        m_Scene.geometries.push_back(geometry);
     }
 
     {
-        Sphere sphere;
-        sphere.position = { 0.0f, -101.0f, 0.0f };
-        sphere.radius = 100.0f;
-        sphere.materialIndex = 1;
-        m_Scene.spheres.push_back(sphere);
+        Geometry geometry;
+        geometry.type = GeometryType::Sphere;
+        geometry.translation = { 0.0f, 101.0f, 0.0f };
+        geometry.scale = { 100.0f, 100.0f, 100.0f };
+        geometry.updateTransform();
+        geometry.materialIndex = 1;
+        m_Scene.geometries.push_back(geometry);
     }
 }
 
@@ -74,15 +77,16 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::End();
 
     ImGui::Begin("Scene");
-    for (size_t i = 0; i < m_Scene.spheres.size(); i++)
+    for (size_t i = 0; i < m_Scene.geometries.size(); i++)
     {
         ImGui::PushID(i);
 
-        Sphere &sphere = m_Scene.spheres[i];
+        Geometry &geometry = m_Scene.geometries[i];
 
-        m_modified |= ImGui::DragFloat3("position", glm::value_ptr(sphere.position), 0.1f);
-        m_modified |= ImGui::DragFloat("radius", &sphere.radius, 0.1f);
-        m_modified |= ImGui::DragInt("material ID", &sphere.materialIndex, 1, 0, (int) m_Scene.materials.size() - 1);
+        m_modified |= ImGui::DragFloat3("translation", glm::value_ptr(geometry.translation), 0.1f);
+        m_modified |= ImGui::DragFloat3("rotation", glm::value_ptr(geometry.rotation), 0.1f);
+        m_modified |= ImGui::DragFloat3("scale", glm::value_ptr(geometry.scale), 0.1f);
+        m_modified |= ImGui::DragInt("material ID", &geometry.materialIndex, 1, 0, (int) m_Scene.materials.size() - 1);
 
         ImGui::Separator();
 

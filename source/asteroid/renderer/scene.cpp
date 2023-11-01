@@ -3,14 +3,19 @@
 using namespace Asteroid;
 
 SceneView::SceneView(const Scene &scene)
-    : deviceSpheres(scene.deviceSpheres.data(), scene.deviceSpheres.size()),
+    : deviceGeometries(scene.deviceGeometries.data(), scene.deviceGeometries.size()),
       deviceMaterials(scene.deviceMaterials.data(), scene.deviceMaterials.size())
 {
 }
 
 void Scene::UpdateDevice()
 {
-    deviceSpheres.upload(spheres);
+    for (auto& geometry : geometries)
+    {
+        geometry.updateTransform();
+    }
+
+    deviceGeometries.upload(geometries);
 
     deviceMaterials.upload(materials);
 }

@@ -11,7 +11,7 @@ namespace Asteroid {
 
     struct SceneView {
 
-        BufferView<Sphere> deviceSpheres;
+        BufferView<Geometry> deviceGeometries;
 
         BufferView<Material> deviceMaterials;
 
@@ -21,11 +21,11 @@ namespace Asteroid {
 
     struct Scene {
 
-        std::vector<Sphere> spheres;
+        std::vector<Geometry> geometries;
 
         std::vector<Material> materials;
 
-        DeviceBuffer<Sphere> deviceSpheres;
+        DeviceBuffer<Geometry> deviceGeometries;
 
         DeviceBuffer<Material> deviceMaterials;
 

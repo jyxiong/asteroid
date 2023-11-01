@@ -5,6 +5,7 @@
 #include "glm/glm.hpp"
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
+#include "asteroid/kernel/intersection.h"
 #include "path_tracer_kernel.h"
 
 namespace Asteroid {
@@ -50,8 +51,16 @@ ComputeIntersection(const SceneView scene, BufferView<PathSegment> pathSegments,
     int closestSphere = -1;
     Intersection its;
     float hitDistance = std::numeric_limits<float>::max();
-    for (size_t i = 0; i < scene.deviceSpheres.size(); ++i) {
-        if (!HitSphere(scene.deviceSpheres[i], path.ray, its)) continue;
+    for (size_t i = 0; i < scene.deviceGeometries.size(); ++i) {
+        const auto& geometry = scene.deviceGeometries[i];
+        
+        if (geometry.type == GeometryType::Sphere)
+        {
+            if (!intersect_sphere(geometry, path.ray, its))
+            {
+                continue;
+            }
+        }
 
         if (its.t < hitDistance && its.t > 0) {
             hitDistance = its.t;
