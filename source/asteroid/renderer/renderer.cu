@@ -21,7 +21,6 @@ void Renderer::onResize(const glm::ivec2& size)
 
     m_devicePaths.resize(pixel_num);
     m_intersections.resize(pixel_num);
-    m_accumulationData.resize(pixel_num);
     m_imageData.resize(pixel_num);
 
     resetFrameIndex();

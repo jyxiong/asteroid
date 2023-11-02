@@ -8,7 +8,7 @@
 namespace Asteroid
 {
 
-inline __device__ bool intersect_sphere(const Geometry& geometry, const Ray& r, Intersection& its)
+inline __device__ bool intersectSphere(const Geometry& geometry, const Ray& r, Intersection& its)
 {
     auto center = glm::vec3(0);
     auto radius = 1.0f;
@@ -59,7 +59,7 @@ inline __device__ bool intersect_sphere(const Geometry& geometry, const Ray& r, 
     return true;
 }
 
-inline __device__ bool intersect_cube(const Geometry& geometry, const Ray& r, Intersection& its)
+inline __device__ bool intersectCube(const Geometry& geometry, const Ray& r, Intersection& its)
 {
     auto bot = glm::vec3(-1.0f);
     auto top = glm::vec3(1.0f);

@@ -5,26 +5,44 @@
 
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
+#include "asteroid/kernel/traceRay.h"
 
 namespace Asteroid
 {
 
-__device__
-void scatterRay(PathSegment& pathSegment, const Intersection& its, const Material& mat)
+__device__ void directLight()
 {
 
-    auto lightDir = glm::normalize(glm::vec3(-1, -1, -1));
-    auto lightIntensity = glm::max(glm::dot(its.normal, -lightDir), 0.0f);
+}
 
-    auto color = mat.albedo * lightIntensity;
-    pathSegment.color += color * pathSegment.throughput;
+__device__ glm::vec3 pathTrace(const SceneView& scene, const RenderState& state, const Ray& ray)
+{
+    auto radiance = glm::vec3(0);
 
-    pathSegment.throughput *= 0.5f;
+    for (int i = 0; i < state.maxDepth; ++i)
+    {
+        closestHit();
 
-    pathSegment.ray.origin = its.position + its.normal * 0.0001f;
-    pathSegment.ray.direction = glm::reflect(pathSegment.ray.direction, its.normal + mat.roughness);
+        if 
+    }
 
-    pathSegment.remainingBounces--;
+    return glm::vec3(0);
+}
+
+__device__ glm::vec3 samplePixel(const SceneView& scene, const Camera& camera, const RenderState& state, const glm::ivec2& coord)
+{
+    auto uv = (glm::vec2(coord) + 0.5f) * 2.f / glm::vec2(state.size) - 1.f;
+
+    auto offsetX = uv.x * camera.tanHalfFov * camera.aspectRatio * camera.right;
+    auto offsetY = uv.y * camera.tanHalfFov * camera.up;
+
+    Ray ray{};
+    ray.direction = glm::normalize(camera.direction + offsetX + offsetY);
+    ray.origin = camera.position;
+
+    auto radiance = pathTrace(scene, state, ray);
+
+    return radiance;
 }
 
 }

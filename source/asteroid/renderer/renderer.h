@@ -26,12 +26,8 @@ public:
 private:
     RenderState m_state;
 
-    // 存储用于展示的纹理图像
     std::shared_ptr<Image> m_finalImage;
 
-    DeviceBuffer<glm::vec3> m_accumulationData;
-
-    // 存储最终颜色值[0, 255]
     DeviceBuffer<glm::vec4> m_imageData;
 
     DeviceBuffer<PathSegment> m_devicePaths;

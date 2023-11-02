@@ -10,6 +10,50 @@
 
 namespace Asteroid
 {
+__global__ void renderFrame(const SceneView scene,
+                            const Camera camera,
+                            const RenderState state,
+                            BufferView<glm::vec4> image)
+{
+    auto x = blockIdx.x * blockDim.x + threadIdx.x;
+    auto y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    auto viewport = camera.viewport;
+
+    if (x >= viewport.x && y >= viewport.y)
+        return;
+
+    
+    auto pixelColor = glm::vec3(0);
+    for (int i = 0; i < state.maxSamples; ++i)
+    {
+        pixelColor += samplePixel(scene, camera, state, { x, y });
+    }
+    pixelColor /= float(state.maxSamples);
+
+    auto pixelIndex = y * viewport.x + x;
+    auto oldColor = glm::vec3(image[pixelIndex]);
+    image[pixelIndex] = glm::vec4(glm::mix(oldColor, pixelColor, 1.f / float(state.frame + 1)), 1.f);
+}
+
+__device__
+void scatterRay(PathSegment& pathSegment, const Intersection& its, const Material& mat)
+{
+
+    auto lightDir = glm::normalize(glm::vec3(-1, -1, -1));
+    auto lightIntensity = glm::max(glm::dot(its.normal, -lightDir), 0.0f);
+
+    auto color = mat.albedo * lightIntensity;
+    pathSegment.color += color * pathSegment.throughput;
+
+    pathSegment.throughput *= 0.5f;
+
+    pathSegment.ray.origin = its.position + its.normal * 0.0001f;
+    pathSegment.ray.direction = glm::reflect(pathSegment.ray.direction, its.normal + mat.roughness);
+
+    pathSegment.remainingBounces--;
+}
+
 __global__ void generatePathSegment(const Camera camera, unsigned int traceDepth, BufferView<PathSegment> pathSegments)
 {
     auto x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -59,13 +103,13 @@ __global__ void computeIntersection(const SceneView scene, int width, int height
 
         if (geometry.type == GeometryType::Sphere)
         {
-            if (!intersect_sphere(geometry, path.ray, its))
+            if (!intersectSphere(geometry, path.ray, its))
             {
                 continue;
             }
         } else if (geometry.type == GeometryType::Cube)
         {
-            if (!intersect_cube(geometry, path.ray, its))
+            if (!intersectCube(geometry, path.ray, its))
             {
                 continue;
             }
@@ -129,7 +173,7 @@ __global__ void finalGather(const BufferView<PathSegment> pathSegments,
         return;
 
     const auto& path = pathSegments[y * width + x];
-    auto old_color = glm::vec3(image[y * width + x]);
-    image[y * width + x] = glm::vec4(glm::mix(old_color, path.color, 1.f / float(frame + 1)), 1.f);
+    auto oldColor = glm::vec3(image[y * width + x]);
+    image[y * width + x] = glm::vec4(glm::mix(oldColor, path.color, 1.f / float(frame + 1)), 1.f);
 }
 }
