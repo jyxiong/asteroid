@@ -11,44 +11,29 @@ namespace Asteroid
 class Timer
 {
 public:
-    Timer()
-    {
-        Reset();
-    }
+    Timer();
 
-    void Reset()
-    {
-        m_Start = std::chrono::high_resolution_clock::now();
-    }
+    void reset();
 
-    float Elapsed()
-    {
-        return std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::high_resolution_clock::now() - m_Start).count() * 0.001f * 0.001f * 0.001f;
-    }
+    float elapsed();
 
-    float ElapsedMillis()
-    {
-        return Elapsed() * 1000.0f;
-    }
+    float elapsedMillis();
 
 private:
-    std::chrono::time_point<std::chrono::high_resolution_clock> m_Start;
-};
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_start;
+
+}; // class Timer
 
 class ScopedTimer
 {
 public:
-    ScopedTimer(const std::string& name)
-        : m_Name(name) {}
-    ~ScopedTimer()
-    {
-        float time = m_Timer.ElapsedMillis();
-        AST_CORE_INFO("[TIMER] {0} - {1}ms", m_Name, time);
-    }
-private:
-    std::string m_Name;
-    Timer m_Timer;
-};
+    explicit ScopedTimer(const std::string& name);
+    ~ScopedTimer();
 
-}
+private:
+    std::string m_name;
+    Timer m_timer;
+
+}; // class ScopedTimer
+
+} // namespace Asteroid

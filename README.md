@@ -6,7 +6,8 @@ The repository is named after the [Asteroid Day](https://www.asteroidday.org/)
 ## TODO
 - geometry: 
   - [x] sphere
-  - aabb
+  - [x] cube
+  - square
   - triangle
   - mesh
 - light

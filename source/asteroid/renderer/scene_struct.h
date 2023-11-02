@@ -42,6 +42,8 @@ struct Material
 enum class GeometryType
 {
     Sphere,
+    Cube,
+    Square,
     AABB,
     Mesh
 };

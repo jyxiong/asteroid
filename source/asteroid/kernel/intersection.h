@@ -48,7 +48,7 @@ inline __device__ bool intersect_sphere(const Geometry& geometry, const Ray& r, 
     auto position = origin + t * direction;
 
     auto outward_normal = glm::normalize(glm::vec3(geometry.inverseTranspose * glm::vec4(position, 0.0f)));
-    its.front_face = glm::dot(direction, outward_normal);
+    its.front_face = glm::dot(direction, outward_normal) < 0.0f;
     its.normal = its.front_face ? outward_normal : -outward_normal;
 
     its.position = glm::vec3(geometry.transform * glm::vec4(position, 1.0f));
@@ -59,4 +59,74 @@ inline __device__ bool intersect_sphere(const Geometry& geometry, const Ray& r, 
     return true;
 }
 
+inline __device__ bool intersect_cube(const Geometry& geometry, const Ray& r, Intersection& its)
+{
+    auto bot = glm::vec3(-1.0f);
+    auto top = glm::vec3(1.0f);
+
+    auto origin = glm::vec3(geometry.inverseTransform * glm::vec4(r.origin, 1.0f));
+    auto direction = glm::vec3(geometry.inverseTransform * glm::vec4(r.direction, 0.0f));
+    auto inv_direction = 1.0f / direction;
+
+    float tmin = -100000;
+    float tmax = 100000;
+
+    glm::vec3 tmin_n, tmax_n;
+    float t1, t2;
+    float ta, tb;
+    for (int i = 0; i < 3; ++i)
+    {
+        t1 = (bot[i] - origin[i]) * inv_direction[i];
+        t2 = (top[i] - origin[i]) * inv_direction[i];
+        auto n = glm::vec3(0);
+
+        if (t1 < t2)
+        {
+            ta = t1;
+            tb = t2;
+            n[i] = -1.0f;
+        } else
+        {
+            tb = t1;
+            ta = t2;
+            n[i] = 1.0f;
+        }
+        if (ta > 0.0f && ta > tmin)
+        {
+            tmin = ta;
+            tmin_n = n;
+        }
+        if (tb < tmax)
+        {
+            tmax = tb;
+            tmax_n = n;
+        }
+    }
+
+    // 没有交点
+    if (tmin >= tmax || tmax < 0.0f)
+    {
+        return false;
+    }
+
+    // 只有一个交点
+    if (tmin <= 0.0f)
+    {
+        tmin = tmax;
+        tmin_n = tmax_n;
+        its.front_face = false;
+    } else
+    {
+        its.front_face = true;
+    }
+
+    its.normal = glm::normalize(glm::vec3(geometry.inverseTranspose * glm::vec4(tmin_n, 0.0f)));
+    its.position = glm::vec3(geometry.transform * glm::vec4(r.origin + tmin * r.direction, 1.0f));
+    its.t = glm::distance(r.origin, its.position);
+
+    its.materialIndex = geometry.materialIndex;
+
+    return true;
 }
+
+} // namespace Asteroid

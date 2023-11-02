@@ -6,7 +6,7 @@
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
 #include "asteroid/kernel/intersection.h"
-#include "path_tracer_kernel.h"
+#include "asteroid/kernel/path_tracer_kernel.h"
 
 namespace Asteroid
 {
@@ -66,6 +66,13 @@ ComputeIntersection(const SceneView scene, BufferView<PathSegment> pathSegments,
                 continue;
             }
         }
+        else if (geometry.type == GeometryType::Cube)
+        {
+            if (!intersect_cube(geometry, path.ray, its))
+            {
+                continue;
+            }
+        }
 
         if (its.t < hitDistance && its.t > 0)
         {
@@ -111,9 +118,6 @@ Shading(const SceneView scene, BufferView<PathSegment> pathSegments, const Buffe
     {
         scatterRay(path, it, material);
     }
-
-//    if (path.pixelIndex == 142821)
-//        printf("pixel index = %d, color = (%f, %f, %f); \n", path.pixelIndex, path.color.x, path.color.y, path.color.z);
 }
 
 __global__ void finalGather(BufferView<glm::vec3> image,

@@ -50,6 +50,14 @@ PathTracerLayer::PathTracerLayer()
         geometry.materialIndex = 1;
         m_Scene.geometries.push_back(geometry);
     }
+
+    {
+        Geometry geometry;
+        geometry.type = GeometryType::Cube;
+        geometry.updateTransform();
+        geometry.materialIndex = 1;
+        m_Scene.geometries.push_back(geometry);
+    }
 }
 
 PathTracerLayer::~PathTracerLayer() = default;
@@ -151,5 +159,5 @@ void PathTracerLayer::Render()
 
     m_Renderer.Render(m_Scene, m_CameraController.GetCamera());
 
-    m_LastRenderTime = timer.ElapsedMillis();
+    m_LastRenderTime = timer.elapsedMillis();
 }
