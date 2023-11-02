@@ -40,9 +40,9 @@ Window::Window(const WindowProps& props)
     AST_ASSERT(status, "Failed to initialize Glad!")
 
     AST_CORE_INFO("OpenGL Info:");
-    AST_CORE_INFO("  Vendor: {}", fmt::ptr(glGetString(GL_VENDOR)));
-    AST_CORE_INFO("  Renderer: {}", fmt::ptr(glGetString(GL_RENDERER)));
-    AST_CORE_INFO("  Version: {}", fmt::ptr(glGetString(GL_VERSION)));
+    AST_CORE_INFO("  Vendor: {}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+    AST_CORE_INFO("  Renderer: {}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+    AST_CORE_INFO("  Version: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
     glfwSetWindowUserPointer(m_Window, &m_Data);
 

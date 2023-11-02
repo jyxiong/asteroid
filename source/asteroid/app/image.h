@@ -3,37 +3,36 @@
 #include <memory>
 #include <cuda_runtime.h>
 #include "glad/gl.h"
+#include "glm/glm.hpp"
 
 namespace Asteroid
 {
 class Image
 {
 public:
-    Image(int width, int height);
+    Image();
+
+    Image(const glm::ivec2& size);
 
     ~Image();
 
-    void SetData(const void* data);
+    void setData(const void* data);
 
-    void Resize(int width, int height);
+    void resize(const glm::ivec2& size);
 
-    int GetWidth() const { return m_Width; }
-
-    int GetHeight() const { return m_Height; }
-
-    unsigned int GetRendererID() const { return m_RendererID; }
+    int width() const { return m_size.x; }
+    int height() const { return m_size.y; }
+    unsigned int rendererID() const { return m_rendererID; }
 
 private:
-    void Allocate();
+    void allocate();
 
-    void Release();
+    void release();
 
 private:
-    int m_Width;
+    glm::ivec2 m_size{};
 
-    int m_Height;
-
-    unsigned int m_RendererID{};
+    unsigned int m_rendererID{};
 
     cudaGraphicsResource_t m_resource;
 };

@@ -76,10 +76,10 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::Begin("Settings");
     ImGui::Text("Last render: %.3fms", m_LastRenderTime);
 
-    ImGui::Text("Current iteration: %d", m_Renderer.GetRenderState().currentIteration);
+    ImGui::Text("Current iteration: %d", m_Renderer.getRenderState().frame);
 
     m_modified |=
-        ImGui::DragInt("Trace depth: %d", reinterpret_cast<int*>(&m_Renderer.GetRenderState().traceDepth), 1, 1, 100);
+        ImGui::DragInt("Trace depth: %d", reinterpret_cast<int*>(&m_Renderer.getRenderState().maxDepth), 1, 1, 100);
 
     m_modified |= ImGui::Button("Reset");
 
@@ -127,13 +127,12 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Viewport");
 
-    m_ViewportWidth = (int) ImGui::GetContentRegionAvail().x;
-    m_ViewportHeight = (int) ImGui::GetContentRegionAvail().y;
+    m_viewport = {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y};
 
-    auto image = m_Renderer.GetFinalImage();
+    auto image = m_Renderer.getFinalImage();
     if (image)
-        ImGui::Image((void*) (intptr_t) image->GetRendererID(),
-                     { (float) image->GetWidth(), (float) image->GetHeight() },
+        ImGui::Image((void*) (intptr_t) image->rendererID(),
+                     { (float) image->width(), (float) image->height() },
                      ImVec2(0, 1), ImVec2(1, 0));
 
     ImGui::End();
@@ -148,16 +147,16 @@ void PathTracerLayer::Render()
 
     if (m_modified)
     {
-        m_Renderer.ResetFrameIndex();
+        m_Renderer.resetFrameIndex();
         m_modified = false;
     }
 
     m_Scene.UpdateDevice();
 
-    m_CameraController.OnResize(m_ViewportWidth, m_ViewportHeight);
-    m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+    m_CameraController.OnResize(m_viewport);
+    m_Renderer.onResize(m_viewport);
 
-    m_Renderer.Render(m_Scene, m_CameraController.GetCamera());
+    m_Renderer.render(m_Scene, m_CameraController.GetCamera());
 
     m_LastRenderTime = timer.elapsedMillis();
 }

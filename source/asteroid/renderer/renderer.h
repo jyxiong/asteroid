@@ -11,15 +11,17 @@ namespace Asteroid
 class Renderer
 {
 public:
-    void OnResize(int width, int height);
+    Renderer();
 
-    void Render(const Scene& scene, const Camera& camera);
+    void onResize(const glm::ivec2& resolution);
 
-    std::shared_ptr<Image> GetFinalImage() const { return m_finalImage; }
+    void render(const Scene& scene, const Camera& camera);
 
-    void ResetFrameIndex() { m_state.currentIteration = 0; }
+    std::shared_ptr<Image> getFinalImage() const { return m_finalImage; }
 
-    RenderState& GetRenderState() { return m_state; }
+    void resetFrameIndex() { m_state.frame = 0; }
+
+    RenderState& getRenderState() { return m_state; }
 
 private:
     RenderState m_state;
@@ -27,13 +29,13 @@ private:
     // 存储用于展示的纹理图像
     std::shared_ptr<Image> m_finalImage;
 
-    std::unique_ptr<DeviceBuffer<glm::vec3>> m_AccumulationData = nullptr;
+    DeviceBuffer<glm::vec3> m_accumulationData;
 
     // 存储最终颜色值[0, 255]
-    std::unique_ptr<DeviceBuffer<glm::u8vec4>> m_ImageData = nullptr;
+    DeviceBuffer<glm::vec4> m_imageData;
 
-    std::unique_ptr<DeviceBuffer<PathSegment>> m_devicePaths = nullptr;
+    DeviceBuffer<PathSegment> m_devicePaths;
 
-    std::unique_ptr<DeviceBuffer<Intersection>> m_Intersections = nullptr;
+    DeviceBuffer<Intersection> m_intersections;
 };
 }

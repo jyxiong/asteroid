@@ -10,8 +10,10 @@ namespace Asteroid
 
 struct RenderState
 {
-    unsigned int currentIteration{ 0 };
-    unsigned int traceDepth{ 5 };
+    unsigned int frame{};
+    unsigned int maxDepth{};
+    unsigned int maxSamples{};
+    glm::ivec2 size{};
 };
 
 struct Camera
@@ -22,7 +24,7 @@ struct Camera
 
     float verticalFov{ 45.f };
     float focalDistance{ 0.f };
-    glm::uvec2 viewport{ 1, 1 };
+    glm::ivec2 viewport{ 1, 1 };
 
     glm::vec3 right;
     float tanHalfFov;
@@ -84,7 +86,6 @@ struct PathSegment
     Ray ray;
     glm::vec3 color; // accumulated light
     glm::vec3 throughput;
-    int pixelIndex;
     unsigned int remainingBounces;
 };
 

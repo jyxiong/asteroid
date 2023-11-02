@@ -5,68 +5,56 @@
 
 using namespace Asteroid;
 
-void Renderer::OnResize(int width, int height)
-{
-    if (m_finalImage)
-    {
-        // No resize necessary
-        if (m_finalImage->GetWidth() == width && m_finalImage->GetHeight() == height)
-            return;
-
-        m_finalImage->Resize(width, height);
-    } else
-    {
-        m_finalImage = std::make_shared<Image>(width, height);
-    }
-
-    auto pixel_num = width * height;
-
-    m_devicePaths = std::make_unique<DeviceBuffer<PathSegment>>(pixel_num);
-
-    m_Intersections = std::make_unique<DeviceBuffer<Intersection>>(pixel_num);
-
-    m_AccumulationData = std::make_unique<DeviceBuffer<glm::vec3>>(pixel_num);
-
-    m_ImageData = std::make_unique<DeviceBuffer<glm::u8vec4>>(pixel_num);
-
-    ResetFrameIndex();
+Renderer::Renderer() {
+    m_finalImage = std::make_shared<Image>();
 }
 
-void Renderer::Render(const Scene& scene, const Camera& camera)
+void Renderer::onResize(const glm::ivec2& size)
 {
-    auto width = m_finalImage->GetWidth();
-    auto height = m_finalImage->GetHeight();
+    if (m_state.size == size)
+        return;
 
-    if (m_state.currentIteration == 0)
+    m_finalImage->resize(size);
+    m_state.size = size;
+
+    auto pixel_num = size.x * size.y;
+
+    m_devicePaths.resize(pixel_num);
+    m_intersections.resize(pixel_num);
+    m_accumulationData.resize(pixel_num);
+    m_imageData.resize(pixel_num);
+
+    resetFrameIndex();
+}
+
+void Renderer::render(const Scene& scene, const Camera& camera)
+{
+    if (m_state.frame == 0)
     {
-        m_AccumulationData->clear();
+        m_imageData.clear();
     }
 
-    m_state.currentIteration++;
-
     auto sceneView = SceneView(scene);
-    auto paths = m_devicePaths->view();
-    auto its = m_Intersections->view();
-    auto accumulations = m_AccumulationData->view();
-    auto imageData = m_ImageData->view();
+    auto paths = m_devicePaths.view();
+    auto its = m_intersections.view();
+    auto imageData = m_imageData.view();
 
     // Execute the kernel
     dim3 block(8, 8, 1);
-    dim3 grid(width / block.x, height / block.y, 1);
+    dim3 grid(m_state.size.x / block.x, m_state.size.y / block.y, 1);
 
-    GeneratePathSegment<<<grid, block>>>(camera, m_state.traceDepth, paths);
+    generatePathSegment<<<grid, block>>>(camera, m_state.maxDepth, paths);
 
-    for (unsigned int i = 0; i < m_state.traceDepth; i++)
+    for (unsigned int i = 0; i < m_state.maxDepth; i++)
     {
-        ComputeIntersection<<<grid, block>>>(sceneView, paths, width, height, its);
+        computeIntersection<<<grid, block>>>(sceneView, m_state.size.x, m_state.size.y, paths, its);
 
-        Shading<<<grid, block>>>(sceneView, paths, its, width, height);
+        shading<<<grid, block>>>(sceneView, its, m_state.size, paths);
     }
 
-    finalGather<<<grid, block>>>(accumulations, paths, width, height);
+    finalGather<<<grid, block>>>(paths, m_state.frame, m_state.size.x, m_state.size.y, imageData);
 
-    ConvertToRGBA<<<grid, block>>>(accumulations, m_state.currentIteration, width, height, imageData);
+    m_finalImage->setData(m_imageData.data());
 
-    m_finalImage->SetData(m_ImageData->data());
-
+    m_state.frame++;
 }

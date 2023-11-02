@@ -33,7 +33,7 @@ private:
 
     Scene m_Scene;
 
-    int m_ViewportWidth = 0, m_ViewportHeight = 0;
+    glm::ivec2 m_viewport;
 
     bool m_modified = false;
 
