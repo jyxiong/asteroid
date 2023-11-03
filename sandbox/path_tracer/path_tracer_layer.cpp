@@ -127,7 +127,12 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Viewport");
 
-    m_viewport = {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y};
+    auto viewport = glm::ivec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
+    if (viewport != m_viewport)
+    {
+        m_viewport = viewport;
+        m_resized = true;
+    }
 
     auto image = m_Renderer.getFinalImage();
     if (image)
@@ -145,7 +150,7 @@ void PathTracerLayer::Render()
 {
     Timer timer;
 
-    if (m_modified)
+    if (m_modified || m_resized)
     {
         m_Renderer.resetFrameIndex();
         m_modified = false;
@@ -153,8 +158,11 @@ void PathTracerLayer::Render()
 
     m_Scene.UpdateDevice();
 
-    m_CameraController.OnResize(m_viewport);
-    m_Renderer.onResize(m_viewport);
+    if (m_resized)
+    {
+        m_CameraController.OnResize(m_viewport);
+        m_Renderer.onResize(m_viewport);
+    }
 
     m_Renderer.render(m_Scene, m_CameraController.GetCamera());
 

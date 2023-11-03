@@ -36,6 +36,7 @@ private:
     glm::ivec2 m_viewport;
 
     bool m_modified = false;
+    bool m_resized = false;
 
     float m_LastRenderTime = 0.0f;
 };

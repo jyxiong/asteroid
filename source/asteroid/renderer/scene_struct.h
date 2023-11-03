@@ -11,8 +11,8 @@ namespace Asteroid
 struct RenderState
 {
     unsigned int frame{};
-    unsigned int maxDepth{};
-    unsigned int maxSamples{};
+    unsigned int maxDepth{5};
+    unsigned int maxSamples{1};
     glm::ivec2 size{};
 };
 
@@ -24,7 +24,6 @@ struct Camera
 
     float verticalFov{ 45.f };
     float focalDistance{ 0.f };
-    glm::ivec2 viewport{ 1, 1 };
 
     glm::vec3 right;
     float tanHalfFov;
@@ -72,30 +71,6 @@ struct Geometry
         inverseTransform = glm::inverse(transform);
         inverseTranspose = glm::transpose(glm::inverse(transform));
     }
-};
-
-struct Ray
-{
-    glm::vec3 origin;
-
-    glm::vec3 direction;
-};
-
-struct PathSegment
-{
-    Ray ray;
-    glm::vec3 color; // accumulated light
-    glm::vec3 throughput;
-    unsigned int remainingBounces;
-};
-
-struct Intersection
-{
-    float t;
-    glm::vec3 normal;
-    bool front_face;
-    glm::vec3 position;
-    int materialIndex;
 };
 
 } // namespace Asteroid

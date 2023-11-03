@@ -85,9 +85,5 @@ bool CameraController::OnUpdate(float ts)
 
 void CameraController::OnResize(const glm::ivec2& viewport)
 {
-    if (m_camera.viewport == viewport)
-        return;
-
-    m_camera.viewport = viewport;
-    m_camera.aspectRatio = (float) m_camera.viewport.x / (float) m_camera.viewport.y;
+    m_camera.aspectRatio = (float) viewport.x / (float) viewport.y;
 }

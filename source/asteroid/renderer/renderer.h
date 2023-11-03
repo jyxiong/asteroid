@@ -29,9 +29,5 @@ private:
     std::shared_ptr<Image> m_finalImage;
 
     DeviceBuffer<glm::vec4> m_imageData;
-
-    DeviceBuffer<PathSegment> m_devicePaths;
-
-    DeviceBuffer<Intersection> m_intersections;
 };
 }
