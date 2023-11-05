@@ -15,9 +15,10 @@ struct Ray
 struct PathSegment
 {
     Ray ray;
-    glm::vec3 color; // accumulated light
+    glm::vec3 color;
     glm::vec3 throughput;
     bool stop;
+    unsigned int seed;
 };
 
 struct Intersection

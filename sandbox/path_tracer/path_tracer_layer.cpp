@@ -7,8 +7,7 @@
 
 using namespace Asteroid;
 
-PathTracerLayer::PathTracerLayer()
-    : Layer("Example")
+PathTracerLayer::PathTracerLayer() : Layer("Example")
 {
 
     Material& pinkGeometry = m_Scene.materials.emplace_back();
@@ -138,7 +137,8 @@ void PathTracerLayer::OnImGuiRender()
     if (image)
         ImGui::Image((void*) (intptr_t) image->rendererID(),
                      { (float) image->width(), (float) image->height() },
-                     ImVec2(0, 1), ImVec2(1, 0));
+                     ImVec2(0, 1),
+                     ImVec2(1, 0));
 
     ImGui::End();
     ImGui::PopStyleVar();

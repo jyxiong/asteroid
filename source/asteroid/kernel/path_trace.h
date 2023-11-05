@@ -6,6 +6,7 @@
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
 #include "asteroid/kernel/trace_ray.h"
+#include "asteroid/renderer/random.h"
 
 namespace Asteroid
 {
@@ -15,44 +16,65 @@ __device__ void directLight()
 
 }
 
-__device__ void pathTrace(const SceneView& scene, const RenderState& state, PathSegment& path)
+__device__ void traceRay(const SceneView& scene, PathSegment& path)
 {
-    for (int i = 0; i < state.maxDepth; ++i)
+    Intersection its{};
+    if (intersect(scene, path.ray, its))
     {
-        Intersection its{};
-        if (intersect(scene, path.ray, its))
-        {
-            closestHit(scene, its, path);
-        }
-        else
-        {
-            miss(scene, its, path);
-        }
-
-        if (path.stop)
-        {
-            break;
-        }
+        closestHit(scene, its, path);
+    } else
+    {
+        miss(scene, its, path);
     }
 }
 
-__device__ glm::vec3 samplePixel(const SceneView& scene, const Camera& camera, const RenderState& state, const glm::ivec2& coord)
+__device__ glm::vec3 samplePixel(const SceneView& scene,
+                                 const Camera& camera,
+                                 const RenderState& state,
+                                 const glm::vec2& coord)
 {
-    auto uv = (glm::vec2(coord) + 0.5f) * 2.f / glm::vec2(state.size) - 1.f;
+    auto pixelColor = glm::vec3(0);
 
-    auto offsetX = uv.x * camera.tanHalfFov * camera.aspectRatio * camera.right;
-    auto offsetY = uv.y * camera.tanHalfFov * camera.up;
+    auto seed = tea<16>(state.size.x * coord.y + coord.x, state.frame * state.maxSamples);
 
-    PathSegment path{};
-    path.color = glm::vec3(0);
-    path.throughput = glm::vec3(1);
-    path.ray.direction = glm::normalize(camera.direction + offsetX + offsetY);
-    path.ray.origin = camera.position;
-    path.stop = false;
+    for (int i = 0; i < state.maxSamples; ++i)
+    {
+        auto uv = (glm::vec2(coord) + 0.5f) * 2.f / glm::vec2(state.size) - 1.f;
 
-    pathTrace(scene, state, path);
+        auto offsetX = uv.x * camera.tanHalfFov * camera.aspectRatio * camera.right;
+        auto offsetY = uv.y * camera.tanHalfFov * camera.up;
 
-    return path.color;
+        for (int i = 0; i < state.maxDepth; ++i)
+        {
+            PathSegment path{};
+            path.color = glm::vec3(0);
+            path.throughput = glm::vec3(1);
+            path.ray.direction = glm::normalize(camera.direction + offsetX + offsetY);
+            path.ray.origin = camera.position;
+            path.stop = false;
+            path.seed = seed;
+
+            traceRay(scene, path);
+
+
+
+            // TODO: if first bounce, store information for denoising
+            if (i == 0)
+            {
+
+            }
+
+            if (path.stop)
+            {
+                break;
+            }
+        }
+
+        pixelColor += path.color;
+    }
+    pixelColor /= float(state.maxSamples);
+
+    return pixelColor;
 }
 
 __global__ void renderFrameKernel(const SceneView scene,
@@ -68,12 +90,8 @@ __global__ void renderFrameKernel(const SceneView scene,
     if (x >= viewport.x && y >= viewport.y)
         return;
 
-    auto pixelColor = glm::vec3(0);
-    for (int i = 0; i < state.maxSamples; ++i)
-    {
-        pixelColor += samplePixel(scene, camera, state, { x, y });
-    }
-    pixelColor /= float(state.maxSamples);
+    auto pixelCoord = glm::vec2(x, y);
+    auto pixelColor = samplePixel(scene, camera, state, pixelCoord);
 
     auto pixelIndex = y * viewport.x + x;
     auto oldColor = glm::vec3(image[pixelIndex]);

@@ -58,6 +58,9 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
 
 __device__ void miss(const SceneView& scene, const Intersection& its, PathSegment& path)
 {
+    // TODO: environment light
+
+
     path.stop = true;
 }
 

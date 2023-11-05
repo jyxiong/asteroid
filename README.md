@@ -10,10 +10,11 @@ The repository is named after the [Asteroid Day](https://www.asteroidday.org/)
   - square
   - triangle
   - mesh
+    - bvh
 - light
     - punctual light
     - area light
-- bvh
+    - environment light
 - texture
 - material: 
   - glass
