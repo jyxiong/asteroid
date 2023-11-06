@@ -35,9 +35,10 @@ struct Camera
 struct Material
 {
     glm::vec3 albedo{ 1.0f };
+    glm::vec3 emittance{ 0.0f };
+
     float roughness = 1.0f;
     float metallic = 0.0f;
-    float emittance = 0.0f;
 };
 
 enum class GeometryType

@@ -2,7 +2,7 @@
 
 #include <curand_kernel.h>
 #include "glm/glm.hpp"
-#include "asteroid/cuda/random.h"
+#include "random.h"
 
 namespace Asteroid
 {
@@ -16,7 +16,7 @@ struct Ray
 struct PathSegment
 {
     Ray ray;
-    glm::vec3 color;
+    glm::vec3 radiance;
     glm::vec3 throughput;
     bool stop;
     LCG<16> rng;
@@ -29,6 +29,21 @@ struct Intersection
     bool front_face;
     glm::vec3 position;
     int materialIndex;
+};
+
+struct LightSample
+{
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec3 emission;
+    float pdf;
+};
+
+struct BsdfSample
+{
+    glm::vec3 l;
+    glm::vec3 f;
+    float pdf;
 };
 
 } // namespace Asteroid

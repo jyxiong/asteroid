@@ -1,9 +1,10 @@
 #pragma once
 
 #include <cuda_runtime.h>
-#include "asteroid/kernel/struct.h"
-#include "asteroid/kernel/intersect.h"
-#include "asteroid/kernel/interact.h"
+#include "asteroid/shader/struct.h"
+#include "intersect.h"
+#include "asteroid/shader/directLight.h"
+#include "asteroid/shader/bsdf/lambert.h"
 
 namespace Asteroid
 {
@@ -44,14 +45,28 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
 {
     auto& material = scene.deviceMaterials[its.materialIndex];
 
-    if (material.emittance > 0.0f)
+    // emittance
+    path.radiance += material.emittance * path.throughput;
+
+    // direct light
+    path.radiance += directLight(its, material) * path.throughput;
+
+    // indirect light
+    BsdfSample bsdfSample;
+    lambertSample(-path.ray.direction, its, material, path.rng, bsdfSample);
+
+    if (bsdfSample.pdf < 0.f)
     {
-        path.color += (material.albedo * material.emittance) * path.throughput;
         path.stop = true;
-    } else
-    {
-        scatterRay(its, material, path);
+        return;
     }
+
+    // TODO: cos(n, l)
+    path.throughput *= bsdfSample.f / bsdfSample.pdf;
+
+    // next ray
+    path.ray.origin = its.position + its.normal * 0.0001f;
+    path.ray.direction = bsdfSample.l;
 
     // TODO: russian roulette
 }
@@ -59,12 +74,10 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
 __device__ void miss(const SceneView& scene, const Intersection& its, PathSegment& path)
 {
     // TODO: environment light
-
-
     path.stop = true;
 }
 
-__device__ void anyHit()
+[[maybe_unused]] [[maybe_unused]] __device__ void anyHit()
 {
 
 }

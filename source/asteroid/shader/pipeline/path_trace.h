@@ -5,16 +5,11 @@
 
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
-#include "asteroid/kernel/trace_ray.h"
-#include "asteroid/cuda/random.h"
+#include "asteroid/shader/pipeline/trace_ray.h"
+#include "asteroid/shader/random.h"
 
 namespace Asteroid
 {
-
-__device__ void directLight()
-{
-
-}
 
 __device__ void traceRay(const SceneView& scene, PathSegment& path)
 {
@@ -44,6 +39,7 @@ __global__ void renderFrameKernel(const SceneView scene,
     auto pixelIndex = y * viewport.x + x;
 
     auto rng = LCG<16>(pixelIndex, state.frame);
+    
     auto uv = (glm::vec2(x, y) + rng.rand2()) * 2.f / glm::vec2(state.size) - 1.f;
     auto offsetX = uv.x * camera.tanHalfFov * camera.aspectRatio * camera.right;
     auto offsetY = uv.y * camera.tanHalfFov * camera.up;
@@ -55,7 +51,7 @@ __global__ void renderFrameKernel(const SceneView scene,
     for (int sample_idx = 0; sample_idx < state.maxSamples; ++sample_idx)
     {
         PathSegment path{};
-        path.color = glm::vec3(0);
+        path.radiance = glm::vec3(0);
         path.throughput = glm::vec3(1);
         path.ray.direction = direction;
         path.ray.origin = origin;
@@ -78,14 +74,19 @@ __global__ void renderFrameKernel(const SceneView scene,
             }
         }
 
-        pixelColor += path.color;
+        pixelColor += path.radiance;
 
         rng = path.rng;
     }
     pixelColor /= float(state.maxSamples);
 
     auto oldColor = glm::vec3(image[pixelIndex]);
-    image[pixelIndex] = glm::vec4(glm::mix(oldColor, pixelColor, 1.f / float(state.frame + 1)), 1.f);
+    auto newColor = glm::mix(oldColor, pixelColor, 1.f / float(state.frame + 1));
+
+    // TODO: tone mapping
+    // TODO: gamma correction
+
+    image[pixelIndex] = glm::vec4(newColor, 1.f);
 }
 
 }

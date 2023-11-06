@@ -33,7 +33,7 @@ private:
 
     Scene m_Scene;
 
-    glm::ivec2 m_viewport;
+    glm::ivec2 m_viewport{};
 
     bool m_modified = false;
     bool m_resized = false;
