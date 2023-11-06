@@ -79,10 +79,16 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::Begin("Settings");
     ImGui::Text("Last render: %.3fms", m_LastRenderTime);
 
-    ImGui::Text("Current iteration: %d", m_Renderer.getRenderState().frame);
+    ImGui::Text("Current frame: %d", m_Renderer.getRenderState().frame);
 
     m_modified |=
         ImGui::DragInt("Trace depth: %d", reinterpret_cast<int*>(&m_Renderer.getRenderState().maxDepth), 1, 1, 100);
+
+    m_modified |= ImGui::DragInt("Samples per pixel: %d",
+                                 reinterpret_cast<int*>(&m_Renderer.getRenderState().maxSamples),
+                                 1,
+                                 1,
+                                 100);
 
     m_modified |= ImGui::Button("Reset");
 
@@ -163,7 +169,6 @@ void PathTracerLayer::Render()
         m_modified = false;
     }
 
-
     if (m_resized)
     {
         m_CameraController.OnResize(m_viewport);
@@ -171,7 +176,6 @@ void PathTracerLayer::Render()
 
         m_resized = false;
     }
-
 
     m_Renderer.render(m_Scene, m_CameraController.GetCamera());
 

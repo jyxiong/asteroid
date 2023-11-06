@@ -17,7 +17,7 @@ public:
 
     void render(const Scene& scene, const Camera& camera);
 
-    std::shared_ptr<Image> getFinalImage() const { return m_finalImage; }
+    [[nodiscard]] std::shared_ptr<Image> getFinalImage() const { return m_finalImage; }
 
     void resetFrameIndex() { m_state.frame = 0; }
 

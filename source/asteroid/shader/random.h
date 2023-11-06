@@ -27,15 +27,15 @@ public:
             v0 += ((v1 << 4) + 0xa341316c) ^ (v1 + s0) ^ ((v1 >> 5) + 0xc8013ea4);
             v1 += ((v0 << 4) + 0xad90777d) ^ (v0 + s0) ^ ((v0 >> 5) + 0x7e95761e);
         }
-        state = v0;
+        m_state = v0;
     }
 
     inline __device__ float rand1()
     {
         const unsigned int LCG_A = 1664525u;
         const unsigned int LCG_C = 1013904223u;
-        state = (LCG_A * state + LCG_C);
-        return (state & 0x00FFFFFF) / (float) 0x01000000;
+        m_state = (LCG_A * m_state + LCG_C);
+        return (m_state & 0x00FFFFFF) / (float) 0x01000000;
     }
 
     inline __device__ glm::vec2 rand2()
@@ -44,7 +44,7 @@ public:
     }
 
 private:
-    unsigned int state;
+    unsigned int m_state;
 };
 
 

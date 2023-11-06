@@ -19,7 +19,7 @@ The repository is named after the [Asteroid Day](https://www.asteroidday.org/)
 - material: 
   - glass
   - metal
-  - diffuse
+  - [x] diffuse
   - microfacet
   - disney
 - importance sampling

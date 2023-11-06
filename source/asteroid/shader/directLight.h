@@ -14,7 +14,7 @@ __device__ inline glm::vec3 directLight(const Intersection& its, const Material&
     auto lightDir = glm::normalize(glm::vec3(-1, -1, -1));
     auto lightIntensity = glm::max(glm::dot(its.normal, -lightDir), 0.0f);
 
-    auto color = mat.albedo * 0.f;
+    auto color = mat.albedo * lightIntensity;
 
     // TODO: shadow ray with any hit
 

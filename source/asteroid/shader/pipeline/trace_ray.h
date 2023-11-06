@@ -47,12 +47,12 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
 
     // emittance
     path.radiance += material.emittance * path.throughput;
-
+        
     // direct light
     path.radiance += directLight(its, material) * path.throughput;
 
     // indirect light
-    BsdfSample bsdfSample;
+    BsdfSample bsdfSample{};
     lambertSample(-path.ray.direction, its, material, path.rng, bsdfSample);
 
     if (bsdfSample.pdf < 0.f)
@@ -61,8 +61,7 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
         return;
     }
 
-    // TODO: cos(n, l)
-    path.throughput *= bsdfSample.f / bsdfSample.pdf;
+    path.throughput *= bsdfSample.f * glm::dot(bsdfSample.l, its.normal) / bsdfSample.pdf;
 
     // next ray
     path.ray.origin = its.position + its.normal * 0.0001f;

@@ -26,11 +26,12 @@ __device__ void lambertSample(const glm::vec3& v,
 {
     auto l = cosineSampleSemiSphere(rng);
     auto transform = onb(its.normal);
-    bsdfSample.l = transform * l;
+    bsdfSample.l = glm::normalize(transform * l);
 
-    bsdfSample.pdf = glm::dot(l, its.normal) / glm::pi<float>();
+    bsdfSample.pdf = glm::dot(bsdfSample.l, its.normal) / glm::pi<float>();
 
     bsdfSample.f = lambertEval(v, bsdfSample.l, its, mtl);
+
 }
 
 }
