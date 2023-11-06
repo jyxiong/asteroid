@@ -1,6 +1,8 @@
 #pragma once
 
+#include <curand_kernel.h>
 #include "glm/glm.hpp"
+#include "asteroid/cuda/random.h"
 
 namespace Asteroid
 {
@@ -8,7 +10,6 @@ namespace Asteroid
 struct Ray
 {
     glm::vec3 origin;
-
     glm::vec3 direction;
 };
 
@@ -18,7 +19,7 @@ struct PathSegment
     glm::vec3 color;
     glm::vec3 throughput;
     bool stop;
-    unsigned int seed;
+    LCG<16> rng;
 };
 
 struct Intersection

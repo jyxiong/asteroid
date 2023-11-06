@@ -10,8 +10,8 @@ namespace Asteroid
 
 struct RenderState
 {
-    unsigned int frame{};
-    unsigned int maxDepth{5};
+    unsigned int frame{0};
+    unsigned int maxDepth{10};
     unsigned int maxSamples{1};
     glm::ivec2 size{};
 };

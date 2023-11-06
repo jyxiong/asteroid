@@ -53,10 +53,14 @@ PathTracerLayer::PathTracerLayer() : Layer("Example")
     {
         Geometry geometry;
         geometry.type = GeometryType::Cube;
+        geometry.translation = { -1.0f, 1.0f, 0.0f };
+        geometry.scale = { 0.5f, 0.5f, 0.5f };
         geometry.updateTransform();
         geometry.materialIndex = 1;
         m_Scene.geometries.push_back(geometry);
     }
+
+    m_modified = true;
 }
 
 PathTracerLayer::~PathTracerLayer() = default;
@@ -150,19 +154,24 @@ void PathTracerLayer::Render()
 {
     Timer timer;
 
-    if (m_modified || m_resized)
+    if (m_modified)
     {
+        m_Scene.UpdateDevice();
+
         m_Renderer.resetFrameIndex();
+
         m_modified = false;
     }
 
-    m_Scene.UpdateDevice();
 
     if (m_resized)
     {
         m_CameraController.OnResize(m_viewport);
         m_Renderer.onResize(m_viewport);
+
+        m_resized = false;
     }
+
 
     m_Renderer.render(m_Scene, m_CameraController.GetCamera());
 
