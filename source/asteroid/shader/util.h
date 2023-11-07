@@ -13,7 +13,7 @@ __device__ inline glm::mat3 onb(const glm::vec3& w)
     auto b = w.x * w.y * a;
     auto u = glm::vec3(1.0f + sign * w.x * w.x * a, sign * b, -sign * w.x);
     auto v = glm::vec3(b, sign + w.y * w.y * a, -w.y);
-    return glm::mat3(u, v, w);
+    return { u, v, w };
 }
 
 } // namespace Asteroid

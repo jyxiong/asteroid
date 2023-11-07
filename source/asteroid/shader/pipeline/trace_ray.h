@@ -2,8 +2,8 @@
 
 #include <cuda_runtime.h>
 #include "asteroid/shader/struct.h"
-#include "intersect.h"
-#include "asteroid/shader/directLight.h"
+#include "asteroid/shader/intersect.h"
+#include "asteroid/shader/direct_light.h"
 #include "asteroid/shader/bsdf/lambert.h"
 
 namespace Asteroid
@@ -41,15 +41,15 @@ __device__ bool intersect(const SceneView& scene, const Ray& ray, Intersection& 
     return geometryID >= 0;
 }
 
-__device__ void closestHit(const SceneView& scene, const Intersection& its, PathSegment& path)
+__device__ void closestHit(const SceneView& scene, const Intersection& its, LCG<16>& rng, PathSegment& path)
 {
     auto& material = scene.deviceMaterials[its.materialIndex];
 
-    // emittance
-    path.radiance += material.emittance * path.throughput;
+    // emission
+    path.radiance += material.emission * path.throughput;
         
     // direct light
-    path.radiance += directLight(its, material) * path.throughput;
+    path.radiance += directLight(scene, its, material, rng) * path.throughput;
 
     // indirect light
     BsdfSample bsdfSample{};

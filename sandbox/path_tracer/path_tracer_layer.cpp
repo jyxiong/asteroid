@@ -21,7 +21,7 @@ PathTracerLayer::PathTracerLayer() : Layer("Example")
     Material& orangeGeometry = m_Scene.materials.emplace_back();
     orangeGeometry.albedo = { 0.8f, 0.5f, 0.2f };
     orangeGeometry.roughness = 0.1f;
-    orangeGeometry.emittance = glm::vec3(2);
+    orangeGeometry.emission = glm::vec3(1);
 
     {
         Geometry geometry;
@@ -124,7 +124,7 @@ void PathTracerLayer::OnImGuiRender()
         m_modified |= ImGui::ColorEdit3("albedo", glm::value_ptr(material.albedo));
         m_modified |= ImGui::DragFloat("roughness", &material.roughness, 0.01f, 0.0f, 1.0f);
         m_modified |= ImGui::DragFloat("metallic", &material.metallic, 0.01f, 0.0f, 1.0f);
-        m_modified |= ImGui::DragFloat3("emittance", glm::value_ptr(material.emittance), 0.05f, 0.0f, FLT_MAX);
+        m_modified |= ImGui::DragFloat3("emission", glm::value_ptr(material.emission), 0.05f, 0.0f, FLT_MAX);
 
         ImGui::Separator();
 

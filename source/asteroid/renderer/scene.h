@@ -12,6 +12,7 @@ struct Scene;
 
 struct SceneView
 {
+    BufferView<AreaLight> deviceAreaLights;
 
     BufferView<Geometry> deviceGeometries;
 
@@ -23,10 +24,13 @@ struct SceneView
 
 struct Scene
 {
+    std::vector<AreaLight> areaLights;
 
     std::vector<Geometry> geometries;
 
     std::vector<Material> materials;
+
+    DeviceBuffer<AreaLight> deviceAreaLights;
 
     DeviceBuffer<Geometry> deviceGeometries;
 
