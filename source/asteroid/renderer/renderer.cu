@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 #include "asteroid/util/macro.h"
-#include "asteroid/shader/pipeline/path_trace.h"
+#include "asteroid/shader/ray_trace/ray_generation.h"
 
 using namespace Asteroid;
 
@@ -13,7 +13,7 @@ void renderFrame(const SceneView& scene,
     dim3 block(8, 8, 1);
     dim3 grid(state.size.x / block.x, state.size.y / block.y, 1);
 
-    renderFrameKernel<<<grid, block>>>(scene, camera, state, image);
+    rayGeneration<<<grid, block>>>(scene, camera, state, image);
 }
 
 Renderer::Renderer() {

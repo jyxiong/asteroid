@@ -5,6 +5,7 @@
 #include "asteroid/renderer/scene_struct.h"
 #include "asteroid/shader/struct.h"
 #include "asteroid/shader/sampling.h"
+#include "asteroid/shader/ray_trace/trace_ray.h"
 
 namespace Asteroid
 {
@@ -28,13 +29,14 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Intersecti
     shadowRay.origin = its.position + its.normal * 0.0001f;
     shadowRay.direction = lightDir;
     // TODO: any hit test
-    if (anyHit(scene, shadowRay))
+    Intersection shadowIts{};
+    if (traceRay(scene, shadowRay, shadowIts))
     {
         return glm::vec3(0);
     }
 
 
-    return color;
+    return { };
 }
 
 } // namespace Asteroid

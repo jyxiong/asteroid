@@ -5,28 +5,19 @@
 
 #include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
-#include "asteroid/shader/pipeline/trace_ray.h"
 #include "asteroid/shader/random.h"
+#include "asteroid/shader/struct.h"
+#include "asteroid/shader/ray_trace/trace_ray.h"
+#include "asteroid/shader/ray_trace/closest_hit.h"
+#include "asteroid/shader/ray_trace/miss.h"
 
 namespace Asteroid
 {
 
-__device__ void traceRay(const SceneView& scene, PathSegment& path)
-{
-    Intersection its{};
-    if (intersect(scene, path.ray, its))
-    {
-        closestHit(scene, its, path);
-    } else
-    {
-        miss(scene, its, path);
-    }
-}
-
-__global__ void renderFrameKernel(const SceneView scene,
-                                  const Camera camera,
-                                  const RenderState state,
-                                  BufferView<glm::vec4> image)
+__global__ void rayGeneration(const SceneView scene,
+                              const Camera camera,
+                              const RenderState state,
+                              BufferView<glm::vec4> image)
 {
     auto x = blockIdx.x * blockDim.x + threadIdx.x;
     auto y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -39,7 +30,7 @@ __global__ void renderFrameKernel(const SceneView scene,
     auto pixelIndex = y * viewport.x + x;
 
     auto rng = LCG<16>(pixelIndex, state.frame);
-    
+
     auto uv = (glm::vec2(x, y) + rng.rand2()) * 2.f / glm::vec2(state.size) - 1.f;
     auto offsetX = uv.x * camera.tanHalfFov * camera.aspectRatio * camera.right;
     auto offsetY = uv.y * camera.tanHalfFov * camera.up;
@@ -60,7 +51,14 @@ __global__ void renderFrameKernel(const SceneView scene,
 
         for (int depth = 0; depth < state.maxDepth; ++depth)
         {
-            traceRay(scene, path);
+            Intersection its{};
+            if (traceRay(scene, path.ray, its))
+            {
+                closestHit(scene, its, path);
+            } else
+            {
+                miss(scene, its, path);
+            }
 
             // TODO: if first bounce, store information for denoising
             if (depth == 0)

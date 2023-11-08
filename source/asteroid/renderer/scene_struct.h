@@ -115,6 +115,7 @@ struct AreaLight
         {
             area = glm::pi<float>() * scale.x * scale.x;
         }
-    };
+    }
 
+};
 } // namespace Asteroid
