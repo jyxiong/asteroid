@@ -27,8 +27,9 @@ The repository is named after the [Asteroid Day](https://www.asteroidday.org/)
 - volume
   - homogeneous
   - heterogeneous
-- real-time path tracing
-  - ...
+- pipeline
+  - software rasterize
+  - software raytrace
 - workflow: [ref1](https://blog.csdn.net/qq_16013649/article/details/113905995), [ref2](https://github.com/ptheywood/cuda-cmake-github-actions/issues/5)
 
 ## Reference
