@@ -5,6 +5,7 @@
 #include "asteroid/renderer/scene_struct.h"
 #include "asteroid/shader/struct.h"
 #include "asteroid/shader/sampling.h"
+#include "asteroid/shader/bsdf/lambert.h"
 #include "asteroid/shader/ray_trace/trace_ray.h"
 
 namespace Asteroid
@@ -35,8 +36,9 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Intersecti
         return glm::vec3(0);
     }
 
+    auto f = lambertEval(-its.normal, lightDir, its, mat);
 
-    return { };
+    return lightSample.emission * glm::dot(its.normal, lightDir) / lightSample.pdf;
 }
 
 } // namespace Asteroid
