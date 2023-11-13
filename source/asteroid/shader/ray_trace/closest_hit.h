@@ -7,7 +7,7 @@
 
 namespace Asteroid
 {
-
+// TODO: trace ray and get closest hit
 __device__ void closestHit(const SceneView& scene, const Intersection& its, PathSegment& path)
 {
     auto& material = scene.deviceMaterials[its.materialIndex];

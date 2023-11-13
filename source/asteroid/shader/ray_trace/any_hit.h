@@ -6,7 +6,8 @@
 namespace Asteroid
 {
 
-[[maybe_unused]] [[maybe_unused]] __device__ void anyHit()
+// TODO: trace ray and process any hit
+__device__ void anyHit()
 {
 
 }
