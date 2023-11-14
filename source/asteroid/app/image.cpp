@@ -39,7 +39,7 @@ void Image::setData(const void* data)
     cudaGraphicsUnmapResources(1, &m_resource);
 }
 
-void Image::resize(const glm::ivec2& size)
+void Image::onResize(const glm::ivec2& size)
 {
     if (m_size == size)
     {

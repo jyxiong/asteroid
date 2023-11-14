@@ -12,17 +12,17 @@ class Image
 public:
     Image();
 
-    Image(const glm::ivec2& size);
+    explicit Image(const glm::ivec2& size);
 
     ~Image();
 
     void setData(const void* data);
 
-    void resize(const glm::ivec2& size);
+    void onResize(const glm::ivec2& size);
 
-    int width() const { return m_size.x; }
-    int height() const { return m_size.y; }
-    unsigned int rendererID() const { return m_rendererID; }
+    [[nodiscard]] int width() const { return m_size.x; }
+    [[nodiscard]] int height() const { return m_size.y; }
+    [[nodiscard]] unsigned int rendererID() const { return m_rendererID; }
 
 private:
     void allocate();
@@ -34,6 +34,6 @@ private:
 
     unsigned int m_rendererID{};
 
-    cudaGraphicsResource_t m_resource;
+    cudaGraphicsResource_t m_resource{};
 };
 }

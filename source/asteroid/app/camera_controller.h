@@ -18,7 +18,7 @@ public:
 
     bool OnUpdate(float ts);
 
-    void OnResize(const glm::ivec2& viewport);
+    void onResize(const glm::ivec2& viewport);
 
 private:
     Camera m_camera;

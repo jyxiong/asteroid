@@ -5,13 +5,24 @@
 
 using namespace Asteroid;
 
+void renderFrame(const SceneView& scene,
+                 const Camera& camera,
+                 const RenderState& state,
+                 BufferView<glm::vec4> image)
+{
+    dim3 block(8, 8, 1);
+    dim3 grid(state.size.x / block.x, state.size.y / block.y, 1);
+
+    renderFrameKernel<<<grid, block>>>(scene, camera, state, image);
+}
+
 Renderer::Renderer() {
     m_finalImage = std::make_shared<Image>();
 }
 
 void Renderer::onResize(const glm::ivec2& size)
 {
-    m_finalImage->resize(size);
+    m_finalImage->onResize(size);
     m_state.size = size;
     m_imageData.resize(size.x * size.y);
 

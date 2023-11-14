@@ -36,7 +36,7 @@ struct Scene
 
     DeviceBuffer<Material> deviceMaterials;
 
-    void UpdateDevice();
+    void updateDevice();
 
 };
 

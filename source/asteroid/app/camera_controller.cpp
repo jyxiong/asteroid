@@ -28,7 +28,7 @@ bool CameraController::OnUpdate(float ts)
 
     bool moved = false;
 
-    constexpr glm::vec3 upDirection(0.0f, 1.0f, 0.0f);
+    glm::vec3 upDirection(0.0f, 1.0f, 0.0f);
     glm::vec3 rightDirection = glm::cross(m_camera.direction, upDirection);
 
     // Movement
@@ -83,7 +83,7 @@ bool CameraController::OnUpdate(float ts)
     return moved;
 }
 
-void CameraController::OnResize(const glm::ivec2& viewport)
+void CameraController::onResize(const glm::ivec2& viewport)
 {
     m_camera.aspectRatio = (float) viewport.x / (float) viewport.y;
 }

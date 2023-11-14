@@ -9,7 +9,7 @@ SceneView::SceneView(const Scene& scene)
 {
 }
 
-void Scene::UpdateDevice()
+void Scene::updateDevice()
 {
     deviceAreaLights.upload(areaLights);
 

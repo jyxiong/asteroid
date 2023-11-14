@@ -24,21 +24,21 @@ public:
     void OnImGuiRender() override;
 
 private:
-    void Render();
+    void render();
 
 private:
-    Renderer m_Renderer;
+    Renderer m_renderer;
 
-    CameraController m_CameraController;
+    CameraController m_cameraController;
 
-    Scene m_Scene;
+    Scene m_scene;
 
     glm::ivec2 m_viewport{};
 
     bool m_modified = false;
     bool m_resized = false;
 
-    float m_LastRenderTime = 0.0f;
+    float m_lastRenderTime = 0.0f;
 };
 
 }
