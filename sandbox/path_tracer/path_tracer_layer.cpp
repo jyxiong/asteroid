@@ -58,16 +58,12 @@ PathTracerLayer::PathTracerLayer() : Layer("Example")
         geometry.updateTransform();
         geometry.materialIndex = 1;
         m_scene.geometries.push_back(geometry);
-    }
 
-    {
         AreaLight light;
-        light.type = LightType::Square;
-        light.emission = { 1.0f, 1.0f, 1.0f };
-        light.translation = { 2.0f, 2.0f, 2.0f };
-        light.update();
+        light.geometry_id = m_scene.geometries.size() - 1;
         m_scene.areaLights.push_back(light);
     }
+
     m_modified = true;
 }
 
@@ -126,15 +122,10 @@ void PathTracerLayer::OnImGuiRender()
     {
         ImGui::PushID(static_cast<int>(i));
 
-        AreaLight& light = m_scene.areaLights[i];
+        auto& light = m_scene.areaLights[i];
 
-        m_modified |= ImGui::DragInt("type", reinterpret_cast<int*>(&light.type), 1, 0, 2);
+        m_modified |= ImGui::Checkbox("enabled", &light.enabled);
         m_modified |= ImGui::Checkbox("two sided", &light.twoSided);
-
-        m_modified |= ImGui::DragFloat3("translation", glm::value_ptr(light.translation), 0.1f);
-        m_modified |= ImGui::DragFloat3("rotation", glm::value_ptr(light.rotation), 0.1f);
-        m_modified |= ImGui::DragFloat3("scale", glm::value_ptr(light.scale), 0.1f);
-        m_modified |= ImGui::DragFloat3("emission", glm::value_ptr(light.emission), 0.1f);
 
         ImGui::Separator();
 

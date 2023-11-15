@@ -43,10 +43,12 @@ struct Material
 
 enum class GeometryType
 {
+    Disk,
+    Square, // -1 < x < 1, -1 < y < 1, z = 0
     Sphere, // x*x + y*y + z*z = 1
     Cube,   // -1 < x < 1, -1 < y < 1, -1 < z < 1
-    Square, // -1 < x < 1, -1 < y < 1, z = 0
-    AABB, Mesh
+    AABB,
+    Mesh
 };
 
 struct Geometry
@@ -73,49 +75,11 @@ struct Geometry
     }
 };
 
-enum class LightType
-{
-    Square, // -1 < x < 1, -1 < y < 1, z = 0
-    Sphere, // x*x + y*y + z*z = 1
-    Disk,   // x*x + y*y = 1, z = 0
-};
-
 struct AreaLight
 {
-    LightType type;
-    glm::vec3 emission{ 1.0f };
-    float area;
+    bool enabled{ false };
     bool twoSided{ false };
-
-    glm::vec3 translation{ 0 };
-    glm::vec3 rotation{ 0 };
-    glm::vec3 scale{ 1 };
-    glm::mat4 transform;
-    glm::mat4 inverseTransform;
-    glm::mat4 inverseTranspose;
-
-    void update()
-    {
-        transform = glm::translate(glm::mat4(1.0f), translation)
-            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), glm::vec3(1, 0, 0))
-            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0, 1, 0))
-            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0, 0, 1))
-            * glm::scale(glm::mat4(1.0f), scale);
-
-        inverseTransform = glm::inverse(transform);
-        inverseTranspose = glm::transpose(glm::inverse(transform));
-
-        if (type == LightType::Square)
-        {
-            area = 4 * scale.x * scale.y;
-        } else if (type == LightType::Sphere)
-        {
-            area = 4 * glm::pi<float>() * scale.x * scale.x;
-        } else if (type == LightType::Disk)
-        {
-            area = glm::pi<float>() * scale.x * scale.x;
-        }
-    }
-
+    size_t geometry_id{};
 };
+
 } // namespace Asteroid

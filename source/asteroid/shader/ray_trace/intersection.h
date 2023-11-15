@@ -129,4 +129,12 @@ inline __device__ bool intersectCube(const Geometry& geometry, const Ray& r, Int
     return true;
 }
 
+inline __device__ bool intersectSquare(const Geometry& geometry, const Ray& r, Intersection& its)
+{
+    auto origin = glm::vec3(geometry.inverseTransform * glm::vec4(r.origin, 1.0f));
+    auto direction = glm::vec3(geometry.inverseTransform * glm::vec4(r.direction, 0.0f));
+
+    return true;
+}
+
 } // namespace Asteroid
