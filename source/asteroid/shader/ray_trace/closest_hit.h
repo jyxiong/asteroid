@@ -13,7 +13,15 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
     auto& material = scene.deviceMaterials[its.materialIndex];
 
     // emission
-    path.radiance += material.emission * path.throughput;
+    if (material.emission.x > 0.f || material.emission.y > 0.f || material.emission.z > 0.f)
+    {
+        if (path.depth == 0)
+        {
+            path.radiance += material.emission * path.throughput;
+        }
+        path.stop = true;
+        return;
+    }
 
     // direct light
     path.radiance += directLight(scene, its, material, path.rng) * path.throughput;

@@ -10,6 +10,7 @@ namespace Asteroid
 __device__ void miss(const SceneView& scene, const Intersection& its, PathSegment& path)
 {
     // TODO: environment light
+//    path.radiance = glm::vec3(1, 0, 0);
     path.stop = true;
 }
 

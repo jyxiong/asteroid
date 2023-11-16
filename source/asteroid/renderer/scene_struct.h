@@ -79,7 +79,7 @@ struct AreaLight
 {
     bool enabled{ false };
     bool twoSided{ false };
-    size_t geometry_id{};
+    size_t geometryId{};
 };
 
 } // namespace Asteroid

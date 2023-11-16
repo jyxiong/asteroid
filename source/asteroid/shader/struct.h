@@ -15,6 +15,7 @@ struct Ray
 
 struct PathSegment
 {
+    int depth;
     Ray ray;
     glm::vec3 radiance;
     glm::vec3 throughput;
@@ -29,6 +30,7 @@ struct Intersection
     bool front_face;
     glm::vec3 position;
     int materialIndex;
+    int geometryIndex;
 };
 
 struct LightSample

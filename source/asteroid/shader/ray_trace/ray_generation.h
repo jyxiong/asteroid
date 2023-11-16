@@ -42,9 +42,10 @@ __device__ glm::vec3 rayGeneration(const SceneView scene,
         path.ray.origin = origin;
         path.stop = false;
         path.rng = rng;
+        path.depth = 0;
 
         // trace depth
-        for (int depth = 0; depth < state.maxDepth; ++depth)
+        while (path.depth < state.maxDepth)
         {
             Intersection its{};
             if (traceRay(scene, path.ray, its))
@@ -56,7 +57,7 @@ __device__ glm::vec3 rayGeneration(const SceneView scene,
             }
 
             // TODO: if first bounce, store information for denoising
-            if (depth == 0)
+            if (path.depth == 0)
             {
 
             }
@@ -65,6 +66,8 @@ __device__ glm::vec3 rayGeneration(const SceneView scene,
             {
                 break;
             }
+
+            path.depth++;
         }
 
         pixelColor += path.radiance;

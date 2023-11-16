@@ -10,7 +10,7 @@ namespace Asteroid
 __device__ bool traversal(const SceneView& scene, const Ray& ray, Intersection& its)
 {
     auto t = std::numeric_limits<float>::max();
-    int geometryID = -1;
+    its.geometryIndex = -1;
 
     for (size_t i = 0; i < scene.deviceGeometries.size(); ++i)
     {
@@ -33,7 +33,7 @@ __device__ bool traversal(const SceneView& scene, const Ray& ray, Intersection& 
         if (its.t < t && its.t > 0)
         {
             t = its.t;
-            geometryID = static_cast<int>(i);
+            its.geometryIndex = static_cast<int>(i);
 
             // TODO: any hit test
             anyHit();
@@ -41,7 +41,7 @@ __device__ bool traversal(const SceneView& scene, const Ray& ray, Intersection& 
 
     }
 
-    return geometryID >= 0;
+    return its.geometryIndex >= 0;
 }
 
 } // namespace Asteroid

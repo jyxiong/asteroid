@@ -26,6 +26,7 @@ PathTracerLayer::PathTracerLayer() : Layer("Example")
     {
         Geometry geometry;
         geometry.type = GeometryType::Sphere;
+        geometry.translation = { -1.0f, 0.0f, 0.0f };
         geometry.materialIndex = 0;
         geometry.updateTransform();
         m_scene.geometries.push_back(geometry);
@@ -34,10 +35,14 @@ PathTracerLayer::PathTracerLayer() : Layer("Example")
     {
         Geometry geometry;
         geometry.type = GeometryType::Sphere;
-        geometry.translation = { 2.0f, 0.0f, 0.0f };
+        geometry.translation = { 1.0f, 0.0f, 0.0f };
         geometry.updateTransform();
         geometry.materialIndex = 2;
         m_scene.geometries.push_back(geometry);
+
+        AreaLight light;
+        light.geometryId = m_scene.geometries.size() - 1;
+        m_scene.areaLights.push_back(light);
     }
 
     {
@@ -48,20 +53,6 @@ PathTracerLayer::PathTracerLayer() : Layer("Example")
         geometry.updateTransform();
         geometry.materialIndex = 1;
         m_scene.geometries.push_back(geometry);
-    }
-
-    {
-        Geometry geometry;
-        geometry.type = GeometryType::Cube;
-        geometry.translation = { -1.0f, 1.0f, 0.0f };
-        geometry.scale = { 0.5f, 0.5f, 0.5f };
-        geometry.updateTransform();
-        geometry.materialIndex = 1;
-        m_scene.geometries.push_back(geometry);
-
-        AreaLight light;
-        light.geometry_id = m_scene.geometries.size() - 1;
-        m_scene.areaLights.push_back(light);
     }
 
     m_modified = true;
@@ -131,6 +122,16 @@ void PathTracerLayer::OnImGuiRender()
 
         ImGui::PopID();
     }
+
+    ImGui::End();
+
+    ImGui::Begin("Camera");
+
+    auto& camera = m_cameraController.GetCamera();
+    m_modified |= ImGui::DragFloat3("translation", glm::value_ptr(camera.position), 0.1f);
+    m_modified |= ImGui::DragFloat3("direction", glm::value_ptr(camera.direction), 0.1f);
+    m_modified |= ImGui::DragFloat3("up", glm::value_ptr(camera.up), 0.1f);
+    m_modified |= ImGui::DragFloat("fov", &camera.verticalFov, 0.1f, 0.0f, 180.0f);
 
     ImGui::End();
 

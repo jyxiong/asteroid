@@ -47,9 +47,7 @@ inline __device__ bool intersectSphere(const Geometry& geometry, const Ray& r, I
 
     auto position = origin + t * direction;
 
-    auto outward_normal = glm::normalize(glm::vec3(geometry.inverseTranspose * glm::vec4(position, 0.0f)));
-    its.front_face = glm::dot(direction, outward_normal) < 0.0f;
-    its.normal = its.front_face ? outward_normal : -outward_normal;
+    its.normal = glm::normalize(glm::vec3(geometry.inverseTranspose * glm::vec4(position, 0.0f)));
 
     its.position = glm::vec3(geometry.transform * glm::vec4(position, 1.0f));
     its.t = glm::distance(r.origin, its.position);
