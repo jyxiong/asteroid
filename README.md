@@ -20,7 +20,7 @@ The repository is named after the [Asteroid Day](https://www.asteroidday.org/)
   - glass
   - metal
   - [x] diffuse
-  - microfacet
+  - micro-facet
   - disney
 - importance sampling
   - multiple importance sampling
@@ -28,8 +28,8 @@ The repository is named after the [Asteroid Day](https://www.asteroidday.org/)
   - homogeneous
   - heterogeneous
 - pipeline
-  - software rasterize
-  - software raytrace
+  - software rasterizer
+  - software raytracer
 - workflow: [ref1](https://blog.csdn.net/qq_16013649/article/details/113905995), [ref2](https://github.com/ptheywood/cuda-cmake-github-actions/issues/5)
 
 ## Reference

@@ -9,34 +9,35 @@ namespace Asteroid
 {
 __device__ bool traversal(const SceneView& scene, const Ray& ray, Intersection& its)
 {
-    auto t = std::numeric_limits<float>::max();
+    its.t = std::numeric_limits<float>::max();
     its.geometryIndex = -1;
 
+    Intersection itsTemp{};
     for (size_t i = 0; i < scene.deviceGeometries.size(); ++i)
     {
         const auto& geometry = scene.deviceGeometries[i];
 
         if (geometry.type == GeometryType::Sphere)
         {
-            if (!intersectSphere(geometry, ray, its))
+            if (!intersectSphere(geometry, ray, itsTemp))
             {
                 continue;
             }
         } else if (geometry.type == GeometryType::Cube)
         {
-            if (!intersectCube(geometry, ray, its))
+            if (!intersectCube(geometry, ray, itsTemp))
             {
                 continue;
             }
         }
 
-        if (its.t < t && its.t > 0)
+        if (itsTemp.t < its.t && itsTemp.t > 0)
         {
-            t = its.t;
+            its.t = itsTemp.t;
+            its.normal = itsTemp.normal;
+            its.position = itsTemp.position;
             its.geometryIndex = static_cast<int>(i);
-
-            // TODO: any hit test
-            anyHit();
+            its.materialIndex = geometry.materialIndex;
         }
 
     }

@@ -77,9 +77,9 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::Text("Current frame: %d", m_renderer.getRenderState().frame);
 
     m_modified |=
-        ImGui::DragInt("Trace depth: %d", reinterpret_cast<int*>(&m_renderer.getRenderState().maxDepth), 1, 1, 100);
+        ImGui::DragInt("Trace depth: ", reinterpret_cast<int*>(&m_renderer.getRenderState().maxDepth), 1, 1, 100);
 
-    m_modified |= ImGui::DragInt("Samples per pixel: %d",
+    m_modified |= ImGui::DragInt("Samples per pixel: ",
                                  reinterpret_cast<int*>(&m_renderer.getRenderState().maxSamples),
                                  1,
                                  1,

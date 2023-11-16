@@ -52,8 +52,6 @@ inline __device__ bool intersectSphere(const Geometry& geometry, const Ray& r, I
     its.position = glm::vec3(geometry.transform * glm::vec4(position, 1.0f));
     its.t = glm::distance(r.origin, its.position);
 
-    its.materialIndex = geometry.materialIndex;
-
     return true;
 }
 

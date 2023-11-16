@@ -10,7 +10,7 @@ void renderFrame(const SceneView& scene,
                  const RenderState& state,
                  BufferView<glm::vec4> image)
 {
-    dim3 block(8, 8, 1);
+    dim3 block(16, 16, 1);
     dim3 grid(state.size.x / block.x, state.size.y / block.y, 1);
 
     renderFrameKernel<<<grid, block>>>(scene, camera, state, image);
