@@ -57,7 +57,7 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Intersecti
         }
     }
 
-    auto f = lambertEval(-its.normal, lightDir, its, mat);
+    auto f = evalLambert(-its.normal, lightDir, its, mat);
 
     return lightSample.emission * glm::dot(its.normal, lightDir) * f / lightSample.pdf;
 }

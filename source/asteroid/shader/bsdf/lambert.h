@@ -10,7 +10,7 @@
 namespace Asteroid
 {
 
-__device__ glm::vec3 lambertEval(const glm::vec3& v, const glm::vec3& l, const Intersection& its, const Material& mtl)
+__device__ glm::vec3 evalLambert(const glm::vec3& v, const glm::vec3& l, const Intersection& its, const Material& mtl)
 {
     return mtl.albedo / glm::pi<float>();
 }
@@ -20,11 +20,11 @@ __device__ float pdf(const glm::vec3& v, const glm::vec3& l, const Intersection&
 
 }
 
-__device__ void lambertSample(const glm::vec3& v,
-                                   const Intersection& its,
-                                   const Material& mtl,
-                                   LCG<16>& rng,
-                                   BsdfSample& bsdfSample)
+__device__ void sampleLambert(const glm::vec3& v,
+                              const Intersection& its,
+                              const Material& mtl,
+                              LCG<16>& rng,
+                              BsdfSample& bsdfSample)
 {
     auto l = cosineSampleSemiSphere(rng);
     auto transform = onb(its.normal);
@@ -32,8 +32,7 @@ __device__ void lambertSample(const glm::vec3& v,
 
     bsdfSample.pdf = glm::dot(bsdfSample.l, its.normal) / glm::pi<float>();
 
-    bsdfSample.f = lambertEval(v, bsdfSample.l, its, mtl);
-
+    bsdfSample.f = evalLambert(v, bsdfSample.l, its, mtl);
 }
 
 }

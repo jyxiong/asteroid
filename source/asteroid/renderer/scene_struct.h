@@ -32,8 +32,17 @@ struct Camera
     glm::vec2 lastMousePosition{ 0.0f, 0.0f };
 };
 
+enum class MaterialType
+{
+    Lambert,
+    Metal,
+    Dielectric,
+    Emission
+};
+
 struct Material
 {
+    MaterialType type{};
     glm::vec3 albedo{ 1.0f };
     glm::vec3 emission{ 0.0f };
 

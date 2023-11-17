@@ -28,7 +28,10 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
 
     // indirect light
     BsdfSample bsdfSample{};
-    lambertSample(-path.ray.direction, its, material, path.rng, bsdfSample);
+    if (material.type == MaterialType::Lambert)
+    {
+        sampleLambert(-path.ray.direction, its, material, path.rng, bsdfSample);
+    }
 
     if (bsdfSample.pdf < 0.f)
     {
