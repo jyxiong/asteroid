@@ -6,6 +6,7 @@
 #include "asteroid/shader/struct.h"
 #include "asteroid/shader/sampling.h"
 #include "asteroid/shader/bsdf/lambert.h"
+#include "asteroid/shader/bsdf/gltf.h"
 #include "asteroid/shader/ray_trace/trace_ray.h"
 
 namespace Asteroid
@@ -15,7 +16,7 @@ __device__ inline void uniformSampleOneLight(const Geometry& geometry, const Mat
 {
     if (geometry.type == GeometryType::Sphere)
     {
-        auto point = uniformSampleSphere(geometry, rng);
+        auto point = uniformSampleSphere(rng);
         lightSample.position = glm::vec3(geometry.transform * glm::vec4(point, 1.f));
         lightSample.normal = glm::normalize(glm::vec3(geometry.transform * glm::vec4(point, 0.f)));
         lightSample.emission = material.emission;
@@ -26,7 +27,7 @@ __device__ inline void uniformSampleOneLight(const Geometry& geometry, const Mat
     }
 }
 
-__device__ inline glm::vec3 directLight(const SceneView& scene, const Intersection& its, const Material& mat, LCG<16>& rng)
+__device__ inline glm::vec3 directLight(const SceneView& scene, const Ray& ray, const Intersection& its, const Material& mat, LCG<16>& rng)
 {
     auto& lights = scene.deviceAreaLights;
     auto lightIndex = size_t(rng.rand1() * float(lights.size()));
@@ -57,7 +58,7 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Intersecti
         }
     }
 
-    auto f = evalLambert(-its.normal, lightDir, its, mat);
+    auto f = evalGltf(-ray.direction, lightDir, its, mat);
 
     return lightSample.emission * glm::dot(its.normal, lightDir) * f / lightSample.pdf;
 }

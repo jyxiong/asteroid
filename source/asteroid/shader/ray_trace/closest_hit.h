@@ -24,7 +24,7 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
     }
 
     // direct light
-    path.radiance += directLight(scene, its, material, path.rng) * path.throughput;
+    path.radiance += directLight(scene, path.ray, its, material, path.rng) * path.throughput;
 
     // indirect light
     BsdfSample bsdfSample{};

@@ -15,11 +15,6 @@ __device__ glm::vec3 evalLambert(const glm::vec3& v, const glm::vec3& l, const I
     return mtl.albedo / glm::pi<float>();
 }
 
-__device__ float pdf(const glm::vec3& v, const glm::vec3& l, const Intersection& intersect, const Material& mtl)
-{
-
-}
-
 __device__ void sampleLambert(const glm::vec3& v,
                               const Intersection& its,
                               const Material& mtl,
