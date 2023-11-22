@@ -12,7 +12,7 @@ namespace Asteroid
 
 __device__ glm::vec3 evalLambert(const glm::vec3& v, const glm::vec3& l, const Intersection& its, const Material& mtl)
 {
-    return mtl.albedo / glm::pi<float>();
+    return mtl.baseColor / glm::pi<float>();
 }
 
 __device__ void sampleLambert(const glm::vec3& v,

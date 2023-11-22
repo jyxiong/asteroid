@@ -43,7 +43,7 @@ enum class MaterialType
 struct Material
 {
     MaterialType type{};
-    glm::vec3 albedo{ 1.0f };
+    glm::vec3 baseColor{1.0f };
     glm::vec3 emission{ 0.0f };
 
     float roughness = 1.0f;

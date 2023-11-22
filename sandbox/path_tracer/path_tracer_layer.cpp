@@ -11,15 +11,15 @@ PathTracerLayer::PathTracerLayer() : Layer("Example")
 {
 
     Material& pinkGeometry = m_scene.materials.emplace_back();
-    pinkGeometry.albedo = { 1.0f, 0.0f, 1.0f };
+    pinkGeometry.baseColor = {1.0f, 0.0f, 1.0f };
     pinkGeometry.roughness = 0.0f;
 
     Material& blueGeometry = m_scene.materials.emplace_back();
-    blueGeometry.albedo = { 0.2f, 0.3f, 1.0f };
+    blueGeometry.baseColor = {0.2f, 0.3f, 1.0f };
     blueGeometry.roughness = 0.1f;
 
     Material& orangeGeometry = m_scene.materials.emplace_back();
-    orangeGeometry.albedo = { 0.8f, 0.5f, 0.2f };
+    orangeGeometry.baseColor = {0.8f, 0.5f, 0.2f };
     orangeGeometry.roughness = 0.1f;
     orangeGeometry.emission = glm::vec3(1);
 
@@ -143,7 +143,7 @@ void PathTracerLayer::OnImGuiRender()
 
         Material& material = m_scene.materials[i];
 
-        m_modified |= ImGui::ColorEdit3("albedo", glm::value_ptr(material.albedo));
+        m_modified |= ImGui::ColorEdit3("baseColor", glm::value_ptr(material.baseColor));
         m_modified |= ImGui::DragFloat("roughness", &material.roughness, 0.01f, 0.0f, 1.0f);
         m_modified |= ImGui::DragFloat("metallic", &material.metallic, 0.01f, 0.0f, 1.0f);
         m_modified |= ImGui::DragFloat3("emission", glm::value_ptr(material.emission), 0.05f, 0.0f, FLT_MAX);
