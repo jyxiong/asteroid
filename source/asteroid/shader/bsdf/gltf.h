@@ -32,10 +32,10 @@ __device__ float D_GGX(float NdotH, float alpha)
     return alpha2 / (glm::pi<float>() * f * f);
 }
 
-__device__ glm::vec3 evalGltf(const glm::vec3& v,
-                              const glm::vec3& l,
-                              const Intersection& its,
-                              const Material& mat)
+__device__ void evalGltf(const glm::vec3& v,
+                         const Intersection& its,
+                         const Material& mat,
+                         BsdfSample& bsdfSample)
 {
     auto alpha = mat.roughness * mat.roughness;
     auto f0 = glm::mix(glm::vec3(0.04f), mat.baseColor, mat.metallic);
@@ -43,9 +43,9 @@ __device__ glm::vec3 evalGltf(const glm::vec3& v,
 
     auto diffuseColor = glm::mix(mat.baseColor, glm::vec3(0), mat.metallic);
 
-    auto h = glm::normalize(v + l);
+    auto h = glm::normalize(v + bsdfSample.l);
 
-    auto NdotL = glm::clamp(glm::dot(its.normal, l), 0.f, 1.f);
+    auto NdotL = glm::clamp(glm::dot(its.normal, bsdfSample.l), 0.f, 1.f);
     auto NdotV = glm::clamp(glm::dot(its.normal, v), 0.f, 1.f);
     auto NdotH = glm::clamp(glm::dot(its.normal, h), 0.f, 1.f);
     auto VdotH = glm::clamp(glm::dot(v, h), 0.f, 1.f);
@@ -57,7 +57,13 @@ __device__ glm::vec3 evalGltf(const glm::vec3& v,
     auto diffuse = (1.f - F) * diffuseColor / glm::pi<float>();
     auto specular = F * V * D;
 
-    return diffuse + specular;
+    bsdfSample.f = diffuse + specular;
+
+    auto diffuseRatio = 0.5f * (1.f - mat.metallic);
+    auto diffusePdf = NdotL / glm::pi<float>();
+    auto specularPdf = D * NdotH / (4.f * VdotH);
+
+    bsdfSample.pdf = glm::mix(specularPdf, diffusePdf, diffuseRatio);
 }
 
 __device__ void sampleGltf(const glm::vec3& v,
@@ -82,7 +88,7 @@ __device__ void sampleGltf(const glm::vec3& v,
 
     auto transform = onb(its.normal);
     bsdfSample.l = glm::normalize(transform * bsdfSample.l);
-    bsdfSample.f = evalGltf(v, bsdfSample.l, its, mtl);
+    evalGltf(v, its, mtl, bsdfSample);
 }
 
 } // namespace Asteroid

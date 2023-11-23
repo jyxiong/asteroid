@@ -46,4 +46,10 @@ __device__ inline glm::vec3 ggxSampleSemiSphere(float roughness, LCG<16>& rng)
     return {sinTheta * glm::cos(phi), sinTheta * glm::sin(phi), cosTheta};
 }
 
+__device__ inline float powerHeuristic(float a, float b)
+{
+    auto t = a * a;
+    return t / (b * b + t);
+}
+
 } // namespace Asteroid
