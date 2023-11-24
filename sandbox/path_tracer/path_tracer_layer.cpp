@@ -9,51 +9,49 @@ using namespace Asteroid;
 
 PathTracerLayer::PathTracerLayer() : Layer("Example")
 {
+    for (int i = 0; i <= 10; ++i) {
+        for (int j = 0; j <= 10; ++j) {
+            auto& material = m_scene.materials.emplace_back();
+            material.baseColor = {1.f, 0.f, 0.f};
+            material.roughness = float(i) / 10.f;
+            material.metallic = float(j) / 10.f;
 
-    Material& pinkGeometry = m_scene.materials.emplace_back();
-    pinkGeometry.baseColor = {1.0f, 0.0f, 1.0f };
-    pinkGeometry.roughness = 0.0f;
+            Geometry geometry;
+            geometry.type = GeometryType::Sphere;
+            geometry.translation = {float(i) * 3.f - 15.f, float(j) * 3.f - 15.f, 0.0f};
+            geometry.materialIndex = i * 11 + j;
+            geometry.updateTransform();
 
-    Material& blueGeometry = m_scene.materials.emplace_back();
-    blueGeometry.baseColor = {0.2f, 0.3f, 1.0f };
-    blueGeometry.roughness = 0.1f;
-
-    Material& orangeGeometry = m_scene.materials.emplace_back();
-    orangeGeometry.baseColor = {0.8f, 0.5f, 0.2f };
-    orangeGeometry.roughness = 0.1f;
-    orangeGeometry.emission = glm::vec3(1);
-
-    {
-        Geometry geometry;
-        geometry.type = GeometryType::Sphere;
-        geometry.translation = { -1.0f, 0.0f, 0.0f };
-        geometry.materialIndex = 0;
-        geometry.updateTransform();
-        m_scene.geometries.push_back(geometry);
+            m_scene.geometries.push_back(geometry);
+        }
     }
 
     {
+        auto& lightMat = m_scene.materials.emplace_back();
+        lightMat.emission = glm::vec3(1);
+
         Geometry geometry;
         geometry.type = GeometryType::Sphere;
-        geometry.translation = { 1.0f, 0.0f, 0.0f };
+        geometry.translation = {0.0f, 0.0f, 3.0f};
+        geometry.scale = {0.1, 0.1, 0.1};
         geometry.updateTransform();
-        geometry.materialIndex = 2;
+        geometry.materialIndex = int(m_scene.materials.size()) - 1;
         m_scene.geometries.push_back(geometry);
 
         AreaLight light;
         light.geometryId = m_scene.geometries.size() - 1;
         m_scene.areaLights.push_back(light);
     }
-
-    {
-        Geometry geometry;
-        geometry.type = GeometryType::Sphere;
-        geometry.translation = { 0.0f, -101.0f, 0.0f };
-        geometry.scale = { 100.0f, 100.0f, 100.0f };
-        geometry.updateTransform();
-        geometry.materialIndex = 1;
-        m_scene.geometries.push_back(geometry);
-    }
+//
+//    {
+//        Geometry geometry;
+//        geometry.type = GeometryType::Sphere;
+//        geometry.translation = {0.0f, -101.0f, 0.0f};
+//        geometry.scale = {100.0f, 100.0f, 100.0f};
+//        geometry.updateTransform();
+//        geometry.materialIndex = 1;
+//        m_scene.geometries.push_back(geometry);
+//    }
 
     m_modified = true;
 }
@@ -90,8 +88,7 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::End();
 
     ImGui::Begin("Scene");
-    for (size_t i = 0; i < m_scene.geometries.size(); i++)
-    {
+    for (size_t i = 0; i < m_scene.geometries.size(); i++) {
         ImGui::PushID(static_cast<int>(i));
 
         Geometry& geometry = m_scene.geometries[i];
@@ -109,8 +106,7 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::End();
 
     ImGui::Begin("Lights");
-    for (size_t i = 0; i < m_scene.areaLights.size(); i++)
-    {
+    for (size_t i = 0; i < m_scene.areaLights.size(); i++) {
         ImGui::PushID(static_cast<int>(i));
 
         auto& light = m_scene.areaLights[i];
@@ -137,8 +133,7 @@ void PathTracerLayer::OnImGuiRender()
 
     ImGui::Begin("Material");
 
-    for (size_t i = 0; i < m_scene.materials.size(); i++)
-    {
+    for (size_t i = 0; i < m_scene.materials.size(); i++) {
         ImGui::PushID(static_cast<int>(i));
 
         Material& material = m_scene.materials[i];
@@ -159,8 +154,7 @@ void PathTracerLayer::OnImGuiRender()
     ImGui::Begin("Viewport");
 
     glm::ivec2 viewport = glm::ivec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
-    if (viewport != m_viewport)
-    {
+    if (viewport != m_viewport) {
         m_viewport = viewport;
         m_resized = true;
     }
@@ -168,7 +162,7 @@ void PathTracerLayer::OnImGuiRender()
     auto image = m_renderer.getFinalImage();
     if (image)
         ImGui::Image((void*) (intptr_t) image->rendererID(),
-                     { (float) image->width(), (float) image->height() },
+                     {(float) image->width(), (float) image->height()},
                      ImVec2(0, 1),
                      ImVec2(1, 0));
 
@@ -182,8 +176,7 @@ void PathTracerLayer::render()
 {
     Timer timer;
 
-    if (m_modified)
-    {
+    if (m_modified) {
         m_scene.updateDevice();
 
         m_renderer.resetFrameIndex();
@@ -191,8 +184,7 @@ void PathTracerLayer::render()
         m_modified = false;
     }
 
-    if (m_resized)
-    {
+    if (m_resized) {
         m_cameraController.onResize(m_viewport);
         m_renderer.onResize(m_viewport);
 

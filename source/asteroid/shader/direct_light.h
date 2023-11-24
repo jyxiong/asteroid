@@ -42,7 +42,7 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Ray& ray, 
     // 光源必须正对着色点
     if (glm::dot(its.normal, lightSample.normal) > 0.0f)
     {
-        return glm::vec3(0);
+//        return glm::vec3(0);
     }
 
     Ray shadowRay{};
@@ -60,11 +60,15 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Ray& ray, 
 
     BsdfSample bsdfSample{};
     bsdfSample.l = lightDir;
-    evalGltf(-ray.direction, its, mat, bsdfSample);
+    evalGltf(-ray.direction, its.normal, mat, bsdfSample);
+    if (bsdfSample.pdf < 0.f)
+    {
+        return glm::vec3(0);
+    }
 
     auto misWeight = powerHeuristic(lightSample.pdf, bsdfSample.pdf);
 
-    return misWeight * lightSample.emission * glm::dot(its.normal, lightDir) * bsdfSample.f / lightSample.pdf;
+    return lightSample.emission * glm::dot(its.normal, lightDir) * bsdfSample.f / lightSample.pdf;
 }
 
 } // namespace Asteroid

@@ -33,7 +33,7 @@ __device__ float D_GGX(float NdotH, float alpha)
 }
 
 __device__ void evalGltf(const glm::vec3& v,
-                         const Intersection& its,
+                         const glm::vec3& n,
                          const Material& mat,
                          BsdfSample& bsdfSample)
 {
@@ -45,9 +45,17 @@ __device__ void evalGltf(const glm::vec3& v,
 
     auto h = glm::normalize(v + bsdfSample.l);
 
-    auto NdotL = glm::clamp(glm::dot(its.normal, bsdfSample.l), 0.f, 1.f);
-    auto NdotV = glm::clamp(glm::dot(its.normal, v), 0.f, 1.f);
-    auto NdotH = glm::clamp(glm::dot(its.normal, h), 0.f, 1.f);
+    auto NdotL = glm::dot(n, bsdfSample.l);
+    if (NdotL < 0.f) {
+        bsdfSample.pdf = 0.f;
+        bsdfSample.f = glm::vec3(0.f);
+        return;
+    }
+    NdotL = glm::clamp(NdotL, 0.001f, 1.f);
+    auto NdotV = glm::dot(n, v);
+    NdotV = glm::clamp(glm::abs(NdotV), 0.001f, 1.f);
+
+    auto NdotH = glm::clamp(glm::dot(n, h), 0.f, 1.f);
     auto VdotH = glm::clamp(glm::dot(v, h), 0.f, 1.f);
 
     auto F = F_Schlick(f0, f90, VdotH);
@@ -59,7 +67,7 @@ __device__ void evalGltf(const glm::vec3& v,
 
     bsdfSample.f = diffuse + specular;
 
-    auto diffuseRatio = 0.5f * (1.f - mat.metallic);
+    auto diffuseRatio = 0.f;//0.5f * (1.f - mat.metallic);
     auto diffusePdf = NdotL / glm::pi<float>();
     auto specularPdf = D * NdotH / (4.f * VdotH);
 
@@ -67,28 +75,24 @@ __device__ void evalGltf(const glm::vec3& v,
 }
 
 __device__ void sampleGltf(const glm::vec3& v,
-                           const Intersection& its,
+                           const glm::vec3& n,
                            const Material& mtl,
                            LCG<16>& rng,
                            BsdfSample& bsdfSample)
 {
-    auto diffuseRatio = 0.5f * (1.f - mtl.metallic);
+    auto transform = onb(n);
 
-    auto f0 = glm::mix(glm::vec3(0.04f), mtl.baseColor, mtl.metallic);
-
+    auto diffuseRatio = 0.f;//0.5f * (1.f - mtl.metallic);
     if (rng.rand1() < diffuseRatio) {
-        bsdfSample.l = cosineSampleSemiSphere(rng);
-        bsdfSample.pdf = glm::dot(bsdfSample.l, its.normal) / glm::pi<float>();
+        auto l = cosineSampleSemiSphere(rng);
+        bsdfSample.l = glm::normalize(transform * l);
     } else {
         auto h = ggxSampleSemiSphere(mtl.roughness, rng);
-        bsdfSample.l = glm::reflect(-v, h);
-        bsdfSample.pdf =
-            D_GGX(glm::dot(its.normal, h), mtl.roughness) * glm::dot(its.normal, h) / (4.f * glm::dot(v, h));
+        h = glm::normalize(transform * h);
+        bsdfSample.l = glm::normalize(glm::reflect(-v, h));
     }
 
-    auto transform = onb(its.normal);
-    bsdfSample.l = glm::normalize(transform * bsdfSample.l);
-    evalGltf(v, its, mtl, bsdfSample);
+    evalGltf(v, n, mtl, bsdfSample);
 }
 
 } // namespace Asteroid

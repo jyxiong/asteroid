@@ -13,12 +13,8 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
     auto& material = scene.deviceMaterials[its.materialIndex];
 
     // emission
-    if (material.emission.x > 0.f || material.emission.y > 0.f || material.emission.z > 0.f)
-    {
-        if (path.depth == 0)
-        {
-            path.radiance += material.emission * path.throughput;
-        }
+    if (material.emission.x > 0.f || material.emission.y > 0.f || material.emission.z > 0.f) {
+        path.radiance += material.emission * path.throughput;
         path.stop = true;
         return;
     }
@@ -28,13 +24,15 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
 
     // indirect light
     BsdfSample bsdfSample{};
-    if (material.type == MaterialType::Lambert)
-    {
-        sampleLambert(-path.ray.direction, its, material, path.rng, bsdfSample);
+    sampleGltf(-path.ray.direction, its.normal, material, path.rng, bsdfSample);
+
+    if (bsdfSample.pdf < 0.f) {
+        path.stop = true;
+        return;
     }
 
-    if (bsdfSample.pdf < 0.f)
-    {
+    auto NdotL = glm::dot(bsdfSample.l, its.normal);
+    if (NdotL < 0.f) {
         path.stop = true;
         return;
     }
