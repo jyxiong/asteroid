@@ -7,7 +7,7 @@
 #include "asteroid/renderer/scene_struct.h"
 #include "asteroid/shader/random.h"
 #include "asteroid/shader/struct.h"
-#include "asteroid/shader/ray_trace/ray_generation.h"
+#include "asteroid/shader/ray_trace/sample_pixel.h"
 
 namespace Asteroid
 {
@@ -25,9 +25,16 @@ __global__ void renderFrameKernel(const SceneView scene,
     if (x >= viewport.x && y >= viewport.y)
         return;
 
-    auto pixelColor = rayGeneration(scene, camera, state, {x, y});
-
     auto pixelIndex = y * viewport.x + x;
+    auto rng = LCG<16>(pixelIndex, state.frame * state.maxSamples);
+
+    // sample per pixel in one frame
+    auto pixelColor = glm::vec3(0);
+    for (int sample = 0; sample < state.maxSamples; ++sample) {
+        pixelColor += samplePixel(scene, camera, state, glm::ivec2(x, y), rng);
+    }
+    pixelColor /= float(state.maxSamples);
+
     auto oldColor = glm::vec3(image[pixelIndex]);
     auto newColor = glm::mix(oldColor, pixelColor, 1.f / float(state.frame + 1));
     // TODO: tone mapping

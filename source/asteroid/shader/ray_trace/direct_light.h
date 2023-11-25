@@ -2,12 +2,13 @@
 
 #include <cuda_runtime.h>
 #include "glm/glm.hpp"
+#include "asteroid/renderer/scene.h"
 #include "asteroid/renderer/scene_struct.h"
 #include "asteroid/shader/struct.h"
 #include "asteroid/shader/sampling.h"
 #include "asteroid/shader/bsdf/lambert.h"
 #include "asteroid/shader/bsdf/gltf.h"
-#include "asteroid/shader/ray_trace/trace_ray.h"
+#include "asteroid/shader/ray_trace/traversal.h"
 
 namespace Asteroid
 {
@@ -50,7 +51,7 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Ray& ray, 
     shadowRay.direction = lightDir;
     // TODO: any hit test
     Intersection shadowIts{};
-    if (traceRay(scene, shadowRay, shadowIts))
+    if (traversal(scene, shadowRay, shadowIts))
     {
         if (shadowIts.geometryIndex != geometryIndex)
         {

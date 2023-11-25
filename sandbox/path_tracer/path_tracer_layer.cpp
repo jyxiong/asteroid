@@ -32,7 +32,7 @@ PathTracerLayer::PathTracerLayer() : Layer("Example")
 
         Geometry geometry;
         geometry.type = GeometryType::Sphere;
-        geometry.translation = {0.0f, 0.0f, 3.0f};
+        geometry.translation = {0.0f, 0.0f, 30.0f};
         geometry.scale = {0.1, 0.1, 0.1};
         geometry.updateTransform();
         geometry.materialIndex = int(m_scene.materials.size()) - 1;

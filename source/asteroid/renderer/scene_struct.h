@@ -18,7 +18,7 @@ struct RenderState
 
 struct Camera
 {
-    glm::vec3 position{ 0, 0, 6 };
+    glm::vec3 position{ 0, 0, 60 };
     glm::vec3 direction{ 0, 0, -1 };
     glm::vec3 up{ 0, 1, 0 };
 

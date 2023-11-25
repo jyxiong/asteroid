@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 #include "asteroid/util/macro.h"
-#include "asteroid/shader/path_trace.h"
+#include "asteroid/shader/render.h"
 
 using namespace Asteroid;
 
