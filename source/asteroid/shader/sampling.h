@@ -13,9 +13,19 @@ __device__ inline glm::vec3 cosineSampleSemiSphere(LCG<16>& rng)
     auto sample = rng.rand2();
 
     auto r = sqrt(sample.x);
-    auto theta = 2 * glm::pi<float>() * sample.y;
+    auto phi = 2 * glm::pi<float>() * sample.y;
 
-    return {r * cos(theta), r * sin(theta), sqrt(1 - sample.x)};
+    return {r * cos(phi), r * sin(phi), sqrt(1 - sample.x)};
+}
+
+__device__ inline glm::vec3 uniformSampleSemiSphere(LCG<16>& rng)
+{
+    auto sample = rng.rand2();
+
+    auto r = sqrt(1 - sample.x * sample.x);
+    auto phi = 2 * glm::pi<float>() * sample.y;
+
+    return {r * cos(phi), r * sin(phi), sample.x};
 }
 
 __device__ inline glm::vec3 uniformSampleSquare(LCG<16>& rng)

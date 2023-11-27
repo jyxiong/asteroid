@@ -19,7 +19,7 @@ __device__ void sampleLambert(const glm::vec3& v,
                               const Intersection& its,
                               const Material& mtl,
                               LCG<16>& rng,
-                              BsdfSample& bsdfSample)
+                              ScatterSample& bsdfSample)
 {
     auto l = cosineSampleSemiSphere(rng);
     auto transform = onb(its.normal);

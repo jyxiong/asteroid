@@ -1,5 +1,6 @@
-#include "renderer.h"
+#include "asteroid/renderer/renderer.h"
 
+#include "stb_image_write.h"
 #include "asteroid/util/macro.h"
 #include "asteroid/shader/render.h"
 
@@ -44,4 +45,12 @@ void Renderer::render(const Scene& scene, const Camera& camera)
     m_finalImage->setData(m_imageData.data());
 
     m_state.frame++;
+}
+
+void Renderer::save(const std::filesystem::path& path)
+{
+    std::vector<glm::vec4> image(m_imageData.size());
+    m_imageData.download(image);
+
+    
 }

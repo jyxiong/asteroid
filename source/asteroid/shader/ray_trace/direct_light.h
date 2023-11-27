@@ -21,7 +21,8 @@ __device__ inline void uniformSampleOneLight(const Geometry& geometry, const Mat
         lightSample.position = glm::vec3(geometry.transform * glm::vec4(point, 1.f));
         lightSample.normal = glm::normalize(glm::vec3(geometry.transform * glm::vec4(point, 0.f)));
         lightSample.emission = material.emission;
-        lightSample.pdf = 1.f / (4.f * glm::pi<float>());
+        lightSample.pdf = 1.f / (4.f * glm::pi<float>() * geometry.scale.x * geometry.scale.x);
+        
     }
     else if (geometry.type == GeometryType::Cube)
     {
@@ -40,15 +41,16 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Ray& ray, 
     uniformSampleOneLight(lightGeometry, lightMaterial, rng, lightSample);
 
     auto lightDir = glm::normalize(lightSample.position - its.position);
-    // 光源必须正对着色点
-    if (glm::dot(its.normal, lightSample.normal) > 0.0f)
+
+    if (glm::dot(lightSample.normal, lightDir) > 0.0f)
     {
-//        return glm::vec3(0);
+        return glm::vec3(0);
     }
 
     Ray shadowRay{};
     shadowRay.origin = its.position + its.normal * 0.0001f;
     shadowRay.direction = lightDir;
+
     // TODO: any hit test
     Intersection shadowIts{};
     if (traversal(scene, shadowRay, shadowIts))
@@ -59,17 +61,17 @@ __device__ inline glm::vec3 directLight(const SceneView& scene, const Ray& ray, 
         }
     }
 
-    BsdfSample bsdfSample{};
-    bsdfSample.l = lightDir;
-    evalGltf(-ray.direction, its.normal, mat, bsdfSample);
-    if (bsdfSample.pdf < 0.f)
+    ScatterSample scatterSample{};
+    scatterSample.l = lightDir;
+    evalGltf(-ray.direction, its.normal, mat, scatterSample);
+    if (scatterSample.pdf < 0.f)
     {
         return glm::vec3(0);
     }
 
-    auto misWeight = powerHeuristic(lightSample.pdf, bsdfSample.pdf);
+    auto misWeight = powerHeuristic(lightSample.pdf, scatterSample.pdf);
 
-    return lightSample.emission * glm::dot(its.normal, lightDir) * bsdfSample.f / lightSample.pdf;
+    return misWeight * lightSample.emission * scatterSample.f / lightSample.pdf;
 }
 
 } // namespace Asteroid

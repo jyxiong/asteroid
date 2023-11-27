@@ -41,7 +41,7 @@ struct LightSample
     float pdf;
 };
 
-struct BsdfSample
+struct ScatterSample
 {
     glm::vec3 l;
     glm::vec3 f;

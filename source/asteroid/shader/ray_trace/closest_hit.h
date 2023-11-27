@@ -23,25 +23,25 @@ __device__ void closestHit(const SceneView& scene, const Intersection& its, Path
     path.radiance += directLight(scene, path.ray, its, material, path.rng) * path.throughput;
 
     // indirect light
-    BsdfSample bsdfSample{};
-    sampleGltf(-path.ray.direction, its.normal, material, path.rng, bsdfSample);
+    ScatterSample scatterSample{};
+    sampleGltf(-path.ray.direction, its.normal, material, path.rng, scatterSample);
 
-    if (bsdfSample.pdf < 0.f) {
+    if (scatterSample.pdf < 0.f) {
         path.stop = true;
         return;
     }
 
-    auto NdotL = glm::dot(bsdfSample.l, its.normal);
-    if (NdotL < 0.f) {
-        path.stop = true;
-        return;
-    }
+//    auto NdotL = glm::dot(scatterSample.l, its.normal);
+//    if (NdotL < 0.f) {
+//        path.stop = true;
+//        return;
+//    }
 
-    path.throughput *= bsdfSample.f * glm::dot(bsdfSample.l, its.normal) / bsdfSample.pdf;
+    path.throughput *= scatterSample.f / scatterSample.pdf;
 
     // next ray
     path.ray.origin = its.position + its.normal * 0.0001f;
-    path.ray.direction = bsdfSample.l;
+    path.ray.direction = scatterSample.l;
 
     // TODO: russian roulette
 }

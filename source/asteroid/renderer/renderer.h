@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <filesystem>
 #include "glm/glm.hpp"
 #include "asteroid/app/image.h"
 #include "asteroid/renderer/scene.h"
@@ -16,6 +17,8 @@ public:
     void onResize(const glm::ivec2& resolution);
 
     void render(const Scene& scene, const Camera& camera);
+
+    void save(const std::filesystem::path& path);
 
     [[nodiscard]] std::shared_ptr<Image> getFinalImage() const { return m_finalImage; }
 

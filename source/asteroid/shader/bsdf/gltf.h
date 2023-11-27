@@ -35,7 +35,7 @@ __device__ float D_GGX(float NdotH, float alpha)
 __device__ void evalGltf(const glm::vec3& v,
                          const glm::vec3& n,
                          const Material& mat,
-                         BsdfSample& bsdfSample)
+                         ScatterSample& bsdfSample)
 {
     auto alpha = mat.roughness * mat.roughness;
     auto f0 = glm::mix(glm::vec3(0.04f), mat.baseColor, mat.metallic);
@@ -78,7 +78,7 @@ __device__ void sampleGltf(const glm::vec3& v,
                            const glm::vec3& n,
                            const Material& mtl,
                            LCG<16>& rng,
-                           BsdfSample& bsdfSample)
+                           ScatterSample& bsdfSample)
 {
     auto transform = onb(n);
 
