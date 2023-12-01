@@ -6,7 +6,9 @@
 #include "asteroid/renderer/scene_struct.h"
 #include "asteroid/shader/struct.h"
 #include "asteroid/shader/sampling.h"
-#include "asteroid/shader/bsdf/lambert.h"
+#include "asteroid/shader/bsdf/diffuse.h"
+#include "asteroid/shader/bsdf/conductor.h"
+#include "asteroid/shader/bsdf/dielectric.h"
 #include "asteroid/shader/bsdf/gltf.h"
 #include "asteroid/shader/ray_trace/traversal.h"
 

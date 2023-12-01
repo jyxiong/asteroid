@@ -48,6 +48,7 @@ struct Material
 
     float roughness = 1.0f;
     float metallic = 0.0f;
+    float ior = 1.5f;
 };
 
 enum class GeometryType
