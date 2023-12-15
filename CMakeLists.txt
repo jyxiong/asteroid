@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(asteroid LANGUAGES CXX CUDA)
+project(asteroid LANGUAGES C CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -9,6 +9,10 @@ if (MSVC)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler=/wd4819")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:MSVCRT")
+endif()
+
+if (UNIX)
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -diag-suppress=1675")
 endif()
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda")

@@ -35,3 +35,5 @@ __device__ float fresnel(const glm::vec3& v, const glm::vec3& n, float ior)
     return (rParl * rParl + rPerp * rPerp) / 2.0f;
 
 }
+
+} // namespace Asteroid

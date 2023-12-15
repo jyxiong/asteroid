@@ -32,7 +32,7 @@ void Application::Run()
     {
         auto time = (float) glfwGetTime();
         m_FrameTime = time - m_LastFrameTime;
-        m_TimeStep = min(m_FrameTime, 0.0333f);
+        m_TimeStep = std::min(m_FrameTime, 0.0333f);
         m_LastFrameTime = time;
 
         // update

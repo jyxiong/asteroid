@@ -28,8 +28,12 @@ target_precompile_headers(asteroid PUBLIC astpch.h)
 target_compile_definitions(asteroid PUBLIC
     GLFW_INCLUDE_NONE
     STB_IMAGE_IMPLEMENTATION
-    AST_PLATFORM_WINDOWS
     AST_ENABLE_ASSERTS)
+
+if (WIN32)
+    target_compile_definitions(asteroid PUBLIC
+        AST_PLATFORM_WINDOWS)
+endif()
 
 set_target_properties(asteroid PROPERTIES
     CUDA_SEPARABLE_COMPILATION ON
